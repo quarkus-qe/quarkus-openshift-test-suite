@@ -1,0 +1,13 @@
+quarkus:
+  application:
+    name: test-http
+  http:
+    root-path: /api
+kubernetes:
+  deployment:
+    target: openshift
+openshift:
+  expose: true
+s2i:
+  # tag must be present for now, see https://github.com/dekorateio/dekorate/pull/441
+  builder-image: registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift:latest
