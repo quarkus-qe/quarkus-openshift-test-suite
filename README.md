@@ -60,6 +60,8 @@ OpenShift tests should be named `*OpenShiftIT` and be executed by Failsafe.
 > Quarkus typically usurps the `*IT` suffix for native tests.
 > In my opinion, this is wrong.
 > We don't have native tests here yet, but when we do, I propose it's a dedicated Failsafe execution and test classes are named `*TestNative`.
+> In any case, the OpenShift tests _must_ be executed by Failsafe, because the test framework expects the application to be already built.
+> (In other words, the tests must run after `mvn package`, which is when OpenShift resources for deploying the application are created.)
 
 The test class should be annotated with `@OpenShiftTest`:
 
@@ -103,11 +105,13 @@ public class HelloOpenShiftIT {
 }
 ```
 
+### Dependency injection
+
 For more complex test scenarios, you can obtain some useful objects by annotating a test instance field or a test method parameter with `@TestResource`:
 
 ```java
 @OpenShiftTest
-public class ExampleResourceOpenShiftIT {
+public class HelloOpenShiftIT {
     @TestResource
     private OpenShiftClient oc;
 
@@ -124,6 +128,24 @@ The full set of objects that you can inject is:
 
 - `OpenShiftClient`: the Fabric8 Kubernetes client, in default configuration
 - `AppMetadata`: provides convenient access to data collected in `target/app-metadata.properties`
+- `AwaitUtil`: utility to wait for some OpenShift resources
+- `OpenShiftUtil`: utility to perform higher-level actions on some OpenShift resources
+
+### Deploying additional resources
+
+The test application might require additional OpenShift resources to be deployed, such as ConfigMaps or other applications.
+To do that, you can use the `@AdditionalResources` annotation:
+
+```java
+@OpenShiftTest
+@AdditionalResources("classpath:configmap.yaml")
+public class HelloOpenShiftIT {
+    ...
+}
+```
+
+These resources are deployed _before_ the test application is deployed, and are also undeployed _after_ the test application is undeployed.
+This annotation is `@Repeatable`, so you can include it more than once.
 
 ### TODO
 
@@ -136,9 +158,6 @@ The most interesting probably are:
   We could support S2I-less deployments relatively easily (would currently require Docker to be installed, but Docker-less builds are being prototyped).
   Supporting S2I source builds is more complex, as you need the application source stored in some Git repo, and when you're working on the test suite, you want your local changes, not something out there on GitHub.
 - To be able to customize URL path for route awaiting.
-- To be able to deploy additional resources before the application.
-  I can see a `@Repeatable` annotation called e.g. `@AdditionalResources` whose `value` would be a URL to some YAML file that would be deployed.
-  As a special case, we would handle the `classpath:` prefix and load the denoted classloader resource.
 - To be able to cleanup the project before running the test.
   Could be just a simple annotation `@CleanupProject` added on the test class.
 - To be able to run tests in an ephemeral namespace.

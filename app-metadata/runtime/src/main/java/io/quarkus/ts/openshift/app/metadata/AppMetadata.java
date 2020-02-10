@@ -10,9 +10,29 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
+/**
+ * Useful information about the test application.
+ * @see #appName
+ * @see #httpRoot
+ * @see #knownEndpoint
+ */
 public final class AppMetadata {
+    /**
+     * Name of the application.
+     * If not customized via {@code quarkus.application.name}, defaults to the name of the artifact.
+     */
     public final String appName;
+    /**
+     * Root path for the HTTP endpoints exposed by the application.
+     * If not customized via {@code quarkus.http.root-path}, defaults to {@code /}.
+     */
     public final String httpRoot;
+    /**
+     * URL path to some known endpoint that the application exposes.
+     * If the application provides a readiness probe, its path is used.
+     * Otherwise, if the application provides a liveness probe, its path is used.
+     * Otherwise, {@code /} is used.
+     */
     public final String knownEndpoint;
 
     public AppMetadata(String appName, String httpRoot, String knownEndpoint) {
