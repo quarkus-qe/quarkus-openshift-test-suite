@@ -178,3 +178,8 @@ The main difference is that there's no S2I in Kubernetes, so we'd have to do the
 
 A smoke test, really.
 Verifies that you can deploy a simple HTTP endpoint to OpenShift and access it.
+
+### `configmap`
+
+Checks that the application can read configuration from a ConfigMap.
+The ConfigMap is exposed by mounting it into the container file system.

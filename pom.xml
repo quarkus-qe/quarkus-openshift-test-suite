@@ -17,6 +17,7 @@
         <module>common</module>
 
         <module>http</module>
+        <module>configmap</module>
     </modules>
 
     <properties>
