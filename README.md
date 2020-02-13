@@ -1,8 +1,16 @@
 # Quarkus OpenShift Test Suite
 
-For running the tests, it is expected that the user is logged into an OpenShift project (`oc login ...`).
-All tests will run in that project, so it should be empty.
-For local usage, Minishift is recommended.
+For running the tests, it is expected that the user is logged into an OpenShift project:
+- with OpenShift 4, run `oc login https://api.<cluster name>.<domain>:6443`
+- with Minishift (which provides OpenShift 3.11), run something like `oc login https://192.168.99.100:8443`
+
+To verify that you're logged into correct project, you can run `oc whoami` and `oc project`.
+
+All tests will run in the project you're logged into, so it should be empty.
+If there are resources deployed in the project, you should not expect they will survive.
+
+Running the tests amounts to standard `mvn clean verify`.
+If the test suite depends on Quarkus `999-SNAPSHOT` (it does currently), make sure you have built Quarkus locally prior to running the tests.
 
 ## Test Framework
 
