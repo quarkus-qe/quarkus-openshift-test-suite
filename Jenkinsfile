@@ -7,6 +7,11 @@ pipeline {
     }
     agent { label 'ocp_executor' }
     stages {
+        stage('Login') {
+            steps {
+                sh "oc login ${OCP_CLUSTER_URL}  --username=${OCP_USER} --password=${OCP_PASS}"
+            }
+        }
         stage('Run tests') {
             steps {
                 sh "./mvnw clean verify -Dversion.quarkus=${QUARKUS_VERSION}"
