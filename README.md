@@ -6,6 +6,9 @@ For running the tests, it is expected that the user is logged into an OpenShift 
 
 To verify that you're logged into correct project, you can run `oc whoami` and `oc project`.
 
+If you don't have a project, use `oc new-project ...` to create one.
+Alternatively, see _Running tests in ephemeral namespaces_ below.
+
 All tests will run in the project you're logged into, so it should be empty.
 If there are resources deployed in the project, you should not expect they will survive.
 
@@ -156,6 +159,24 @@ public class HelloOpenShiftIT {
 These resources are deployed _before_ the test application is deployed, and are also undeployed _after_ the test application is undeployed.
 This annotation is `@Repeatable`, so you can include it more than once.
 
+### Running tests in ephemeral namespaces
+
+By default, the test framework expects that the user is logged into an OpenShift project, and that project is used for all tests.
+
+If you start the tests with `-Dts.use-ephemeral-namespaces`, the test framework will create an ephemeral namespace for each test.
+After the test is finished, the ephemeral namespace is automatically dropped.
+
+The ephemeral namespaces are named `ts-<unique suffix>`, where the unique suffix is 10 random `a-z` characters.
+
+### Retaining resources on failure
+
+When the test finishes, all deployed resources are deleted.
+Sometimes, that's not what you want: if the test fails, you might want all the OpenShift resources to stay intact, so that you can investigate the problem.
+To do that, run the tests with `-Dts.retain-on-failure`.
+
+This works with and without ephemeral namespaces, but note that if you're not using ephemeral namespaces, all the tests run in a single namespace.
+In such case, when you enable retaining resources on test failure, it's best to only run a single test.
+
 ### TODO
 
 There's a lot of possible improvements that haven't been implemented yet.
@@ -169,8 +190,6 @@ The most interesting probably are:
 - To be able to customize URL path for route awaiting.
 - To be able to cleanup the project before running the test.
   Could be just a simple annotation `@CleanupProject` added on the test class.
-- To be able to run tests in an ephemeral namespace.
-  That would probably imply `@CleanupProject` (see above) for each test.
 - To be able to inject more resources automatically.
   For example, `URI` or `URL` of the application, or the OpenShift objects corresponding to the application (such as `DeploymentConfig`, `Service`, `Route`, or even `Pod` if there's only one).
 - To be able to configure the connection to OpenShift cluster (that is, how `OpenShiftClient` is created).

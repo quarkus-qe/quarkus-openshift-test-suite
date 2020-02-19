@@ -14,13 +14,15 @@ import static org.fusesource.jansi.Ansi.ansi;
 final class AdditionalResourcesDeployed implements CloseableResource {
     private final String url;
     private final Path file;
+    private final TestsStatus testsStatus;
 
-    private AdditionalResourcesDeployed(String url, Path file) {
+    private AdditionalResourcesDeployed(String url, Path file, TestsStatus testsStatus) {
         this.url = url;
         this.file = file;
+        this.testsStatus = testsStatus;
     }
 
-    static AdditionalResourcesDeployed deploy(AdditionalResources annotation) throws IOException, InterruptedException {
+    static AdditionalResourcesDeployed deploy(AdditionalResources annotation, TestsStatus testsStatus) throws IOException, InterruptedException {
         String url = annotation.value();
 
         InputStream resources;
@@ -36,11 +38,15 @@ final class AdditionalResourcesDeployed implements CloseableResource {
         System.out.println(ansi().a("deploying ").fgYellow().a(url).reset());
         new Command("oc apply", "oc", "apply", "-f", tempFile.toString()).runAndWait();
 
-        return new AdditionalResourcesDeployed(url, tempFile);
+        return new AdditionalResourcesDeployed(url, tempFile, testsStatus);
     }
 
     @Override
     public void close() throws Throwable {
+        if (RetainOnFailure.isEnabled() && testsStatus.failed) {
+            return;
+        }
+
         System.out.println(ansi().a("undeploying ").fgYellow().a(url).reset());
         new Command("oc delete", "oc", "delete", "-f", file.toString(), "--ignore-not-found").runAndWait();
         Files.delete(file);
