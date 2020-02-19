@@ -9,12 +9,12 @@ pipeline {
     stages {
         stage('Login') {
             steps {
-                sh "oc login ${OCP_CLUSTER_URL}  --username=${OCP_USER} --password=${OCP_PASS}"
+                sh "oc login ${OCP_URL}  --username=${OCP_USERNAME} --password=${OCP_PASSWORD}"
             }
         }
         stage('Run tests') {
             steps {
-                sh "./mvnw clean verify -Dversion.quarkus=${QUARKUS_VERSION}"
+                sh "./mvnw clean verify -Dversion.quarkus=${QUARKUS_VERSION} -Dts.use-ephemeral-namespaces"
             }
         }
     }
