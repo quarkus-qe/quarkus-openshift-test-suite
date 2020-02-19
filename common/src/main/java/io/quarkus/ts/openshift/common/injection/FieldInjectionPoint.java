@@ -16,7 +16,6 @@ final class FieldInjectionPoint implements InjectionPoint {
 
     @Override
     public String description() {
-        return "field " + field.getDeclaringClass().getSimpleName() + "." + field.getName()
-                + " of type " + field.getType().getSimpleName();
+        return "field " + field.getDeclaringClass().getSimpleName() + "." + field.getName();
     }
 }

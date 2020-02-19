@@ -52,7 +52,7 @@ public final class OpenShiftUtil {
 
     public void awaitDeploymentReadiness(String deploymentConfigName, int expectedReplicas) {
         System.out.println(ansi().a("waiting for ").fgYellow().a(deploymentConfigName).reset()
-                .a(" to have exactly ").fgYellow().a(expectedReplicas).reset().a(" ready replicas"));
+                .a(" to have exactly ").fgYellow().a(expectedReplicas).reset().a(" ready replica(s)"));
 
         await().atMost(5, TimeUnit.MINUTES).until(() -> {
             // ideally, we'd look at deployment config's status.availableReplicas field,
