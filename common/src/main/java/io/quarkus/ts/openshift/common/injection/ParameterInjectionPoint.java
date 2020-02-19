@@ -18,7 +18,7 @@ final class ParameterInjectionPoint implements InjectionPoint {
     @Override
     public String description() {
         Executable method = parameter.getDeclaringExecutable();
-        return "parameter " + parameter.getName() + " of type " + parameter.getType().getSimpleName()
-                + " in " + method.getDeclaringClass().getSimpleName() + "." + method.getName();
+        return "parameter " + parameter.getName() + " in " + method.getDeclaringClass().getSimpleName()
+                + "." + method.getName();
     }
 }

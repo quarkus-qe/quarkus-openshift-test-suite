@@ -138,6 +138,7 @@ The full set of objects that you can inject is:
 - `AppMetadata`: provides convenient access to data collected in `target/app-metadata.properties`
 - `AwaitUtil`: utility to wait for some OpenShift resources
 - `OpenShiftUtil`: utility to perform higher-level actions on some OpenShift resources
+- `Config`: simple configuration utility for the test suite; currently only reads system properties
 
 ### Deploying additional resources
 

@@ -11,6 +11,7 @@ import java.lang.annotation.Target;
  * <ul>
  *     <li>{@link io.fabric8.openshift.client.OpenShiftClient}</li>
  *     <li>{@link io.quarkus.ts.openshift.app.metadata.AppMetadata}</li>
+ *     <li>{@link io.quarkus.ts.openshift.common.config.Config}</li>
  *     <li>{@link io.quarkus.ts.openshift.common.util.AwaitUtil}</li>
  *     <li>{@link io.quarkus.ts.openshift.common.util.OpenShiftUtil}</li>
  * </ul>

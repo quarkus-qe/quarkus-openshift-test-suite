@@ -3,6 +3,7 @@ package io.quarkus.ts.openshift.common;
 import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.quarkus.ts.openshift.app.metadata.AppMetadata;
+import io.quarkus.ts.openshift.common.config.Config;
 import io.quarkus.ts.openshift.common.injection.InjectionPoint;
 import io.quarkus.ts.openshift.common.injection.TestResource;
 import io.quarkus.ts.openshift.common.util.AwaitUtil;
@@ -162,7 +163,6 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
         }
     }
 
-
     @Override
     public boolean supportsParameter(ParameterContext parameter, ExtensionContext context) throws ParameterResolutionException {
         return parameter.isAnnotated(TestResource.class);
@@ -187,8 +187,11 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
             return getAwaitUtil(context);
         } else if (OpenShiftUtil.class.equals(injectionPoint.type())) {
             return getOpenShiftUtil(context);
+        } else if (Config.class.equals(injectionPoint.type())) {
+            return Config.get();
         } else {
-            throw new OpenShiftTestException("Unsupported type for @TestResource " + injectionPoint.description());
+            throw new OpenShiftTestException("Unsupported type " + injectionPoint.type().getSimpleName()
+                    + " for @TestResource " + injectionPoint.description());
         }
     }
 }

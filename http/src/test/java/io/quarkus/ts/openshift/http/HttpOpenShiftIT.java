@@ -7,7 +7,7 @@ import static io.restassured.RestAssured.when;
 import static org.hamcrest.CoreMatchers.is;
 
 @OpenShiftTest
-public class HelloOpenShiftIT {
+public class HttpOpenShiftIT {
     @Test
     public void hello() {
         when()
