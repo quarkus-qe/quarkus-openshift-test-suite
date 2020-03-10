@@ -18,8 +18,9 @@ import java.util.stream.Collectors;
  */
 public final class AppMetadata {
     /**
-     * Name of the application.
-     * If not customized via {@code quarkus.application.name}, defaults to the name of the artifact.
+     * Name of the application, which is used as the name of Kubernetes resources.
+     * If not customized via {@code quarkus.application.name} or {@code quarkus.container-image.name},
+     * defaults to the name of the artifact.
      */
     public final String appName;
     /**

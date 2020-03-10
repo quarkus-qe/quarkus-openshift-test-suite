@@ -98,17 +98,17 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
 
         Path openshiftResources = getResourcesYaml();
         if (!Files.exists(openshiftResources)) {
-            throw new OpenShiftTestException("Missing " + openshiftResources + ", did you add the quarkus-kubernetes extension?");
+            throw new OpenShiftTestException("Missing " + openshiftResources + ", did you add the quarkus-kubernetes or quarkus-openshift extension?");
         }
 
         deployAdditionalResources(context);
 
         System.out.println("deploying application");
-        new Command("oc apply", "oc", "apply", "-f", openshiftResources.toString()).runAndWait();
+        new Command("oc", "apply", "-f", openshiftResources.toString()).runAndWait();
 
         awaitImageStreams(context);
 
-        new Command("oc start-build", "oc", "start-build", metadata.appName, "--from-dir=target", "--follow").runAndWait();
+        new Command("oc", "start-build", metadata.appName, "--from-dir=target", "--follow").runAndWait();
 
         setUpRestAssured(context);
 
@@ -121,7 +121,7 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
             getStore(context).put(EphemeralNamespace.class.getName(), namespace);
 
             System.out.println(ansi().a("using ephemeral namespace ").fgYellow().a(namespace.name).reset());
-            new Command("oc new-project", "oc", "new-project", namespace.name).runAndWait();
+            new Command("oc", "new-project", namespace.name).runAndWait();
         }
     }
 
@@ -164,7 +164,7 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
         AppMetadata metadata = getAppMetadata(context);
         Route route = oc.routes().withName(metadata.appName).get();
         if (route == null) {
-            throw new OpenShiftTestException("Missing route " + metadata.appName + ", did you set openshift.expose=true?");
+            throw new OpenShiftTestException("Missing route " + metadata.appName + ", did you set quarkus.openshift.expose=true?");
         }
         if (route.getSpec().getTls() != null) {
             RestAssured.useRelaxedHTTPSValidation();
@@ -199,7 +199,7 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
 
         if (shouldUndeployApplication) {
             System.out.println("undeploying application");
-            new Command("oc delete", "oc", "delete", "-f", getResourcesYaml().toString(), "--ignore-not-found").runAndWait();
+            new Command("oc", "delete", "-f", getResourcesYaml().toString(), "--ignore-not-found").runAndWait();
         }
 
         dropEphemeralNamespaceIfNecessary(context);
@@ -215,7 +215,7 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
                         .a(" intact"));
             } else {
                 System.out.println(ansi().a("dropping ephemeral namespace ").fgYellow().a(ephemeralNamespace.name).reset());
-                new Command("oc delete", "oc", "delete", "project", ephemeralNamespace.name).runAndWait();
+                new Command("oc", "delete", "project", ephemeralNamespace.name).runAndWait();
             }
         }
     }

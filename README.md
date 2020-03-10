@@ -88,8 +88,7 @@ public class HelloOpenShiftIT {
 
 This will make sure that OpenShift resources are deployed before this test class is executed, and also undeployed after this test class is executed.
 It is expected that a YAML file with a complete list of OpenShift resources to deploy the application is present in `target/kubernetes/openshift.yml`.
-This is what the Quarkus Kubernetes extension does, when configured correctly.
-See [its documentation](https://quarkus.io/guides/kubernetes).
+This is what the [Quarkus Kubernetes](https://quarkus.io/guides/kubernetes) extension (or the [Quarkus OpenShift](https://quarkus.io/guides/openshift) extension) does, when configured correctly.
 
 After the application is deployed, the application's route is awaited.
 If there's a readiness probe, it is used, otherwise a liveness probe is used if it exists; if there's no health probe, the root path `/` is awaited.
@@ -184,7 +183,7 @@ The most interesting probably are:
 
 - To be able to customize where the `openshift.yml` file is loaded from.
   Or, more generally, to be able to customize the test application deployment.
-  Currently, we support binary S2I builds, with the expectation that `quarkus-kubernetes` is used.
+  Currently, we support binary S2I builds, with the expectation that `quarkus-kubernetes` (or `quarkus-openshift`) is used.
   We could support S2I-less deployments relatively easily (would currently require Docker to be installed, but Docker-less builds are being prototyped).
   Supporting S2I source builds is more complex, as you need the application source stored in some Git repo, and when you're working on the test suite, you want your local changes, not something out there on GitHub.
 - To be able to customize URL path for route awaiting.

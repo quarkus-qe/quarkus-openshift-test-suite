@@ -25,8 +25,6 @@ final class EphemeralNamespace {
 
     final String name;
 
-    boolean shouldBeRetained;
-
     private EphemeralNamespace(String name) {
         this.name = name;
     }

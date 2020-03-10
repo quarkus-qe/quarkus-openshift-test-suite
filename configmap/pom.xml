@@ -19,7 +19,7 @@
     <dependencies>
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-kubernetes</artifactId>
+            <artifactId>quarkus-openshift</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>

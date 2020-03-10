@@ -36,7 +36,7 @@ final class AdditionalResourcesDeployed implements CloseableResource {
         Files.copy(resources, tempFile, StandardCopyOption.REPLACE_EXISTING);
 
         System.out.println(ansi().a("deploying ").fgYellow().a(url).reset());
-        new Command("oc apply", "oc", "apply", "-f", tempFile.toString()).runAndWait();
+        new Command("oc", "apply", "-f", tempFile.toString()).runAndWait();
 
         return new AdditionalResourcesDeployed(url, tempFile, testsStatus);
     }
@@ -48,7 +48,7 @@ final class AdditionalResourcesDeployed implements CloseableResource {
         }
 
         System.out.println(ansi().a("undeploying ").fgYellow().a(url).reset());
-        new Command("oc delete", "oc", "delete", "-f", file.toString(), "--ignore-not-found").runAndWait();
+        new Command("oc", "delete", "-f", file.toString(), "--ignore-not-found").runAndWait();
         Files.delete(file);
     }
 }
