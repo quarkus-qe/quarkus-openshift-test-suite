@@ -13,13 +13,20 @@ public class Command {
     private final String description;
     private final List<String> command;
 
-    public Command(String description, String... command) {
-        this(description, Arrays.asList(command));
+    public Command(String... command) {
+        this(Arrays.asList(command));
     }
 
-    public Command(String description, List<String> command) {
-        this.description = description;
+    public Command(List<String> command) {
+        this.description = descriptionOfProgram(command.get(0));
         this.command = command;
+    }
+
+    private static String descriptionOfProgram(String program) {
+        if (program.contains(File.separator)) {
+            return program.substring(program.lastIndexOf(File.separator) + 1);
+        }
+        return program;
     }
 
     public void runAndWait() throws IOException, InterruptedException {

@@ -17,6 +17,14 @@
     <name>Quarkus OpenShift TS: HTTP</name>
 
     <dependencies>
+        <!--
+          - in this test, we use quarkus-kubernetes directly, to have some coverage
+          - in other tests, we use quarkus-openshift, because it simplifies the setup a bit
+          -->
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-container-image-s2i</artifactId>
+        </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-kubernetes</artifactId>

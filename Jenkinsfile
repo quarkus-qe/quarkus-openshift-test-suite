@@ -1,6 +1,6 @@
 pipeline {
     environment {
-        QUARKUS_VERSION = '1.3.0.Alpha2'
+        QUARKUS_VERSION = '1.3.0.CR2'
     }
     options {
         ansiColor("xterm")

@@ -36,7 +36,7 @@
 
         <dependency>
             <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-core-deployment</artifactId>
+            <artifactId>quarkus-container-image-spi</artifactId>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>

@@ -1,8 +1,8 @@
 package io.quarkus.ts.openshift.app.metadata;
 
+import io.quarkus.container.spi.ContainerImageInfoBuildItem;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
-import io.quarkus.deployment.builditem.ApplicationInfoBuildItem;
 import io.quarkus.deployment.builditem.GeneratedFileSystemResourceBuildItem;
 import io.quarkus.kubernetes.spi.KubernetesHealthLivenessPathBuildItem;
 import io.quarkus.kubernetes.spi.KubernetesHealthReadinessPathBuildItem;
@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public class AppMetadataCollector {
     @BuildStep
-    public void collectAppMetadata(ApplicationInfoBuildItem app,
+    public void collectAppMetadata(ContainerImageInfoBuildItem containerImage,
                                    HttpRootPathBuildItem httpRoot,
                                    Optional<KubernetesHealthLivenessPathBuildItem> liveness,
                                    Optional<KubernetesHealthReadinessPathBuildItem> readiness,
@@ -30,7 +30,7 @@ public class AppMetadataCollector {
         }
 
         AppMetadata result = new AppMetadata(
-                app.getName(),
+                containerImage.getName(),
                 httpRoot.getRootPath(),
                 knownEndpoint
         );
