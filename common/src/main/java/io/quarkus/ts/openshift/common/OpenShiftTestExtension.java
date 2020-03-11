@@ -1,5 +1,6 @@
 package io.quarkus.ts.openshift.common;
 
+import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.quarkus.ts.openshift.app.metadata.AppMetadata;
@@ -29,6 +30,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static org.fusesource.jansi.Ansi.ansi;
 import static org.junit.platform.commons.util.AnnotationUtils.findAnnotatedFields;
@@ -106,7 +108,7 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
         System.out.println("deploying application");
         new Command("oc", "apply", "-f", openshiftResources.toString()).runAndWait();
 
-        awaitImageStreams(context);
+        awaitImageStreams(context, openshiftResources);
 
         new Command("oc", "start-build", metadata.appName, "--from-dir=target", "--follow").runAndWait();
 
@@ -145,15 +147,15 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
         }
     }
 
-    private void awaitImageStreams(ExtensionContext context) {
+    private void awaitImageStreams(ExtensionContext context, Path openshiftResources) throws IOException {
         OpenShiftClient oc = getOpenShiftClient(context);
         AppMetadata metadata = getAppMetadata(context);
         AwaitUtil awaitUtil = getAwaitUtil(context);
 
-        oc.imageStreams()
-                .list()
-                .getItems()
+        oc.load(Files.newInputStream(openshiftResources))
+                .get()
                 .stream()
+                .flatMap(it -> it instanceof ImageStream ? Stream.of(it) : Stream.empty())
                 .map(it -> it.getMetadata().getName())
                 .filter(it -> !it.equals(metadata.appName))
                 .forEach(awaitUtil::awaitImageStream);
