@@ -1,5 +1,8 @@
 package io.quarkus.ts.openshift.common;
 
+import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.openshift.client.OpenShiftClient;
+import io.quarkus.ts.openshift.common.util.AwaitUtil;
 import org.junit.jupiter.api.extension.ExtensionContext.Store.CloseableResource;
 
 import java.io.IOException;
@@ -8,6 +11,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 
 import static org.fusesource.jansi.Ansi.ansi;
 
@@ -22,7 +26,8 @@ final class AdditionalResourcesDeployed implements CloseableResource {
         this.testsStatus = testsStatus;
     }
 
-    static AdditionalResourcesDeployed deploy(AdditionalResources annotation, TestsStatus testsStatus) throws IOException, InterruptedException {
+    static AdditionalResourcesDeployed deploy(AdditionalResources annotation, TestsStatus testsStatus,
+                                              OpenShiftClient oc, AwaitUtil awaitUtil) throws IOException, InterruptedException {
         String url = annotation.value();
 
         InputStream resources;
@@ -32,11 +37,14 @@ final class AdditionalResourcesDeployed implements CloseableResource {
         } else {
             resources = new URL(url).openStream();
         }
-        Path tempFile = Files.createTempFile("additional-resources", null);
+        Path tempFile = Files.createTempFile("additional-resources", ".yml");
         Files.copy(resources, tempFile, StandardCopyOption.REPLACE_EXISTING);
 
         System.out.println(ansi().a("deploying ").fgYellow().a(url).reset());
         new Command("oc", "apply", "-f", tempFile.toString()).runAndWait();
+
+        List<HasMetadata> deployedResources = oc.load(Files.newInputStream(tempFile)).get();
+        awaitUtil.awaitReadiness(deployedResources);
 
         return new AdditionalResourcesDeployed(url, tempFile, testsStatus);
     }
