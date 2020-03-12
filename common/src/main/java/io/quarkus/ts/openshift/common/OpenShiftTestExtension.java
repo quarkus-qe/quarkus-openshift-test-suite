@@ -129,12 +129,15 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
 
     private void deployAdditionalResources(ExtensionContext context) throws IOException, InterruptedException {
         TestsStatus testsStatus = getTestsStatus(context);
+        OpenShiftClient oc = getOpenShiftClient(context);
+        AwaitUtil awaitUtil = getAwaitUtil(context);
         Optional<AnnotatedElement> element = context.getElement();
         if (element.isPresent()) {
             AnnotatedElement annotatedElement = element.get();
             AdditionalResources[] annotations = annotatedElement.getAnnotationsByType(AdditionalResources.class);
             for (AdditionalResources additionalResources : annotations) {
-                AdditionalResourcesDeployed deployed = AdditionalResourcesDeployed.deploy(additionalResources, testsStatus);
+                AdditionalResourcesDeployed deployed = AdditionalResourcesDeployed.deploy(additionalResources,
+                        testsStatus, oc, awaitUtil);
 
                 if (EphemeralNamespace.isDisabled()) {
                     // when using ephemeral namespaces, we don't delete additional resources because:
