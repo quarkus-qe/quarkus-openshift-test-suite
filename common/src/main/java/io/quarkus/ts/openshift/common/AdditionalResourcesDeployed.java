@@ -34,6 +34,9 @@ final class AdditionalResourcesDeployed implements CloseableResource {
         if (url.startsWith("classpath:")) {
             String classloaderResource = url.substring("classpath:".length());
             resources = OpenShiftTestExtension.class.getClassLoader().getResourceAsStream(classloaderResource);
+            if (resources == null) {
+                throw new IOException("Not found: " + url);
+            }
         } else {
             resources = new URL(url).openStream();
         }
