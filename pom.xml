@@ -18,6 +18,11 @@
 
         <module>http</module>
         <module>configmap</module>
+        <module>sql-db/app</module>
+        <module>sql-db/postgresql</module>
+        <module>sql-db/mysql</module>
+        <module>sql-db/mariadb</module>
+        <module>sql-db/mssql</module>
     </modules>
 
     <properties>
@@ -30,7 +35,9 @@
 
         <version.awaitility>4.0.2</version.awaitility>
         <version.fusesource-jansi>1.18</version.fusesource-jansi>
+        <version.jandex-maven-plugin>1.0.7</version.jandex-maven-plugin>
         <version.maven-compiler-plugin>3.8.1</version.maven-compiler-plugin>
+        <version.maven-jar-plugin>3.2.0</version.maven-jar-plugin>
         <version.maven-surefire-plugin>2.22.1</version.maven-surefire-plugin>
         <version.quarkus>999-SNAPSHOT</version.quarkus>
     </properties>
@@ -54,6 +61,17 @@
                 <groupId>io.quarkus.ts.openshift</groupId>
                 <artifactId>common</artifactId>
                 <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.quarkus.ts.openshift</groupId>
+                <artifactId>sql-db-app</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.quarkus.ts.openshift</groupId>
+                <artifactId>sql-db-app</artifactId>
+                <version>${project.version}</version>
+                <classifier>tests</classifier>
             </dependency>
 
             <dependency>
@@ -91,6 +109,11 @@
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>${version.maven-jar-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-surefire-plugin</artifactId>
                     <version>${version.maven-surefire-plugin}</version>
                     <configuration>
@@ -111,6 +134,11 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.jboss.jandex</groupId>
+                    <artifactId>jandex-maven-plugin</artifactId>
+                    <version>${version.jandex-maven-plugin}</version>
                 </plugin>
             </plugins>
         </pluginManagement>

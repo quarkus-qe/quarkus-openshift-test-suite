@@ -210,3 +210,25 @@ Verifies that you can deploy a simple HTTP endpoint to OpenShift and access it.
 
 Checks that the application can read configuration from a ConfigMap.
 The ConfigMap is exposed by mounting it into the container file system.
+
+### `sql-db`
+
+Verifies that the application can connect to a SQL database and persist data using Hibernate ORM with Panache.
+The application also uses RESTEasy to expose a RESTful API, Jackson for JSON serialization, and Hibernate Validator to validate inputs.
+There are actually multiple Maven modules in the `sql-db` directory:
+
+- `app`: the main application and the test code; no JDBC drivers (except H2 for unit test)
+- `postgresql`: depends on `app` and the PostgreSQL JDBC driver; produces the PostgreSQL-specific build of the application and runs the OpenShift test with PostgreSQL
+- `mysql`: same for MysQL
+- `mariadb`: same for MariaDB
+- `mssql`: same for MSSQL
+
+All the tests deploy a SQL database directly into OpenShift, alongside the application.
+This might not be recommended for production, but is good enough for test.
+Container images used in the tests are:
+
+- PostgreSQL: `registry.access.redhat.com/rhscl/postgresql-10-rhel7`
+- MySQL: `registry.access.redhat.com/rhscl/mysql-80-rhel7`
+- MariaDB: `registry.access.redhat.com/rhscl/mariadb-102-rhel7`
+  - we don't use MariaDB 10.3 at this point, because that image isn't available without auth, even though it probably should be
+- MSSQL: `mcr.microsoft.com/mssql/rhel/server`
