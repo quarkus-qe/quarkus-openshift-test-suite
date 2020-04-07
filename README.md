@@ -88,7 +88,7 @@ public class HelloOpenShiftIT {
 
 This will make sure that OpenShift resources are deployed before this test class is executed, and also undeployed after this test class is executed.
 It is expected that a YAML file with a complete list of OpenShift resources to deploy the application is present in `target/kubernetes/openshift.yml`.
-This is what the [Quarkus Kubernetes](https://quarkus.io/guides/kubernetes) extension (or the [Quarkus OpenShift](https://quarkus.io/guides/openshift) extension) does, when configured correctly.
+This is what the [Quarkus Kubernetes](https://quarkus.io/guides/kubernetes) extension (or the [Quarkus OpenShift](https://quarkus.io/guides/deploying-to-openshift) extension) does, when configured correctly.
 
 After the application is deployed, the application's route is awaited.
 If there's a readiness probe, it is used, otherwise a liveness probe is used if it exists; if there's no health probe, the root path `/` is awaited.
@@ -244,3 +244,23 @@ Container images used in the tests are:
   - version 10.2: `registry.access.redhat.com/rhscl/mariadb-102-rhel7`
   - version 10.3: `registry.redhat.io/rhscl/mariadb-103-rhel7` (only if `ts.authenticated-registry` is set)
 - MSSQL: `mcr.microsoft.com/mssql/rhel/server`
+
+### `security/basic`
+
+Verifies the simplest way of doing authn/authz.
+Authentication is HTTP `Basic`, with users/passwords/roles defined in `application.properties`.
+Authorization is based on roles, restrictions are defined using common annotations (`@RolesAllowed` etc.).
+
+### `security/jwt`
+
+Verifies token-based authn/authz.
+Authentication is MicroProfile JWT.
+Authorization is based on roles, which are embedded in the token.
+Restrictions are defined using common annotations (`@RolesAllowed` etc.).
+
+### `security/https-1way`
+
+Verifies that accessing an HTTPS endpoint is posible.
+Uses a self-signed certificate generated during the build, so that the test is fully self-contained.
+
+This test doesn't run on OpenShift (yet).

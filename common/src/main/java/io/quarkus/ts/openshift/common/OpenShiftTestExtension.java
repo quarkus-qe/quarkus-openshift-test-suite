@@ -231,7 +231,7 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
     public void beforeEach(ExtensionContext context) {
         System.out.println(ansi().a("---------- running test ")
                 .fgYellow().a(context.getParent().map(ctx -> ctx.getDisplayName() + ".").orElse(""))
-                .a(context.getDisplayName()).reset().a("----------"));
+                .a(context.getDisplayName()).reset().a(" ----------"));
     }
 
     // ---

@@ -7,6 +7,10 @@ import java.util.stream.Collectors;
  * Simple configuration mechanism for the test suite.
  * It currently only reads system properties, and only those that have a prefix of {@code ts.}.
  * In the future, it could possibly read other sources of data.
+ *
+ * @see #getAsBoolean(String, boolean)
+ * @see #getAsInt(String, int)
+ * @see #getAsString(String, String)
  */
 public class Config {
     private static final String PREFIX = "ts.";
@@ -45,7 +49,7 @@ public class Config {
 
     /**
      * Returns an integer config value under given {@code key}.
-     * The {@link Integer#parseInt(String)} is used for conversion from string to int.
+     * The {@link Integer#parseInt(String)} method is used for conversion from string to int.
      * If there's no value under the {@code key}, the {@code defaultValue} is returned instead.
      * Note that the {@code key} must begin with {@code ts.}, the prefix is not handled automatically.
      */

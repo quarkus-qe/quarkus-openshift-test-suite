@@ -23,6 +23,9 @@
         <module>sql-db/mysql</module>
         <module>sql-db/mariadb</module>
         <module>sql-db/mssql</module>
+        <module>security/basic</module>
+        <module>security/jwt</module>
+        <module>security/https-1way</module>
     </modules>
 
     <properties>
@@ -33,9 +36,12 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+        <version.apache-httpclient-fluent>4.5.12</version.apache-httpclient-fluent> <!-- same as Apache HTTP Client managed by Quarkus BOM -->
         <version.awaitility>4.0.2</version.awaitility>
         <version.fusesource-jansi>1.18</version.fusesource-jansi>
         <version.jandex-maven-plugin>1.0.7</version.jandex-maven-plugin>
+        <version.jjwt>0.10.7</version.jjwt>
+        <version.keytool-maven-plugin>1.5</version.keytool-maven-plugin>
         <version.maven-compiler-plugin>3.8.1</version.maven-compiler-plugin>
         <version.maven-jar-plugin>3.2.0</version.maven-jar-plugin>
         <version.maven-surefire-plugin>2.22.1</version.maven-surefire-plugin>
@@ -74,6 +80,26 @@
                 <classifier>tests</classifier>
             </dependency>
 
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-api</artifactId>
+                <version>${version.jjwt}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>${version.jjwt}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId>
+                <version>${version.jjwt}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>fluent-hc</artifactId>
+                <version>${version.apache-httpclient-fluent}</version>
+            </dependency>
             <dependency>
                 <groupId>org.awaitility</groupId>
                 <artifactId>awaitility</artifactId>
@@ -134,6 +160,11 @@
                             </goals>
                         </execution>
                     </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>keytool-maven-plugin</artifactId>
+                    <version>${version.keytool-maven-plugin}</version>
                 </plugin>
                 <plugin>
                     <groupId>org.jboss.jandex</groupId>
