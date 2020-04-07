@@ -19,6 +19,11 @@ public class AppMetadataCollector {
                                    Optional<KubernetesHealthReadinessPathBuildItem> readiness,
                                    BuildProducer<GeneratedFileSystemResourceBuildItem> output) {
 
+        String image = containerImage.getImage();
+        int lastSlash = image.lastIndexOf('/');
+        int lastColon = image.lastIndexOf(':');
+        String appName = image.substring(lastSlash + 1, lastColon);
+
         // paths to Kubernetes probes are already httpRoot-adjusted
         String knownEndpoint;
         if (readiness.isPresent()) {
@@ -30,7 +35,7 @@ public class AppMetadataCollector {
         }
 
         AppMetadata result = new AppMetadata(
-                containerImage.getName(),
+                appName,
                 httpRoot.getRootPath(),
                 knownEndpoint
         );
