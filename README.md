@@ -176,6 +176,14 @@ To do that, run the tests with `-Dts.retain-on-failure`.
 This works with and without ephemeral namespaces, but note that if you're not using ephemeral namespaces, all the tests run in a single namespace.
 In such case, when you enable retaining resources on test failure, it's best to only run a single test.
 
+### Enabling/disabling tests
+
+The `@OnlyIfConfigured` annotation can be used to selectively enable/disable execution of tests based on a configuration property.
+
+This can be used for example to disable tests that require access to authenticated registry.
+The tests that do require such access are annotated `@OnlyIfConfigured("ts.authenticated-registry")` and are not executed by default.
+When executing tests against an OpenShift cluster that has configured access to the authenticated registry, you just run the tests with `-Dts.authenticated-registry` and the tests will be executed.
+
 ### TODO
 
 There's a lot of possible improvements that haven't been implemented yet.
@@ -227,8 +235,12 @@ All the tests deploy a SQL database directly into OpenShift, alongside the appli
 This might not be recommended for production, but is good enough for test.
 Container images used in the tests are:
 
-- PostgreSQL: `registry.access.redhat.com/rhscl/postgresql-10-rhel7`
-- MySQL: `registry.access.redhat.com/rhscl/mysql-80-rhel7`
-- MariaDB: `registry.access.redhat.com/rhscl/mariadb-102-rhel7`
-  - we don't use MariaDB 10.3 at this point, because that image isn't available without auth, even though it probably should be
+- PostgreSQL:
+  - version 10: `registry.access.redhat.com/rhscl/postgresql-10-rhel7`
+  - version 12: `registry.redhat.io/rhscl/postgresql-12-rhel7` (only if `ts.authenticated-registry` is set)
+- MySQL:
+  - version 8.0: `registry.access.redhat.com/rhscl/mysql-80-rhel7`
+- MariaDB:
+  - version 10.2: `registry.access.redhat.com/rhscl/mariadb-102-rhel7`
+  - version 10.3: `registry.redhat.io/rhscl/mariadb-103-rhel7` (only if `ts.authenticated-registry` is set)
 - MSSQL: `mcr.microsoft.com/mssql/rhel/server`

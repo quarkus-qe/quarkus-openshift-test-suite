@@ -29,6 +29,9 @@ import java.lang.annotation.Target;
  * The {@link AdditionalResources @AdditionalResources} annotation can be used to deploy
  * additional OpenShift resources before the test application is deployed. These resources
  * are automatically undeployed after the test application is undeployed.
+ * <p>
+ * The {@link OnlyIfConfigured @OnlyIfConfigured} annotation can be used to selectively
+ * enable/disable execution of tests based on a configuration property.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
