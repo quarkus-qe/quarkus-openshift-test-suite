@@ -26,6 +26,9 @@ import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 import java.io.IOException;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -105,6 +108,8 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
 
         deployAdditionalResources(context);
 
+        beforeApplicationDeployment(context);
+
         System.out.println("deploying application");
         new Command("oc", "apply", "-f", openshiftResources.toString()).runAndWait();
 
@@ -148,6 +153,34 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
                 }
             }
         }
+    }
+
+    private void beforeApplicationDeployment(ExtensionContext context) throws Exception {
+        for (Method method : context.getRequiredTestClass().getMethods()) {
+            if (method.getAnnotation(BeforeApplicationDeployment.class) != null) {
+                if (!isPublicStaticVoid(method)) {
+                    throw new OpenShiftTestException("@" + BeforeApplicationDeployment.class.getSimpleName()
+                            + " method " + method.getDeclaringClass().getSimpleName() + "." + method.getName()
+                            + " must be public static void");
+                }
+
+                Parameter[] parameters = method.getParameters();
+                Object[] arguments = new Object[parameters.length];
+                for (int i = 0; i < parameters.length; i++) {
+                    Parameter parameter = parameters[i];
+                    InjectionPoint injectionPoint = InjectionPoint.forParameter(parameter);
+                    arguments[i] = valueFor(injectionPoint, context);
+                }
+
+                method.invoke(null, arguments);
+            }
+        }
+    }
+
+    private static boolean isPublicStaticVoid(Method method) {
+        return Modifier.isPublic(method.getModifiers())
+                && Modifier.isStatic(method.getModifiers())
+                && Void.TYPE.equals(method.getReturnType());
     }
 
     private void awaitImageStreams(ExtensionContext context, Path openshiftResources) throws IOException {

@@ -25,6 +25,8 @@
         <module>sql-db/mssql</module>
         <module>security/basic</module>
         <module>security/jwt</module>
+        <module>security/keycloak</module>
+        <module>security/keycloak-authz</module>
         <module>security/https-1way</module>
     </modules>
 

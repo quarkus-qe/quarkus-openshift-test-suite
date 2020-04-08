@@ -253,10 +253,27 @@ Authorization is based on roles, restrictions are defined using common annotatio
 
 ### `security/jwt`
 
-Verifies token-based authn/authz.
-Authentication is MicroProfile JWT.
+Verifies token-based authn and role-based authz.
+Authentication is MicroProfile JWT, and tokens are issued manually in the test.
 Authorization is based on roles, which are embedded in the token.
 Restrictions are defined using common annotations (`@RolesAllowed` etc.).
+
+### `security/keycloak`
+
+Verifies token-based authn and role-based authz.
+Authentication is OIDC, and Keycloak is used for issuing and verifying tokens.
+Authorization is based on roles, which are embedded in the token.
+Restrictions are defined using common annotations (`@RolesAllowed` etc.).
+
+A simple Keycloak realm with 1 client (protected application), 2 users and 2 roles is provided in `test-realm.json`.
+
+### `security/keycloak-authz`
+
+Verifies token-based authn and URL-based authz.
+Authentication is OIDC, and Keycloak is used for issuing and verifying tokens.
+Authorization is based on URL patterns, and Keycloak is used for defining and enforcing restrictions.
+
+A simple Keycloak realm with 1 client (protected application), 2 users, 2 roles and 2 protected resources is provided in `test-realm.json`.
 
 ### `security/https-1way`
 
