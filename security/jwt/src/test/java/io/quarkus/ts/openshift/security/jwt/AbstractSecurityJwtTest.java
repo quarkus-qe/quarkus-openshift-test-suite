@@ -3,6 +3,7 @@ package io.quarkus.ts.openshift.security.jwt;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.restassured.http.ContentType;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -362,6 +363,7 @@ public abstract class AbstractSecurityJwtTest {
     }
 
     @Test
+    @Disabled("until we properly fix clock skew in our infrastructure")
     public void tokenExpirationGracePeriod() throws IOException, GeneralSecurityException {
         Supplier<Date> clock = () -> {
             Date now = new Date();
