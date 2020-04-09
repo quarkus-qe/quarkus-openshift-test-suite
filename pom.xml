@@ -28,6 +28,7 @@
         <module>security/keycloak</module>
         <module>security/keycloak-authz</module>
         <module>security/https-1way</module>
+        <module>security/https-2way</module>
     </modules>
 
     <properties>

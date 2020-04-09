@@ -21,7 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @QuarkusTest
-public class HelloTest {
+public class SecurityHttps1wayTest {
     // not using RestAssured because we want 100% control over certificate & hostname verification
 
     @TestHTTPResource(value = "/hello", ssl = true)

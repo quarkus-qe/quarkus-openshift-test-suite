@@ -281,3 +281,11 @@ Verifies that accessing an HTTPS endpoint is posible.
 Uses a self-signed certificate generated during the build, so that the test is fully self-contained.
 
 This test doesn't run on OpenShift (yet).
+
+### `security/https-2way`
+
+Verifies that accessing an HTTPS endpoint with client certificate is posible.
+The client certificate is required in this test.
+Uses self-signed certificates generated during the build, so that the test is fully self-contained.
+
+This test doesn't run on OpenShift (yet).
