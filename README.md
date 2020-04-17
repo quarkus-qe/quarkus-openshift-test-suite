@@ -15,6 +15,11 @@ If there are resources deployed in the project, you should not expect they will 
 Running the tests amounts to standard `mvn clean verify`.
 If the test suite depends on Quarkus `999-SNAPSHOT` (it does currently), make sure you have built Quarkus locally prior to running the tests.
 
+All the tests currently use the RHEL 7 OpenJDK 11 image.
+This is configured in the `application.properties` file in each module.
+Since this is standard Quarkus configuration, it's possible to override using a system property.
+Therefore, if you want to run the tests with a different Java S2I image, run `mvn clean verify -Dquarkus.s2i.base-jvm-image=...`.
+
 ## Test Framework
 
 The `app-metadata` and `common` directories contain a tiny framework for testing Quarkus applications on OpenShift.
