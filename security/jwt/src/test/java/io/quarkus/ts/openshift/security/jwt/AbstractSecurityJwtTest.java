@@ -363,7 +363,6 @@ public abstract class AbstractSecurityJwtTest {
     }
 
     @Test
-    @Disabled("until we properly fix clock skew in our infrastructure")
     public void tokenExpirationGracePeriod() throws IOException, GeneralSecurityException {
         Supplier<Date> clock = () -> {
             Date now = new Date();
