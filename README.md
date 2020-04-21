@@ -294,3 +294,19 @@ The client certificate is required in this test.
 Uses self-signed certificates generated during the build, so that the test is fully self-contained.
 
 This test doesn't run on OpenShift (yet).
+
+### `microprofile`
+
+Verifies combined usage of MicroProfile RestClient, Fault Tolerance and OpenTracing.
+
+The test hits a "client" endpoint, which uses RestClient to invoke a "hello" endpoint.
+The response is then modified in the "client" endpoint and returned back to the test.
+The RestClient interface uses Fault Tolerance to guard against the "hello" endpoint errors.
+It is possible to enable/disable the "hello" endpoint, which controls whether Fault Tolerance is used or not.
+
+All HTTP endpoints and internal processing is asynchronous, so Context Propagation is also required.
+JAX-RS endpoints and RestClient calls are automatically traced with OpenTracing, and some additional logging into the OpenTracing spans is also done.
+Jaeger is deployed in an "all-in-one" configuration, and the OpenShift test verifies the stored traces.
+
+Note that the Fault Tolerance annotations are currently commented out, because of https://github.com/quarkusio/quarkus/issues/8650.
+This is a RESTEasy bug, there is a proposed fix: https://github.com/resteasy/Resteasy/pull/2359
