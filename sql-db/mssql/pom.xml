@@ -36,18 +36,6 @@
             <groupId>io.quarkus.ts.openshift</groupId>
             <artifactId>common</artifactId>
             <scope>test</scope>
-            <exclusions>
-                <exclusion>
-                    <!--
-                      - because Panache puts @XmlTransient on entity fields,
-                      - causing Jackson to completely ignore such properties,
-                      - even if a getter is present :-/
-                      - https://github.com/quarkusio/quarkus/issues/7879
-                      -->
-                    <groupId>com.fasterxml.jackson.module</groupId>
-                    <artifactId>jackson-module-jaxb-annotations</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.quarkus.ts.openshift</groupId>
