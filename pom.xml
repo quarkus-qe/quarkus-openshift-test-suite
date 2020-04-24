@@ -178,4 +178,14 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <profiles>
+        <profile>
+            <id>source-to-image</id>
+            <modules>
+                <module>todo-demo-app</module>
+            </modules>
+        </profile>
+    </profiles>
+
 </project>
