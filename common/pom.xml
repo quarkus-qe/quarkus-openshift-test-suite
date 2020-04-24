@@ -22,6 +22,11 @@
             <artifactId>openshift-client</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-builder</artifactId>
+            <version>${version.quarkus}</version>
+        </dependency>
+        <dependency>
             <groupId>io.quarkus.ts.openshift</groupId>
             <artifactId>app-metadata</artifactId>
         </dependency>

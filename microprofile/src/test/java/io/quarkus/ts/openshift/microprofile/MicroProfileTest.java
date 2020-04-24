@@ -1,12 +1,9 @@
 package io.quarkus.ts.openshift.microprofile;
 
 import io.quarkus.test.junit.QuarkusTest;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
-
-import static io.restassured.RestAssured.when;
-import static org.hamcrest.CoreMatchers.is;
+import io.quarkus.ts.openshift.common.DisabledOnQuarkus;
 
 @QuarkusTest
+@DisabledOnQuarkus(version = "1\\.3\\..*", reason = "https://github.com/quarkusio/quarkus/pull/7987")
 public class MicroProfileTest extends AbstractMicroProfileTest {
 }

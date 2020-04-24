@@ -2,6 +2,7 @@ package io.quarkus.ts.openshift.microprofile;
 
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.quarkus.ts.openshift.common.AdditionalResources;
+import io.quarkus.ts.openshift.common.DisabledOnQuarkus;
 import io.quarkus.ts.openshift.common.OpenShiftTest;
 import io.quarkus.ts.openshift.common.injection.TestResource;
 import org.junit.jupiter.api.MethodOrderer;
@@ -20,6 +21,7 @@ import static org.hamcrest.Matchers.hasSize;
 @AdditionalResources("https://raw.githubusercontent.com/jaegertracing/jaeger-kubernetes/master/all-in-one/jaeger-all-in-one-template.yml")
 @AdditionalResources("classpath:jaeger-route.yaml")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@DisabledOnQuarkus(version = "1\\.3\\..*", reason = "https://github.com/quarkusio/quarkus/pull/7987")
 public class MicroProfileOpenShiftIT extends AbstractMicroProfileTest {
     @TestResource
     private OpenShiftClient oc;

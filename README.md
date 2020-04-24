@@ -189,6 +189,12 @@ This can be used for example to disable tests that require access to authenticat
 The tests that do require such access are annotated `@OnlyIfConfigured("ts.authenticated-registry")` and are not executed by default.
 When executing tests against an OpenShift cluster that has configured access to the authenticated registry, you just run the tests with `-Dts.authenticated-registry` and the tests will be executed.
 
+The `@DisabledOnQuarkus` annotation can be used to selectively disable execution of tests based on Quarkus version.
+The Quarkus version used in the test suite is matched against a regular expression provided in the annotation, and if it matches, the test is disabled.
+
+This can be used to disable tests that are known to fail on certain Quarkus versions.
+In such case, the `reason` attribute of the annotation should point to corresponding issue (or pull request).
+
 ### TODO
 
 There's a lot of possible improvements that haven't been implemented yet.
