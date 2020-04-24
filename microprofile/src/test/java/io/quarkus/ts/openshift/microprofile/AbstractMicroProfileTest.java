@@ -13,6 +13,8 @@ import static org.hamcrest.CoreMatchers.is;
 public abstract class AbstractMicroProfileTest {
     @Test
     @Order(1)
+    // Fails on 1.3 branch atm
+    // backport of https://github.com/quarkusio/quarkus/pull/7987 would be needed, not a small change though
     public void hello() {
         when()
                 .post("/hello/enable")
