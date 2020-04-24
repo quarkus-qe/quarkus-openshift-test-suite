@@ -50,6 +50,10 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
         return context.getStore(Namespace.create(getClass()));
     }
 
+    private Optional<ManualDeployment> getManualDeploymentAnnotation(ExtensionContext context) {
+        return context.getElement().map(it -> it.getAnnotation(ManualDeployment.class));
+    }
+
     private OpenShiftClient getOpenShiftClient(ExtensionContext context) {
         return getStore(context)
                 .getOrComputeIfAbsent(OpenShiftClientResource.class.getName(), ignored -> OpenShiftClientResource.createDefault(), OpenShiftClientResource.class)
@@ -61,6 +65,16 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
     }
 
     private AppMetadata getAppMetadata(ExtensionContext context) {
+        Optional<ManualDeployment> manualDeployment = getManualDeploymentAnnotation(context);
+        if (manualDeployment.isPresent()) {
+            return getStore(context)
+                    .getOrComputeIfAbsent(AppMetadata.class.getName(), ignored -> new AppMetadata(
+                            manualDeployment.get().appName(),
+                            manualDeployment.get().httpRoot(),
+                            manualDeployment.get().knownEndpoint()
+                    ), AppMetadata.class);
+        }
+
         Path file = Paths.get("target", "app-metadata.properties");
         return getStore(context)
                 .getOrComputeIfAbsent(AppMetadata.class.getName(), ignored -> AppMetadata.load(file), AppMetadata.class);
@@ -104,21 +118,23 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
 
         AppMetadata metadata = getAppMetadata(context);
 
-        Path openshiftResources = getResourcesYaml();
-        if (!Files.exists(openshiftResources)) {
-            throw new OpenShiftTestException("Missing " + openshiftResources + ", did you add the quarkus-kubernetes or quarkus-openshift extension?");
-        }
-
         deployAdditionalResources(context);
 
         beforeApplicationDeployment(context);
 
-        System.out.println("deploying application");
-        new Command("oc", "apply", "-f", openshiftResources.toString()).runAndWait();
+        if (!getManualDeploymentAnnotation(context).isPresent()) {
+            Path openshiftResources = getResourcesYaml();
+            if (!Files.exists(openshiftResources)) {
+                throw new OpenShiftTestException("Missing " + openshiftResources + ", did you add the quarkus-kubernetes or quarkus-openshift extension?");
+            }
 
-        awaitImageStreams(context, openshiftResources);
+            System.out.println("deploying application");
+            new Command("oc", "apply", "-f", openshiftResources.toString()).runAndWait();
 
-        new Command("oc", "start-build", metadata.appName, "--from-dir=target", "--follow").runAndWait();
+            awaitImageStreams(context, openshiftResources);
+
+            new Command("oc", "start-build", metadata.appName, "--from-dir=target", "--follow").runAndWait();
+        }
 
         setUpRestAssured(context);
 
@@ -236,6 +252,9 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
                 System.out.println(ansi().a("test ").fgYellow().a(context.getDisplayName()).reset()
                         .a(" failed, not deleting any resources"));
             }
+        }
+        if (getManualDeploymentAnnotation(context).isPresent()) {
+            shouldUndeployApplication = false;
         }
 
         if (shouldUndeployApplication) {

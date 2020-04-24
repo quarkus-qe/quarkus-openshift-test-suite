@@ -30,6 +30,8 @@
         <module>security/https-1way</module>
         <module>security/https-2way</module>
         <module>microprofile</module>
+
+        <module>todo-demo-app</module>
     </modules>
 
     <properties>

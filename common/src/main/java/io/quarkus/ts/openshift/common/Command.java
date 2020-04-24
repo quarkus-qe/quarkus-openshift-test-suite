@@ -50,7 +50,7 @@ public class Command {
 
         int result = process.waitFor();
         if (result != 0) {
-            throw new RuntimeException(description + " failed (return code " + result + ")");
+            throw new RuntimeException(description + " failed (executed " + command + ", return code " + result + ")");
         }
     }
 }
