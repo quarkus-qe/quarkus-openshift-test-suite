@@ -7,13 +7,16 @@ For running the tests, it is expected that the user is logged into an OpenShift 
 To verify that you're logged into correct project, you can run `oc whoami` and `oc project`.
 
 If you don't have a project, use `oc new-project ...` to create one.
-Alternatively, see _Running tests in ephemeral namespaces_ below.
+Alternatively, see _Running tests in ephemeral namespaces below.
 
 All tests will run in the project you're logged into, so it should be empty.
 If there are resources deployed in the project, you should not expect they will survive.
 
 Running the tests amounts to standard `mvn clean verify`.
 If the test suite depends on Quarkus `999-SNAPSHOT` (it does currently), make sure you have built Quarkus locally prior to running the tests.
+
+When using ``` -Dts.retain-on-failure``` it is highly recommended to do
+ ``` oc delete all --all``` before ```mvn``` if you are debugging your failing deployments.
 
 All the tests currently use the RHEL 7 OpenJDK 11 image.
 This is configured in the `application.properties` file in each module.

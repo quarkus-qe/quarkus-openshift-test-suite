@@ -18,6 +18,8 @@
 
         <module>http</module>
         <module>configmap</module>
+        <module>jms/app</module>
+        <module>jms/artemis</module>
         <module>sql-db/app</module>
         <module>sql-db/postgresql</module>
         <module>sql-db/mysql</module>
@@ -61,7 +63,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-
             <dependency>
                 <groupId>io.quarkus.ts.openshift</groupId>
                 <artifactId>app-metadata</artifactId>
@@ -83,7 +84,17 @@
                 <version>${project.version}</version>
                 <classifier>tests</classifier>
             </dependency>
-
+            <dependency>
+                <groupId>io.quarkus.ts.openshift</groupId>
+                <artifactId>jms-app</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.quarkus.ts.openshift</groupId>
+                <artifactId>jms-app</artifactId>
+                <version>${project.version}</version>
+                <classifier>tests</classifier>
+            </dependency>
             <dependency>
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt-api</artifactId>
