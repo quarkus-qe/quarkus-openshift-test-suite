@@ -7,6 +7,7 @@ import io.quarkus.ts.openshift.app.metadata.AppMetadata;
 import io.quarkus.ts.openshift.common.config.Config;
 import io.quarkus.ts.openshift.common.injection.InjectionPoint;
 import io.quarkus.ts.openshift.common.injection.TestResource;
+import io.quarkus.ts.openshift.common.injection.WithName;
 import io.quarkus.ts.openshift.common.util.AwaitUtil;
 import io.quarkus.ts.openshift.common.util.OpenShiftUtil;
 import io.restassured.RestAssured;
@@ -29,6 +30,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -306,9 +309,40 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
             return getOpenShiftUtil(context);
         } else if (Config.class.equals(injectionPoint.type())) {
             return Config.get();
+        } else if (URL.class.equals(injectionPoint.type())) {
+            return getURL(injectionPoint, context);
         } else {
             throw new OpenShiftTestException("Unsupported type " + injectionPoint.type().getSimpleName()
                     + " for @TestResource " + injectionPoint.description());
+        }
+    }
+
+    private Object getURL(InjectionPoint injectionPoint, ExtensionContext context) throws OpenShiftTestException {
+        String address;
+        if (injectionPoint.isAnnotationPresent(WithName.class)) {
+            String routeName = injectionPoint.getAnnotation(WithName.class).value();
+            address = getBaseAddress(getOpenShiftClient(context).routes().withName(routeName).get());
+        } else {
+            AppMetadata metadata = getAppMetadata(context);
+            String routeName = metadata.appName;
+            address = getBaseAddress(getOpenShiftClient(context).routes().withName(routeName).get());
+            if (metadata.httpRoot != null && metadata.httpRoot.length() > 1) {  // skip httpRoot "/" case
+                address = address + metadata.httpRoot;
+            }
+        }
+        try {
+            return new URL(address);
+        } catch (MalformedURLException e) {
+            throw new OpenShiftTestException("Couldn't construct URL for " + injectionPoint.type().getSimpleName()
+                    + " for @TestResource " + injectionPoint.description());
+        }
+    }
+
+    private String getBaseAddress(Route route) {
+        if (route.getSpec().getTls() != null) {
+            return "https://" + route.getSpec().getHost();
+        } else {
+            return "http://" + route.getSpec().getHost();
         }
     }
 

@@ -14,6 +14,7 @@ import java.lang.annotation.Target;
  *     <li>{@link io.quarkus.ts.openshift.common.config.Config}</li>
  *     <li>{@link io.quarkus.ts.openshift.common.util.AwaitUtil}</li>
  *     <li>{@link io.quarkus.ts.openshift.common.util.OpenShiftUtil}</li>
+ *     <li>{@link java.net.URL}</li>
  * </ul>
  */
 @Target({ElementType.FIELD, ElementType.PARAMETER})
