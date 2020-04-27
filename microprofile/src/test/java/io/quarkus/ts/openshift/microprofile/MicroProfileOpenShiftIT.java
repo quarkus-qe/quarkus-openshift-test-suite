@@ -5,11 +5,13 @@ import io.quarkus.ts.openshift.common.AdditionalResources;
 import io.quarkus.ts.openshift.common.DisabledOnQuarkus;
 import io.quarkus.ts.openshift.common.OpenShiftTest;
 import io.quarkus.ts.openshift.common.injection.TestResource;
+import io.quarkus.ts.openshift.common.injection.WithName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
+import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
 import static io.restassured.RestAssured.when;
@@ -23,14 +25,15 @@ import static org.hamcrest.Matchers.hasSize;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisabledOnQuarkus(version = "1\\.3\\..*", reason = "https://github.com/quarkusio/quarkus/pull/7987")
 public class MicroProfileOpenShiftIT extends AbstractMicroProfileTest {
+    @TestResource @WithName("jaeger-query")
+    private URL jaegerUrl;
+
     @TestResource
-    private OpenShiftClient oc;
+    private URL applicationUrl;
 
     @Test
     @Order(5) // see superclass
     public void verifyTracesInJaeger() {
-        String jaegerUrl = "http://" + oc.routes().withName("jaeger-query").get().getSpec().getHost();
-        String applicationUrl = "http://" + oc.routes().withName("microprofile-test").get().getSpec().getHost();
 
         // the tracer inside the application doesn't send traces to the Jaeger server immediately,
         // they are batched, so we need to wait a bit

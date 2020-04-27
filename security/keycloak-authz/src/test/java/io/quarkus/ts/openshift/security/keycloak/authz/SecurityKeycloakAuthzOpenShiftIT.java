@@ -33,6 +33,7 @@ import static org.hamcrest.Matchers.equalTo;
 @AdditionalResources("classpath:keycloak.yaml")
 public class SecurityKeycloakAuthzOpenShiftIT {
     private static String getKeycloakUrl(OpenShiftClient oc) {
+        // @BeforeApplicationDeployment method is invoked too early for @TestResource @WithName("keycloak-plain") approach
         return "http://" + oc.routes().withName("keycloak-plain").get().getSpec().getHost() + "/auth";
     }
 
