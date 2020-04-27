@@ -11,6 +11,7 @@ import io.quarkus.ts.openshift.common.AdditionalResources;
 import io.quarkus.ts.openshift.common.OpenShiftTest;
 import io.quarkus.ts.openshift.common.BeforeApplicationDeployment;
 import io.quarkus.ts.openshift.common.injection.TestResource;
+import io.quarkus.ts.openshift.common.injection.WithName;
 import org.apache.http.impl.client.HttpClients;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.Configuration;
 
 import java.io.IOException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -30,19 +32,15 @@ import static org.hamcrest.Matchers.equalTo;
 @AdditionalResources("classpath:keycloak-realm.yaml")
 @AdditionalResources("classpath:keycloak.yaml")
 public class SecurityKeycloakOpenShiftIT {
-    private static String getKeycloakUrl(OpenShiftClient oc) {
-        // @BeforeApplicationDeployment method is invoked too early for @TestResource @WithName("keycloak-plain") approach
-        return "http://" + oc.routes().withName("keycloak-plain").get().getSpec().getHost() + "/auth";
-    }
 
-    private static String getKeycloakRealmUrl(OpenShiftClient oc) {
-        return getKeycloakUrl(oc) + "/realms/test-realm";
-    }
+    static String keycloakUrl;
+    static String keycloakRealmUrl;
 
     // TODO this is pretty ugly, but I'm tired and can't think of a better way at the moment
     @BeforeApplicationDeployment
-    public static void configureKeycloakUrl(OpenShiftClient oc, AppMetadata appMetadata) throws IOException {
-        String authServerUrl = getKeycloakRealmUrl(oc);
+    public static void configureKeycloakUrl(OpenShiftClient oc, AppMetadata appMetadata, @WithName("keycloak-plain") URL url) throws IOException {
+        keycloakUrl = url + "/auth";
+        keycloakRealmUrl = url + "/auth/realms/test-realm";
 
         List<HasMetadata> objs = oc.load(Files.newInputStream(Paths.get("target/kubernetes/openshift.yml"))).get();
         objs.stream()
@@ -52,7 +50,7 @@ public class SecurityKeycloakOpenShiftIT {
                 .forEach(dc -> {
                     dc.getSpec().getTemplate().getSpec().getContainers().forEach(container -> {
                         container.getEnv().add(
-                                new EnvVar("QUARKUS_OIDC_AUTH_SERVER_URL", authServerUrl, null)
+                                new EnvVar("QUARKUS_OIDC_AUTH_SERVER_URL", keycloakRealmUrl, null)
                         );
                     });
                 });
@@ -70,7 +68,7 @@ public class SecurityKeycloakOpenShiftIT {
     @BeforeEach
     public void setup() {
         authzClient = AuthzClient.create(new Configuration(
-                getKeycloakUrl(oc),
+                keycloakUrl,
                 "test-realm",
                 "test-application-client",
                 new HashMap<String, Object>() {{
@@ -103,7 +101,7 @@ public class SecurityKeycloakOpenShiftIT {
                 .get("/user/issuer")
         .then()
                 .statusCode(200)
-                .body(equalTo("user token issued by " + getKeycloakRealmUrl(oc)));
+                .body(equalTo("user token issued by " + keycloakRealmUrl));
     }
 
     @Test
@@ -146,7 +144,7 @@ public class SecurityKeycloakOpenShiftIT {
                 .get("/admin/issuer")
         .then()
                 .statusCode(200)
-                .body(equalTo("admin token issued by " + getKeycloakRealmUrl(oc)));
+                .body(equalTo("admin token issued by " + keycloakRealmUrl));
     }
 
     @Test
