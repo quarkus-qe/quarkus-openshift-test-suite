@@ -43,6 +43,7 @@
         <version.apache-httpclient-fluent>4.5.12</version.apache-httpclient-fluent> <!-- same as Apache HTTP Client managed by Quarkus BOM -->
         <version.awaitility>4.0.2</version.awaitility>
         <version.fusesource-jansi>1.18</version.fusesource-jansi>
+        <version.impsort-maven-plugin>1.4.1</version.impsort-maven-plugin>
         <version.jandex-maven-plugin>1.0.7</version.jandex-maven-plugin>
         <version.jjwt>0.10.7</version.jjwt>
         <version.keytool-maven-plugin>1.5</version.keytool-maven-plugin>
@@ -178,4 +179,38 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <profiles>
+        <profile>
+            <id>format</id>
+            <activation>
+                <property>
+                    <name>!no-format</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>net.revelc.code</groupId>
+                        <artifactId>impsort-maven-plugin</artifactId>
+                        <version>${version.impsort-maven-plugin}</version>
+                        <configuration>
+                            <groups>*,javax.,java.</groups>
+                            <staticGroups>*</staticGroups>
+                            <staticAfter>true</staticAfter>
+                            <removeUnused>true</removeUnused>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>sort-imports</id>
+                                <goals>
+                                    <goal>sort</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
