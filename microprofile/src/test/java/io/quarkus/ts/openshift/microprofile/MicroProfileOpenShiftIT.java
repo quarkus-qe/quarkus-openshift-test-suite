@@ -1,6 +1,5 @@
 package io.quarkus.ts.openshift.microprofile;
 
-import io.fabric8.openshift.client.OpenShiftClient;
 import io.quarkus.ts.openshift.common.AdditionalResources;
 import io.quarkus.ts.openshift.common.DisabledOnQuarkus;
 import io.quarkus.ts.openshift.common.OpenShiftTest;

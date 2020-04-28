@@ -2,7 +2,6 @@ package io.quarkus.ts.openshift.sqldb;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.annotation.Priority;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;

@@ -7,6 +7,7 @@ import org.eclipse.microprofile.faulttolerance.Asynchronous;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
+
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
