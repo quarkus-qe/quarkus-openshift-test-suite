@@ -42,6 +42,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+        <version.artemis.server>2.10.0</version.artemis.server>
         <version.apache-httpclient-fluent>4.5.12</version.apache-httpclient-fluent> <!-- same as Apache HTTP Client managed by Quarkus BOM -->
         <version.awaitility>4.0.2</version.awaitility>
         <version.fusesource-jansi>1.18</version.fusesource-jansi>
@@ -63,6 +64,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
             <dependency>
                 <groupId>io.quarkus.ts.openshift</groupId>
                 <artifactId>app-metadata</artifactId>
