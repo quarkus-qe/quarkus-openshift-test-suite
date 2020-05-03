@@ -33,6 +33,7 @@
         <module>microprofile</module>
 
         <module>todo-demo-app</module>
+        <module>external-applications/quarkus-workshop-super-heroes</module>
     </modules>
 
     <properties>
