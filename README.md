@@ -15,6 +15,8 @@ If there are resources deployed in the project, you should not expect they will 
 Running the tests amounts to standard `mvn clean verify`.
 If the test suite depends on Quarkus `999-SNAPSHOT` (it does currently), make sure you have built Quarkus locally prior to running the tests.
 
+It is highly recommended to do `oc delete all --all` before `mvn` if you are debugging your failing deployments.
+
 All the tests currently use the RHEL 7 OpenJDK 11 image.
 This is configured in the `application.properties` file in each module.
 Since this is standard Quarkus configuration, it's possible to override using a system property.
