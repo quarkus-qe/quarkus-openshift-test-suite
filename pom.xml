@@ -32,7 +32,8 @@
         <module>security/https-2way</module>
         <module>microprofile</module>
 
-        <module>todo-demo-app</module>
+        <module>external-applications/todo-demo-app</module>
+        <module>external-applications/quarkus-workshop-super-heroes</module>
     </modules>
 
     <properties>
