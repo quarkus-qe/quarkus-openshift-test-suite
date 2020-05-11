@@ -41,7 +41,7 @@ public abstract class AbstractArtemisTest {
                 .post("/price").then().statusCode(500);
         Set<String> s = new HashSet<>(10);
         // Any Awaitility positive person to refactor this for loop? :-)
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 10; i++) {
             s.add(given()
                     .when()
                     .get("/price")
