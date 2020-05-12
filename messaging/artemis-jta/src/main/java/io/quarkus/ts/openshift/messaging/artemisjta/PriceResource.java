@@ -1,6 +1,7 @@
 package io.quarkus.ts.openshift.messaging.artemisjta;
 
 import javax.inject.Inject;
+import javax.jms.JMSException;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
@@ -55,6 +56,30 @@ public class PriceResource {
     @Produces(MediaType.TEXT_PLAIN)
     public Response getCustom() {
         return Response.ok(c.getPrice(), MediaType.TEXT_PLAIN).build();
+    }
+
+    @POST
+    @Path("/noAck")
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response postNoAck(@NotNull String price) {
+        try {
+            p.produceClientAck(price);
+        } catch (Exception e) {
+            return Response.serverError().entity(exToS(e)).build();
+        }
+        return Response.ok().build();
+    }
+
+    @GET
+    @Path("/noAck")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response getNoAck(@QueryParam("ack") boolean ack) {
+        try {
+            return Response.ok(c.receiveAndAck(ack), MediaType.TEXT_PLAIN).build();
+        } catch (JMSException e) {
+            return Response.serverError().entity(exToS(e)).build();
+        }
     }
 
     @GET

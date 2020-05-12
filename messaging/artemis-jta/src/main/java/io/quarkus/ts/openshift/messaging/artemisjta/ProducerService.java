@@ -42,4 +42,10 @@ public class ProducerService {
             LOG.info(customPrice + " sent to queue custom-prices-2");
         }
     }
+
+    public void produceClientAck(String customPrice) {
+        try (JMSContext context = connectionFactory.createContext(Session.CLIENT_ACKNOWLEDGE)) {
+            context.createProducer().send(context.createQueue("custom-prices-cack"), customPrice);
+        }
+    }
 }

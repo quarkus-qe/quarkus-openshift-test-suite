@@ -50,6 +50,18 @@ public class ConsumerService {
         }
     }
 
+    public String receiveAndAck(boolean ackIt) throws JMSException {
+        try (JMSContext context = connectionFactory.createContext(Session.CLIENT_ACKNOWLEDGE)) {
+            JMSConsumer consumer = context.createConsumer(context.createQueue("custom-prices-cack"));
+            Message message = consumer.receiveNoWait();
+            String messageBody = (message != null) ? message.getBody(String.class) : "";
+            if (ackIt) {
+                context.acknowledge();
+            }
+            return messageBody;
+        }
+    }
+
     public static String exToS(Throwable throwable) {
         Writer w = new StringWriter();
         throwable.printStackTrace(new PrintWriter(w, true));

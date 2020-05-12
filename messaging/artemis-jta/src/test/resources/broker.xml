@@ -13,13 +13,5 @@
             <acceptor name="activemq">tcp://localhost:61616</acceptor>
         </acceptors>
         <security-enabled>false</security-enabled>
-        <queues>
-            <queue name="custom-prices-queue-1">
-                <address>custom-prices-1</address>
-            </queue>
-           <!-- <queue name="custom-prices-queue-2">
-                <address>custom-prices-2</address>
-            </queue>-->
-        </queues>
     </core>
 </configuration>
