@@ -15,10 +15,19 @@ import static org.hamcrest.Matchers.lessThan;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public abstract class AbstractArtemisTest {
+
+    /**
+     * There is a PriceProducer that pushes a new integer "price" to a JMS queue called "prices" each second.
+     * PriceConsumer is a loop that starts at the beginning of the application runtime and blocks on reading
+     * from the queue called "prices". Once a value is read, the attribute lastPrice is updated.
+     *
+     * This test merely checks that the value was updated. It is the most basic sanity check that JMS is up
+     * and running.
+     */
     @Test
     @Order(1)
     public void testLastPrice() {
-        await().atMost(5, TimeUnit.SECONDS).untilAsserted(() -> {
+        await().atMost(60, TimeUnit.SECONDS).untilAsserted(() -> {
             String value =
                     given()
                     .when()

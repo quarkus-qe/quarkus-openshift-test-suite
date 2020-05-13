@@ -9,7 +9,7 @@ items:
   stringData:
     username: quarkus
     password: quarkus
-    queues: dummy
+    queues:
 
 - apiVersion: image.openshift.io/v1
   kind: ImageStream

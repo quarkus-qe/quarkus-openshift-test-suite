@@ -12,10 +12,6 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.Writer;
-
 @ApplicationScoped
 public class ConsumerService {
 
@@ -24,29 +20,45 @@ public class ConsumerService {
     @Inject
     ConnectionFactory connectionFactory;
 
-    private volatile String price = "dead";
+    private volatile String price1 = "dead";
+    private volatile String price2 = "dead";
 
     /*
     Why empty getter and setter? CDI proxy...
     */
     public String getPrice() {
-        return price;
+        return price1 + ":" + price2;
     }
 
-    public void setPrice(String price) {
-        this.price = price;
+    public void setPrice1(String price) {
+        this.price1 = price;
+    }
+
+    public void setPrice2(String price) {
+        this.price2 = price;
     }
 
     @Scheduled(every = "1s")
     public void receiveMessages() throws JMSException {
         try (JMSContext context = connectionFactory.createContext(Session.AUTO_ACKNOWLEDGE)) {
             JMSConsumer consumer = context.createConsumer(context.createQueue("custom-prices-1"));
-            Message message = consumer.receiveNoWait();
-            String message1body = (message != null) ? message.getBody(String.class) : "";
+            Message message = consumer.receive(500);
+            if (message != null) {
+                String price = message.getBody(String.class);
+                setPrice1(price);
+                LOG.info("Price 1 set to " + price);
+            } else {
+                LOG.info("Nothing to see in queue custom-prices-1.");
+            }
             consumer = context.createConsumer(context.createQueue("custom-prices-2"));
-            message = consumer.receiveNoWait();
-            String message2body = (message != null) ? message.getBody(String.class) : "";
-            setPrice(message1body + ":" + message2body);
+            message = consumer.receive(500);
+            if (message != null) {
+                String price = message.getBody(String.class);
+                setPrice2(price);
+                LOG.info("Price 2 set to " + price);
+            } else {
+                LOG.info("Nothing to see in queue custom-prices-2.");
+            }
         }
     }
 
@@ -60,11 +72,5 @@ public class ConsumerService {
             }
             return messageBody;
         }
-    }
-
-    public static String exToS(Throwable throwable) {
-        Writer w = new StringWriter();
-        throwable.printStackTrace(new PrintWriter(w, true));
-        return w.toString();
     }
 }

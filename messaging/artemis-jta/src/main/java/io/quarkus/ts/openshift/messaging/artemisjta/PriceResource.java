@@ -5,6 +5,7 @@ import javax.jms.JMSException;
 import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -12,8 +13,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import static io.quarkus.ts.openshift.messaging.artemisjta.ConsumerService.exToS;
 
 @Path("/")
 public class PriceResource {
@@ -29,24 +28,13 @@ public class PriceResource {
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.TEXT_PLAIN)
     @Transactional
-    public Response postCustom(@QueryParam("fail") boolean fail, @NotNull String price) {
-        try {
+    public Response postCustom(@QueryParam("fail") boolean fail,
+                               @QueryParam("transactional") boolean transactional,
+                               @NotNull String price) {
+        if (transactional) {
             p.produceCustomPrice(price, fail);
-        } catch (Exception e) {
-            return Response.serverError().entity(exToS(e)).build();
-        }
-        return Response.ok().build();
-    }
-
-    @POST
-    @Path("/NoJTAPrice")
-    @Consumes(MediaType.TEXT_PLAIN)
-    @Produces(MediaType.TEXT_PLAIN)
-    public Response postCustomNoJTA(@QueryParam("fail") boolean fail, @NotNull String price) {
-        try {
+        } else {
             p.produceCustomPriceNoJTA(price, fail);
-        } catch (Exception e) {
-            return Response.serverError().entity(exToS(e)).build();
         }
         return Response.ok().build();
     }
@@ -58,28 +46,29 @@ public class PriceResource {
         return Response.ok(c.getPrice(), MediaType.TEXT_PLAIN).build();
     }
 
+    @DELETE
+    @Path("/price")
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response deleteCustom() {
+        c.setPrice1("");
+        c.setPrice2("");
+        return Response.ok().build();
+    }
+
     @POST
     @Path("/noAck")
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.TEXT_PLAIN)
     public Response postNoAck(@NotNull String price) {
-        try {
-            p.produceClientAck(price);
-        } catch (Exception e) {
-            return Response.serverError().entity(exToS(e)).build();
-        }
+        p.produceClientAck(price);
         return Response.ok().build();
     }
 
     @GET
     @Path("/noAck")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response getNoAck(@QueryParam("ack") boolean ack) {
-        try {
-            return Response.ok(c.receiveAndAck(ack), MediaType.TEXT_PLAIN).build();
-        } catch (JMSException e) {
-            return Response.serverError().entity(exToS(e)).build();
-        }
+    public Response getNoAck(@QueryParam("ack") boolean ack) throws JMSException {
+        return Response.ok(c.receiveAndAck(ack), MediaType.TEXT_PLAIN).build();
     }
 
     @GET
@@ -88,5 +77,4 @@ public class PriceResource {
     public String root() {
         return "All good.";
     }
-
 }
