@@ -21,6 +21,7 @@
         <module>messaging/artemis</module>
         <module>messaging/artemis-jta</module>
         <module>messaging/amqp-reactive</module>
+        <module>messaging/qpid</module>
         <module>sql-db/app</module>
         <module>sql-db/postgresql</module>
         <module>sql-db/mysql</module>
@@ -47,6 +48,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <version.apache-httpclient-fluent>4.5.12</version.apache-httpclient-fluent> <!-- same as Apache HTTP Client managed by Quarkus BOM -->
+        <version.qpid-jms>0.14.1</version.qpid-jms>
         <version.artemis.server>2.10.0</version.artemis.server>
         <version.awaitility>4.0.2</version.awaitility>
         <version.fusesource-jansi>1.18</version.fusesource-jansi>
