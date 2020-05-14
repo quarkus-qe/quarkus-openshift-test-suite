@@ -1,0 +1,171 @@
+apiVersion: v1
+kind: List
+items:
+- apiVersion: v1
+  kind: Secret
+  metadata:
+    name: amq-broker
+  type: Opaque
+  stringData:
+    username: quarkus
+    password: quarkus
+    queues:
+
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    name: amq-broker
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - name: latest
+      from:
+        kind: DockerImage
+        name: registry.access.redhat.com/amq-broker-7/amq-broker-72-openshift
+
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    name: amq-broker
+  spec:
+    replicas: 1
+    selector:
+      name: amq-broker
+    strategy:
+      type: Rolling
+      rollingParams:
+        maxSurge: 0
+    template:
+      metadata:
+        labels:
+          name: amq-broker
+      spec:
+        containers:
+        - name: amq-broker
+          image: ''
+          imagePullPolicy: Always
+          env:
+          - name: AMQ_USER
+            valueFrom:
+              secretKeyRef:
+                name: amq-broker
+                key: username
+          - name: AMQ_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: amq-broker
+                key: password
+          - name: AMQ_QUEUES
+            valueFrom:
+              secretKeyRef:
+                name: amq-broker
+                key: queues
+          - name: AMQ_DATA_DIR
+            value: /opt/amq/data
+          readinessProbe:
+            exec:
+              command:
+              - "/bin/bash"
+              - "-c"
+              - "/opt/amq/bin/readinessProbe.sh"
+          ports:
+          - containerPort: 8161
+            name: console-jolokia
+            protocol: TCP
+          - containerPort: 5672
+            name: amqp
+            protocol: TCP
+          - containerPort: 1883
+            name: mqtt
+            protocol: TCP
+          - containerPort: 61613
+            name: stomp
+            protocol: TCP
+          - containerPort: 61616
+            name: artemis
+            protocol: TCP
+          terminationGracePeriodSeconds: 60
+          volumeMounts:
+          - name: amq-broker-data
+            mountPath: /opt/amq/data
+        volumes:
+        - name: amq-broker-data
+          emptyDir: {}
+    triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChangeParams:
+        automatic: true
+        containerNames:
+        - amq-broker
+        from:
+          kind: ImageStreamTag
+          name: amq-broker:latest
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: amq-broker-jolokia
+  spec:
+    ports:
+    - port: 8161
+      targetPort: 8161
+    selector:
+      name: amq-broker
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: amq-broker-amqp
+  spec:
+    ports:
+    - port: 5672
+      targetPort: 5672
+    selector:
+      name: amq-broker
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: amq-broker-mqtt
+  spec:
+    ports:
+    - port: 1883
+      targetPort: 1883
+    selector:
+      name: amq-broker
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: amq-broker-stomp
+  spec:
+    ports:
+    - port: 61613
+      targetPort: 61613
+    selector:
+      name: amq-broker
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: amq-broker-tcp
+    annotations:
+      service.alpha.openshift.io/dependencies: '[{"name": "amq-broker-amqp",
+        "kind": "Service"},{"name": "amq-broker-mqtt", "kind": "Service"},{"name":
+        "amq-broker-stomp", "kind": "Service"}]'
+  spec:
+    ports:
+    - port: 61616
+      targetPort: 61616
+    selector:
+      name: amq-broker
+
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    name: amq-broker-console
+  spec:
+    to:
+      name: amq-broker-jolokia
