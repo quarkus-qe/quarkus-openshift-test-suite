@@ -20,6 +20,7 @@
         <module>configmap</module>
         <module>messaging/artemis</module>
         <module>messaging/artemis-jta</module>
+        <module>messaging/amqp-reactive</module>
         <module>sql-db/app</module>
         <module>sql-db/postgresql</module>
         <module>sql-db/mysql</module>
