@@ -25,6 +25,7 @@ import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 
 import java.io.IOException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -50,8 +51,8 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
         return context.getStore(Namespace.create(getClass()));
     }
 
-    private Optional<ManualDeployment> getManualDeploymentAnnotation(ExtensionContext context) {
-        return context.getElement().map(it -> it.getAnnotation(ManualDeployment.class));
+    private Optional<ManualApplicationDeployment> getManualDeploymentAnnotation(ExtensionContext context) {
+        return context.getElement().map(it -> it.getAnnotation(ManualApplicationDeployment.class));
     }
 
     private OpenShiftClient getOpenShiftClient(ExtensionContext context) {
@@ -65,7 +66,7 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
     }
 
     private AppMetadata getAppMetadata(ExtensionContext context) {
-        Optional<ManualDeployment> manualDeployment = getManualDeploymentAnnotation(context);
+        Optional<ManualApplicationDeployment> manualDeployment = getManualDeploymentAnnotation(context);
         if (manualDeployment.isPresent()) {
             return getStore(context)
                     .getOrComputeIfAbsent(AppMetadata.class.getName(), ignored -> new AppMetadata(
@@ -120,7 +121,7 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
 
         deployAdditionalResources(context);
 
-        beforeApplicationDeployment(context);
+        runPublicStaticVoidMethods(CustomizeApplicationDeployment.class, context);
 
         if (!getManualDeploymentAnnotation(context).isPresent()) {
             Path openshiftResources = getResourcesYaml();
@@ -172,34 +173,6 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
                 }
             }
         }
-    }
-
-    private void beforeApplicationDeployment(ExtensionContext context) throws Exception {
-        for (Method method : context.getRequiredTestClass().getMethods()) {
-            if (method.getAnnotation(BeforeApplicationDeployment.class) != null) {
-                if (!isPublicStaticVoid(method)) {
-                    throw new OpenShiftTestException("@" + BeforeApplicationDeployment.class.getSimpleName()
-                            + " method " + method.getDeclaringClass().getSimpleName() + "." + method.getName()
-                            + " must be public static void");
-                }
-
-                Parameter[] parameters = method.getParameters();
-                Object[] arguments = new Object[parameters.length];
-                for (int i = 0; i < parameters.length; i++) {
-                    Parameter parameter = parameters[i];
-                    InjectionPoint injectionPoint = InjectionPoint.forParameter(parameter);
-                    arguments[i] = valueFor(injectionPoint, context);
-                }
-
-                method.invoke(null, arguments);
-            }
-        }
-    }
-
-    private static boolean isPublicStaticVoid(Method method) {
-        return Modifier.isPublic(method.getModifiers())
-                && Modifier.isStatic(method.getModifiers())
-                && Void.TYPE.equals(method.getReturnType());
     }
 
     private void awaitImageStreams(ExtensionContext context, Path openshiftResources) throws IOException {
@@ -262,6 +235,9 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
             new Command("oc", "delete", "-f", getResourcesYaml().toString(), "--ignore-not-found").runAndWait();
         }
 
+        // TODO before or after application undeployment?
+        runPublicStaticVoidMethods(CustomizeApplicationUndeployment.class, context);
+
         dropEphemeralNamespaceIfNecessary(context);
     }
 
@@ -278,6 +254,34 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
                 new Command("oc", "delete", "project", ephemeralNamespace.name).runAndWait();
             }
         }
+    }
+
+    private void runPublicStaticVoidMethods(Class<? extends Annotation> annotation, ExtensionContext context) throws Exception {
+        for (Method method : context.getRequiredTestClass().getMethods()) {
+            if (method.getAnnotation(annotation) != null) {
+                if (!isPublicStaticVoid(method)) {
+                    throw new OpenShiftTestException("@" + CustomizeApplicationUndeployment.class.getSimpleName()
+                            + " method " + method.getDeclaringClass().getSimpleName() + "." + method.getName()
+                            + " must be public static void");
+                }
+
+                Parameter[] parameters = method.getParameters();
+                Object[] arguments = new Object[parameters.length];
+                for (int i = 0; i < parameters.length; i++) {
+                    Parameter parameter = parameters[i];
+                    InjectionPoint injectionPoint = InjectionPoint.forParameter(parameter);
+                    arguments[i] = valueFor(injectionPoint, context);
+                }
+
+                method.invoke(null, arguments);
+            }
+        }
+    }
+
+    private static boolean isPublicStaticVoid(Method method) {
+        return Modifier.isPublic(method.getModifiers())
+                && Modifier.isStatic(method.getModifiers())
+                && Void.TYPE.equals(method.getReturnType());
     }
 
     // ---

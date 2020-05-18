@@ -8,7 +8,7 @@ import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.quarkus.ts.openshift.app.metadata.AppMetadata;
 import io.quarkus.ts.openshift.common.AdditionalResources;
-import io.quarkus.ts.openshift.common.BeforeApplicationDeployment;
+import io.quarkus.ts.openshift.common.CustomizeApplicationDeployment;
 import io.quarkus.ts.openshift.common.OpenShiftTest;
 import io.quarkus.ts.openshift.common.injection.TestResource;
 import io.quarkus.ts.openshift.common.injection.WithName;
@@ -37,7 +37,7 @@ public class SecurityKeycloakOpenShiftIT {
     static String keycloakRealmUrl;
 
     // TODO this is pretty ugly, but I'm tired and can't think of a better way at the moment
-    @BeforeApplicationDeployment
+    @CustomizeApplicationDeployment
     public static void configureKeycloakUrl(OpenShiftClient oc, AppMetadata appMetadata, @WithName("keycloak-plain") URL url) throws IOException {
         keycloakUrl = url + "/auth";
         keycloakRealmUrl = url + "/auth/realms/test-realm";

@@ -198,21 +198,30 @@ The Quarkus version used in the test suite is matched against a regular expressi
 This can be used to disable tests that are known to fail on certain Quarkus versions.
 In such case, the `reason` attribute of the annotation should point to corresponding issue (or pull request).
 
+### Custom application deployment
+
+If the test class is annotated `@ManualApplicationDeployment`, the `target/kubernetes/openshift.yml` file is ignored and the test application is _not_ deployed automatically.
+Instead, you should use `@AdditionalResources`, `@CustomizeApplicationDeployment` and `@CustomizeApplicationUndeployment` to deploy the application manually.
+The `@ManualApplicationDeployment` annotation then provides the necessary info about the application (such as the name or a known endpoint).
+
+This can be used to write tests that excersise an external application.
+You have full control over the application deployment and undeployment process, but the rest of the test can be written as if the application was part of the test suite.
+
 ### TODO
 
 There's a lot of possible improvements that haven't been implemented yet.
 The most interesting probably are:
 
-- To be able to customize where the `openshift.yml` file is loaded from.
-  Or, more generally, to be able to customize the test application deployment.
+- Automation for some alternative deployment options.
   Currently, we support binary S2I builds, with the expectation that `quarkus-kubernetes` (or `quarkus-openshift`) is used.
-  We could support S2I-less deployments relatively easily (would currently require Docker to be installed, but Docker-less builds are being prototyped).
-  Supporting S2I source builds is more complex, as you need the application source stored in some Git repo, and when you're working on the test suite, you want your local changes, not something out there on GitHub.
+  We also support completely custom application deployment, which provides most flexibility, but also requires most work.
+  At the very least, we should provide some automation for S2I-less deployments with `-Dquarkus.container-image.build -Dquarkus.kubernetes.deploy`.
+  Supporting S2I source builds would be more complex (you need the application source stored in some Git repo, and when you're working on the test suite, you want your local changes, not something out there on GitHub) and is probably best left to `@ManualApplicationDeployment`.
 - To be able to customize URL path for route awaiting.
 - To be able to cleanup the project before running the test.
   Could be just a simple annotation `@CleanupProject` added on the test class.
 - To be able to inject more resources automatically.
-  For example, `URI` or `URL` of the application, or the OpenShift objects corresponding to the application (such as `DeploymentConfig`, `Service`, `Route`, or even `Pod` if there's only one).
+  For example, the OpenShift objects corresponding to the application (such as `DeploymentConfig`, `Service`, `Route`, or even `Pod` if there's only one).
 - To be able to configure the connection to OpenShift cluster (that is, how `OpenShiftClient` is created).
   Currently, this isn't possible, and doesn't make too much sense, because for some actions, we just run `oc`, while for some, we use the Java client.
   We could possibly move towards doing everything through the Java library, but some things are hard (e.g. `oc start-build`).
