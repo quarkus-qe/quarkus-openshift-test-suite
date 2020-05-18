@@ -328,3 +328,31 @@ Jaeger is deployed in an "all-in-one" configuration, and the OpenShift test veri
 
 Note that the Fault Tolerance annotations are currently commented out, because of https://github.com/quarkusio/quarkus/issues/8650.
 This is a RESTEasy bug, there is a proposed fix: https://github.com/resteasy/Resteasy/pull/2359
+
+### `messaging/artemis`
+
+TODO
+
+### `messaging/artemis-jta`
+
+TODO
+
+### `messaging/amqp-reactive`
+
+TODO
+
+### `messaging/qpid`
+
+TODO
+
+### `scaling`
+
+TODO
+
+### `external-applications/todo-demo-app`
+
+TODO
+
+### `external-applications/quarkus-workshop-super-heroes`
+
+TODO
