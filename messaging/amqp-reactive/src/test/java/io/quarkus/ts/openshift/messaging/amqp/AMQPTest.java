@@ -4,6 +4,6 @@ import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
-@QuarkusTestResource(AMQPTestResource.class)
+@QuarkusTestResource(ArtemisTestResource.class)
 public class AMQPTest extends AbstractAMQPTest {
 }

@@ -1,7 +1,7 @@
 package io.quarkus.ts.openshift.heroes.workshop;
 
 import io.quarkus.ts.openshift.common.AdditionalResources;
-import io.quarkus.ts.openshift.common.ManualDeployment;
+import io.quarkus.ts.openshift.common.ManualApplicationDeployment;
 import io.quarkus.ts.openshift.common.OpenShiftTest;
 import io.quarkus.ts.openshift.common.injection.TestResource;
 import org.junit.jupiter.api.MethodOrderer;
@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @OpenShiftTest
-@ManualDeployment(appName = "quarkus-workshop-hero", httpRoot = "/", knownEndpoint = "/")
+@ManualApplicationDeployment(appName = "quarkus-workshop-hero", httpRoot = "/", knownEndpoint = "/")
 @AdditionalResources("classpath:openjdk-11-rhel7.yaml")
 @AdditionalResources("classpath:heroes-database.yaml")
 @AdditionalResources("classpath:hero.yaml")

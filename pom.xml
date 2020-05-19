@@ -49,8 +49,6 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
         <version.apache-httpclient-fluent>4.5.12</version.apache-httpclient-fluent> <!-- same as Apache HTTP Client managed by Quarkus BOM -->
-        <version.qpid-jms>0.14.1</version.qpid-jms>
-        <version.artemis.server>2.10.0</version.artemis.server>
         <version.awaitility>4.0.3</version.awaitility>
         <version.fusesource-jansi>1.18</version.fusesource-jansi>
         <version.impsort-maven-plugin>1.4.1</version.impsort-maven-plugin>
@@ -60,6 +58,7 @@
         <version.maven-compiler-plugin>3.8.1</version.maven-compiler-plugin>
         <version.maven-jar-plugin>3.2.0</version.maven-jar-plugin>
         <version.maven-surefire-plugin>2.22.2</version.maven-surefire-plugin>
+        <version.qpid-jms>0.14.1</version.qpid-jms>
         <version.quarkus>999-SNAPSHOT</version.quarkus>
     </properties>
 
