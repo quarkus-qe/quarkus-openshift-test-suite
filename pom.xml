@@ -51,7 +51,7 @@
         <version.apache-httpclient-fluent>4.5.12</version.apache-httpclient-fluent> <!-- same as Apache HTTP Client managed by Quarkus BOM -->
         <version.qpid-jms>0.14.1</version.qpid-jms>
         <version.artemis.server>2.10.0</version.artemis.server>
-        <version.awaitility>4.0.2</version.awaitility>
+        <version.awaitility>4.0.3</version.awaitility>
         <version.fusesource-jansi>1.18</version.fusesource-jansi>
         <version.impsort-maven-plugin>1.4.1</version.impsort-maven-plugin>
         <version.jandex-maven-plugin>1.0.8</version.jandex-maven-plugin>
