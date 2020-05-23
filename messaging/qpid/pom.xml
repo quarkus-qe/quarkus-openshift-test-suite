@@ -20,7 +20,6 @@
         <dependency>
             <groupId>org.amqphub.quarkus</groupId>
             <artifactId>quarkus-qpid-jms</artifactId>
-            <version>${version.qpid-jms}</version>
         </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
