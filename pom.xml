@@ -48,8 +48,10 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+        <quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
+        <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
+
         <version.apache-httpclient-fluent>4.5.12</version.apache-httpclient-fluent> <!-- same as Apache HTTP Client managed by Quarkus BOM -->
-        <version.awaitility>4.0.3</version.awaitility>
         <version.fusesource-jansi>1.18</version.fusesource-jansi>
         <version.impsort-maven-plugin>1.4.1</version.impsort-maven-plugin>
         <version.jandex-maven-plugin>1.0.8</version.jandex-maven-plugin>
@@ -58,15 +60,14 @@
         <version.maven-compiler-plugin>3.8.1</version.maven-compiler-plugin>
         <version.maven-jar-plugin>3.2.0</version.maven-jar-plugin>
         <version.maven-surefire-plugin>2.22.2</version.maven-surefire-plugin>
-        <version.qpid-jms>0.14.1</version.qpid-jms>
-        <version.quarkus>999-SNAPSHOT</version.quarkus>
+        <version.quarkus>1.3.3.Final</version.quarkus>
     </properties>
 
     <dependencyManagement>
         <dependencies>
             <dependency>
-                <groupId>io.quarkus</groupId>
-                <artifactId>quarkus-bom</artifactId>
+                <groupId>${quarkus.platform.group-id}</groupId>
+                <artifactId>${quarkus.platform.artifact-id}</artifactId>
                 <version>${version.quarkus}</version>
                 <type>pom</type>
                 <scope>import</scope>
@@ -113,11 +114,6 @@
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>fluent-hc</artifactId>
                 <version>${version.apache-httpclient-fluent}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.awaitility</groupId>
-                <artifactId>awaitility</artifactId>
-                <version>${version.awaitility}</version>
             </dependency>
             <dependency>
                 <groupId>org.fusesource.jansi</groupId>
@@ -220,6 +216,29 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>quarkus-master</id>
+            <activation>
+                <property>
+                    <name>quarkus-master</name>
+                </property>
+            </activation>
+            <properties>
+                <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
+                <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
+                <version.qpid-jms>0.14.1</version.qpid-jms>
+                <version.quarkus>999-SNAPSHOT</version.quarkus>
+            </properties>
+            <dependencyManagement>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.amqphub.quarkus</groupId>
+                        <artifactId>quarkus-qpid-jms</artifactId>
+                        <version>${version.qpid-jms}</version>
+                    </dependency>
+                </dependencies>
+            </dependencyManagement>
         </profile>
     </profiles>
 </project>
