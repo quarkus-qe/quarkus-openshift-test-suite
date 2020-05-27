@@ -218,10 +218,10 @@
             </build>
         </profile>
         <profile>
-            <id>quarkus-master</id>
+            <id>quarkus-core-only</id>
             <activation>
                 <property>
-                    <name>quarkus-master</name>
+                    <name>quarkus-core-only</name>
                 </property>
             </activation>
             <properties>
