@@ -14,7 +14,7 @@ If there are resources deployed in the project, you should not expect they will 
 
 Running the tests amounts to standard `mvn clean verify`.
 This will use a specific Quarkus version, which can be modified by setting the `version.quarkus` property.
-Alternatively, you can use `-Dquarkus-master` to run the test suite against Quarkus `999-SNAPSHOT`.
+Alternatively, you can use `-Dquarkus-core-only` to run the test suite against Quarkus `999-SNAPSHOT`.
 In that case, make sure you have built Quarkus locally prior to running the tests.
 
 It is highly recommended to do `oc delete all --all` before `mvn` if you are debugging your failing deployments.
