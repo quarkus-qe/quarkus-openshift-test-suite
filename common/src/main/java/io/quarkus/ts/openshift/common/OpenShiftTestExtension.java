@@ -111,9 +111,18 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
 
     @Override
     public void beforeAll(ExtensionContext context) throws Exception {
-        System.out.println("---------- OpenShiftTest set up ----------");
-
         initTestsStatus(context);
+
+        try {
+            doBeforeAll(context);
+        } catch (Exception e) {
+            getTestsStatus(context).failed = true;
+            throw e;
+        }
+    }
+
+    private void doBeforeAll(ExtensionContext context) throws Exception {
+        System.out.println("---------- OpenShiftTest set up ----------");
 
         createEphemeralNamespaceIfNecessary(context);
 
@@ -236,6 +245,8 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
         }
 
         // TODO before or after application undeployment?
+        // TODO not yet clear if this method should be invoked (or not) in presence of ephemeral namespaces,
+        //  test failures, or retain on failure -- fortunately this annotation isn't used anywhere yet :-)
         runPublicStaticVoidMethods(CustomizeApplicationUndeployment.class, context);
 
         dropEphemeralNamespaceIfNecessary(context);
