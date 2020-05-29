@@ -35,6 +35,7 @@
         <module>security/https-1way</module>
         <module>security/https-2way</module>
         <module>microprofile</module>
+        <module>openshift-extension</module>
 
         <module>external-applications/todo-demo-app</module>
         <module>external-applications/quarkus-workshop-super-heroes</module>
