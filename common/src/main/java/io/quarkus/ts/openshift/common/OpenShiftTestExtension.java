@@ -246,7 +246,7 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
 
         // TODO before or after application undeployment?
         // TODO not yet clear if this method should be invoked (or not) in presence of ephemeral namespaces,
-        //  test failures, or retain on failure -- fortunately this annotation isn't used anywhere yet :-)
+        //  test failures, or retain on failure
         runPublicStaticVoidMethods(CustomizeApplicationUndeployment.class, context);
 
         dropEphemeralNamespaceIfNecessary(context);
@@ -271,7 +271,7 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
         for (Method method : context.getRequiredTestClass().getMethods()) {
             if (method.getAnnotation(annotation) != null) {
                 if (!isPublicStaticVoid(method)) {
-                    throw new OpenShiftTestException("@" + CustomizeApplicationUndeployment.class.getSimpleName()
+                    throw new OpenShiftTestException("@" + annotation.getSimpleName()
                             + " method " + method.getDeclaringClass().getSimpleName() + "." + method.getName()
                             + " must be public static void");
                 }
