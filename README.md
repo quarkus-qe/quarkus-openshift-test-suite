@@ -358,3 +358,8 @@ TODO
 ### `external-applications/quarkus-workshop-super-heroes`
 
 TODO
+
+### `deployment-strategies/quarkus`
+
+A smoke test for deploying the application to OpenShift via `quarkus.kubernetes.deploy`.
+The test itself only verifies that a simple HTTP endpoint can be accessed.
