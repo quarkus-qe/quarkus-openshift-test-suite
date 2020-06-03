@@ -126,8 +126,6 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
 
         createEphemeralNamespaceIfNecessary(context);
 
-        AppMetadata metadata = getAppMetadata(context);
-
         deployAdditionalResources(context);
 
         runPublicStaticVoidMethods(CustomizeApplicationDeployment.class, context);
@@ -138,12 +136,14 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
                 throw new OpenShiftTestException("Missing " + openshiftResources + ", did you add the quarkus-kubernetes or quarkus-openshift extension?");
             }
 
+            ImageOverrides.apply(openshiftResources, getOpenShiftClient(context));
+
             System.out.println("deploying application");
             new Command("oc", "apply", "-f", openshiftResources.toString()).runAndWait();
 
             awaitImageStreams(context, openshiftResources);
 
-            new Command("oc", "start-build", metadata.appName, "--from-dir=target", "--follow").runAndWait();
+            new Command("oc", "start-build", getAppMetadata(context).appName, "--from-dir=target", "--follow").runAndWait();
         }
 
         setUpRestAssured(context);
