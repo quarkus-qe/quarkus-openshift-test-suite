@@ -42,6 +42,7 @@ final class AdditionalResourcesDeployed implements CloseableResource {
         }
         Path tempFile = Files.createTempFile("additional-resources", ".yml");
         Files.copy(resources, tempFile, StandardCopyOption.REPLACE_EXISTING);
+        ImageOverrides.apply(tempFile, oc);
 
         System.out.println(ansi().a("deploying ").fgYellow().a(url).reset());
         new Command("oc", "apply", "-f", tempFile.toString()).runAndWait();

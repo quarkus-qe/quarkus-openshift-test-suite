@@ -209,6 +209,32 @@ The `@ManualApplicationDeployment` annotation then provides the necessary info a
 This can be used to write tests that excersise an external application.
 You have full control over the application deployment and undeployment process, but the rest of the test can be written as if the application was part of the test suite.
 
+### Image overrides
+
+It is sometimes useful to globally override certain images, for example when testing with a pre-release version of an image that is not yet available publicly.
+In such case, you can set `-Dts.image-overrides` to a path of a file that looks like this:
+
+```
+registry.access.redhat.com/openjdk/openjdk-11-rhel7=registry.access.redhat.com/ubi8/openjdk-11
+registry.access.redhat.com/rhscl/postgresql-10-rhel7=registry.redhat.io/rhscl/postgresql-12-rhel7
+```
+
+This looks like a `.properties` format, but it is not!
+Specifically, the format is:
+
+- empty lines and lines that begin with `#` are ignored;
+- other lines must have a source image name (possibly with a tag), followed by `=`, followed by a target image name (possibly with a tag).
+
+When a YAML file refers to the source image, it is changed to use the target image before it is deployed.
+If there's no tag in the configuration of the source image, it will match all tags.
+
+Note that this is _not_ dumb string search & replace.
+We actually edit the Kubernetes resources on a few specific places (such as container definition or image stream definition), the rest is left unchanged.
+
+This currently works automatically for the `target/kubernetes/openshift.yml` file and all the files deployed with `@AdditionalResources`.
+
+Note that it is usually a good idea to set `-Dts.image-overrides` to a _full_ path, because Maven changes the current working directory when running tests.
+
 ### TODO
 
 There's a lot of possible improvements that haven't been implemented yet.
@@ -227,6 +253,7 @@ The most interesting probably are:
 - To be able to configure the connection to OpenShift cluster (that is, how `OpenShiftClient` is created).
   Currently, this isn't possible, and doesn't make too much sense, because for some actions, we just run `oc`, while for some, we use the Java client.
   We could possibly move towards doing everything through the Java library, but some things are hard (e.g. `oc start-build`).
+  If we ever do this, then it becomes easily possible to consisently apply image overrides everywhere.
 
 It would also be possible to create a Kubernetes variant: `@KubernetesTest`, `kubernetes.yml`, injection of `KubernetesClient`, etc.
 Most of the code could easily be shared.
