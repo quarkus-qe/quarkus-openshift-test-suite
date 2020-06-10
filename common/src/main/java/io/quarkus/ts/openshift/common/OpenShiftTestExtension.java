@@ -216,6 +216,14 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
 
     @Override
     public void afterAll(ExtensionContext context) throws Exception {
+        boolean testsFailed = getTestsStatus(context).failed;
+
+        if (testsFailed) {
+            System.out.println(ansi().a("test ").fgYellow().a(context.getDisplayName()).reset()
+                    .a(" failed, showing current namespace status"));
+            new Command("oc", "status", "--suggest").runAndWait();
+        }
+
         System.out.println("---------- OpenShiftTest tear down ----------");
 
         boolean shouldUndeployApplication = true;
@@ -226,7 +234,7 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
             //   everything in the ephemeral namespace must be kept intact
             shouldUndeployApplication = false;
         }
-        if (RetainOnFailure.isEnabled() && getTestsStatus(context).failed) {
+        if (RetainOnFailure.isEnabled() && testsFailed) {
             shouldUndeployApplication = false;
 
             if (EphemeralNamespace.isDisabled()) {

@@ -17,8 +17,6 @@ This will use a specific Quarkus version, which can be modified by setting the `
 Alternatively, you can use `-Dquarkus-core-only` to run the test suite against Quarkus `999-SNAPSHOT`.
 In that case, make sure you have built Quarkus locally prior to running the tests.
 
-It is highly recommended to do `oc delete all --all` before `mvn` if you are debugging your failing deployments.
-
 All the tests currently use the RHEL 7 OpenJDK 11 image.
 This is configured in the `application.properties` file in each module.
 Since this is standard Quarkus configuration, it's possible to override using a system property.
@@ -390,3 +388,70 @@ TODO
 
 A smoke test for deploying the application to OpenShift via `quarkus.kubernetes.deploy`.
 The test itself only verifies that a simple HTTP endpoint can be accessed.
+
+## Debugging failing tests
+
+I typically debug failing tests by reproducing everything the test suite does manually.
+
+1. `oc delete all --all` to cleanup the existing project.
+   Note that this doesn't really delete _all_ resources, e.g. ConfigMaps and secrets will stay intact.
+1. `mvn -pl .,app-metadata/runtime,app-metadata/deployment,common,<the failing test suite module> clean package` to rebuild the application.
+1. `cd <the failing test suite module>` just for convenience.
+1. If there are `@AdditionalResources`, then `oc apply -f src/test/resources/<additional resources>.yml`.
+   It is usually enough to do this just once and leave the resources deployed for the entire debugging session.
+   But sometimes, you'll need to undeploy them to really start over from scratch (`oc delete -f src/test/resources/<additional resources>.yml`).
+1. `oc apply -f target/kubernetes/openshift.yml` to create all the Kubernetes resources of the application.
+   Note that this will not deploy the application just yet -- there's no image to run.
+1. `oc start-build <name of the application> --from-dir=target --follow` to upload all the artifacts to the cluster and build the image there (using binary S2I).
+   This might fail if it's done too quickly after the previous command, because the OpenJDK image stream is empty for a while.
+   When the image is built, application deployment will automatically proceed.
+   You may want to watch the pod's log during deployment, in case the application fails to start.
+   It might happen that the pod never becomes ready, because the application always fails to start.
+1. OK, so now the application is deployed.
+
+   I start with trying to hit an endpoint that the test would also use.
+   That is, either `/`, or at least `/health/ready` (as all the tests have health probes), or something like that.
+   I use HTTPie (`http`) on my local machine, as its output is nicer than `curl`, but `curl` is of course also fine.
+   If I'm getting an error, I try hitting the endpoint from inside the pod.
+   For that, I use `curl`, because it's present in almost all images.
+   That can be done from the OpenShift web console, using the _Terminal_ tab, or with `oc rsh`.
+
+   If that fails, I inspect everything that might be related.
+   Again, that can be done from the OpenShift web console, or using `oc` commands.
+   I look into:
+   - the pod's log
+   - the pod's filesystem (on the OpenJDK image, the application should be in `/deployments`)
+   - the pod's environment variables (running the `env` command inside the pod)
+   - the build pod's log
+   - pod logs of other application, if the test uses them
+   - generally everything else that's related to `@AdditionalResources`
+   - the image streams
+   - ConfigMaps and secrets, if the test uses them
+1. In most cases, I need to undeploy the application and deploy it again several times, before I figure out what's wrong.
+   For that, I do just `oc delete -f target/kubernetes/openshift.yml`.
+   This leaves all the `@AdditionalResources` deployed, which is usually fine.
+1. The steps above are often enough to diagnose the issue.
+   Every once in a while, though, one needs to connect a debugger to the deployed application.
+   This is possible, but note that it will be very slow.
+   1. The application needs to accept remote debugger connection.
+      To set the usual JVM arguments, add the following to your application's `application.properties`:
+
+      ```properties
+      # for OpenJDK 8
+      quarkus.s2i.jvm-arguments=-Dquarkus.http.host=0.0.0.0,-Djava.util.logging.manager=org.jboss.logmanager.LogManager,-agentlib:jdwp=transport=dt_socket\\,server=y\\,suspend=n\\,address=5005
+      # for OpenJDK 11
+      quarkus.s2i.jvm-arguments=-Dquarkus.http.host=0.0.0.0,-Djava.util.logging.manager=org.jboss.logmanager.LogManager,-agentlib:jdwp=transport=dt_socket\\,server=y\\,suspend=n\\,address=*:5005
+      ```
+      Note that for other JVMs, the exact string can be different.
+      Also note the escaped `,` characters.
+      If you want to verify your configuration is correct, run `mvn clean package` per above and then check the `JAVA_OPTIONS` entry in `target/kubernetes/openshift.yml`.
+
+      This configuration assumes the common binary S2I approach that is used in this test suite.
+      Other deployment approaches might require using a different option.
+   1. Deploy the application as usual.
+   1. Find out the pod name using `oc get pods`.
+   1. `oc port-forward pod/<name of the pod> 5005` to forward the debugger port from the pod to your local machine.
+   1. Connect to `localhost:5005` from your IDE.
+
+   Note that this assumes that the application starts fine.
+   If the application fails to start, setting `suspend=y` can help to debug the boot process.
