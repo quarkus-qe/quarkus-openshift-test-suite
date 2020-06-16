@@ -1,6 +1,7 @@
 package io.quarkus.ts.openshift.app.metadata;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -55,9 +56,9 @@ public final class AppMetadata {
     }
 
     public static AppMetadata load(Path file) {
-        try {
-            Properties props = new Properties();
-            props.load(Files.newBufferedReader(file));
+        Properties props = new Properties();
+        try (Reader fileReader = Files.newBufferedReader(file)) {
+            props.load(fileReader);
             return new AppMetadata(
                     props.getProperty("app-name"),
                     props.getProperty("http-root"),
