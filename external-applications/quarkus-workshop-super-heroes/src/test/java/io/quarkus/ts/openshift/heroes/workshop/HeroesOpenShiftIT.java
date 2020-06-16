@@ -137,7 +137,7 @@ public class HeroesOpenShiftIT {
     @Order(2)
     public void testUpdateHero() {
         Hero hero = new Hero();
-        hero.id = new Long(heroId);
+        hero.id = Long.valueOf(heroId);
         hero.name = UPDATED_NAME;
         hero.otherName = UPDATED_OTHER_NAME;
         hero.level = UPDATED_LEVEL;
@@ -183,7 +183,7 @@ public class HeroesOpenShiftIT {
             .body("'io.quarkus.workshop.superheroes.hero.HeroResource.countDeleteHero'", is(1));
     }
 
-    class Hero {
+    static class Hero {
         public Long id;
         public String name;
         public String otherName;

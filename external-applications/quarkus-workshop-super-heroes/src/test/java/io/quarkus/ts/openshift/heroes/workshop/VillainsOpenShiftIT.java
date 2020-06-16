@@ -138,7 +138,7 @@ public class VillainsOpenShiftIT {
     @Order(2)
     public void testUpdateVillain() {
         Villain villain = new Villain();
-        villain.id = new Long(villainId);
+        villain.id = Long.valueOf(villainId);
         villain.name = UPDATED_NAME;
         villain.otherName = UPDATED_OTHER_NAME;
         villain.level = UPDATED_LEVEL;
@@ -184,7 +184,7 @@ public class VillainsOpenShiftIT {
             .body("'io.quarkus.workshop.superheroes.villain.VillainResource.countDeleteVillain'", is(1));
     }
 
-    class Villain {
+    static class Villain {
         public Long id;
         public String name;
         public String otherName;
