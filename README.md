@@ -374,15 +374,25 @@ TODO
 
 ### `scaling`
 
-TODO
+An OpenShift test verifying that an OpenShift deployment with a Quarkus application scales up and down.
+
+This test could be extended with some metric gathering.
 
 ### `external-applications/todo-demo-app`
 
-TODO
+This test produces an S2I source deployment config for OpenShift with [todo-demo-app](https://github.com/quarkusio/todo-demo-app) 
+serving a simple todo checklist. The code for this application lives outside of the test suite's codebase.
+
+The test verifies that the application with a sample of libraries is buildable and deployable via supported means.
 
 ### `external-applications/quarkus-workshop-super-heroes`
 
-TODO
+This test produces an S2I source deployment config for OpenShift with 
+[Quarkus Super heroes workshop](https://github.com/quarkusio/quarkus-workshops) application.
+The code for this application lives outside of the test suite's codebase.
+''
+The test verifies that the application is buildable and deployable. It also verifies that the REST and MicroProfile APIs
+function properly on OpenShift, as well as the database integrations.
 
 ### `deployment-strategies/quarkus`
 
