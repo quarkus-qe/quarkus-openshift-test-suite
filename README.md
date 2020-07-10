@@ -465,3 +465,24 @@ I typically debug failing tests by reproducing everything the test suite does ma
 
    Note that this assumes that the application starts fine.
    If the application fails to start, setting `suspend=y` can help to debug the boot process.
+
+## Known issues
+
+### Security https tests and Connection refused
+Security https tests failing with Connection refused and stacktrace similar to this:
+```
+[ERROR] https_serverCertificateUnknownToClient  Time elapsed: 0.179 s  <<< FAILURE!
+org.opentest4j.AssertionFailedError: Unexpected exception type thrown ==> expected: <javax.net.ssl.SSLHandshakeException> but was: <org.apache.http.conn.HttpHostConnectException>
+	at io.quarkus.ts.openshift.security.https.oneway.SecurityHttps1wayTest.https_serverCertificateUnknownToClient(SecurityHttps1wayTest.java:60)
+Caused by: org.apache.http.conn.HttpHostConnectException: Connect to 0.0.0.0:8444 [/0.0.0.0] failed: Connection refused (Connection refused)
+	at io.quarkus.ts.openshift.security.https.oneway.SecurityHttps1wayTest.lambda$https_serverCertificateUnknownToClient$0(SecurityHttps1wayTest.java:61)
+	at io.quarkus.ts.openshift.security.https.oneway.SecurityHttps1wayTest.https_serverCertificateUnknownToClient(SecurityHttps1wayTest.java:60)
+Caused by: java.net.ConnectException: Connection refused (Connection refused)
+	at io.quarkus.ts.openshift.security.https.oneway.SecurityHttps1wayTest.lambda$https_serverCertificateUnknownToClient$0(SecurityHttps1wayTest.java:61)
+	at io.quarkus.ts.openshift.security.https.oneway.SecurityHttps1wayTest.https_serverCertificateUnknownToClient(SecurityHttps1wayTest.java:60)
+```
+These are local fails during `surefire` execution, this behaviour can be noticed on macOS when the client can't
+connect to `0.0.0.0` and explicit address needs to be specified like in this example:
+```
+mvn clean test -Dquarkus.http.host=127.0.0.1
+```
