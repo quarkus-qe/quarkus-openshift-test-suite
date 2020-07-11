@@ -334,7 +334,7 @@ This test doesn't run on OpenShift (yet).
 
 ### `security/https-2way`
 
-Verifies that accessing an HTTPS endpoint with client certificate is posible.
+Verifies that accessing an HTTPS endpoint with client certificate is possible.
 The client certificate is required in this test.
 Uses self-signed certificates generated during the build, so that the test is fully self-contained.
 
@@ -358,19 +358,41 @@ This is a RESTEasy bug, there is a proposed fix: https://github.com/resteasy/Res
 
 ### `messaging/artemis`
 
-TODO
+Verifies that JMS server is up and running and Quarkus can communicate with this service.
+
+There is a PriceProducer that pushes a new integer "price" to a JMS queue called "prices" each second.
+PriceConsumer is a loop that starts at the beginning of the application runtime and blocks on reading
+from the queue called "prices". Once a value is read, the attribute lastPrice is updated.
+Test checks that the value gets updated.
 
 ### `messaging/artemis-jta`
 
-TODO
+Verifies that JMS server is up and running and Quarkus can communicate with this service using either transactions or client acknowledge mode.
+
+There are three JMS queues, `custom-prices-1` and `custom-prices-2` are used to test
+a transactional write: either both are correctly updated with a new value or none of them is.
+
+`custom-prices-cack` queue is used to check that messages remains waiting in the queue until
+client "acks" them, i.e. acknowledges their processing.
 
 ### `messaging/amqp-reactive`
 
-TODO
+Verifies that JMS server is up and running and Quarkus can communicate with this service.
+This module is using Reactive Messaging approach by leveraging `quarkus-smallrye-reactive-messaging-amqp` extension.
+
+There is a PriceProducer that generates message every second, the value of the message is "tick number" multiplied by 10 modulo 100.
+PriceConsumer puts received number into ConcurrentLinkedQueue of Integers.
+State of this queue is exposed using PriceResource which is called from the test.
 
 ### `messaging/qpid`
 
-TODO
+Verifies that JMS server is up and running and Quarkus can communicate with this service.
+Similar to `messaging/artemis` scenario but using `quarkus-qpid-jms` extension to communicate with the server.
+
+There is a PriceProducer that pushes a new integer "price" to a JMS queue called "prices" each second.
+PriceConsumer is a loop that starts at the beginning of the application runtime and blocks on reading
+from the queue called "prices". Once a value is read, the attribute lastPrice is updated.
+Test checks that the value gets updated.
 
 ### `scaling`
 
