@@ -7,7 +7,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.concurrent.TimeUnit;
 
-import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.when;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -19,10 +19,9 @@ public abstract class AbstractAMQPTest {
     public void testLastPrice() {
         await().pollInterval(1, TimeUnit.SECONDS)
                 .atMost(15, TimeUnit.SECONDS).untilAsserted(() ->
-                given()
-                        .when()
+                    when()
                         .get("/price")
-                        .then()
+                    .then()
                         .statusCode(200)
                         .body(equalTo("[10, 20, 30, 40, 50, 60, 70, 80, 90, 100]")));
     }
