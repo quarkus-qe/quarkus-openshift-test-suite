@@ -15,6 +15,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.when;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -37,7 +38,7 @@ public abstract class AbstractArtemisTest {
      */
     @BeforeEach
     public void clean() {
-        given().when().delete("/price").then().statusCode(200);
+        when().delete("/price").then().statusCode(200);
     }
 
     /**
@@ -48,21 +49,22 @@ public abstract class AbstractArtemisTest {
     @Test
     @Order(1)
     public void testPrice() {
-        given().queryParam("fail", "false")
+        given()
+                .queryParam("fail", "false")
                 .queryParam("transactional", "true")
                 .body("666")
-                .when()
-                .post("/price").then().statusCode(200);
+        .when()
+                .post("/price")
+        .then()
+                .statusCode(200);
 
         await().pollInterval(1, TimeUnit.SECONDS)
-                .atMost(5, TimeUnit.SECONDS).untilAsserted(() -> assertThat("testPrice:",
-                given()
-                        .when()
+                .atMost(5, TimeUnit.SECONDS).untilAsserted(() ->
+                    when()
                         .get("/price")
-                        .then()
+                    .then()
                         .statusCode(200)
-                        .extract().body().asString()
-                , equalTo("666:666")));
+                        .body(equalTo("666:666")));
     }
 
     /**
@@ -76,17 +78,18 @@ public abstract class AbstractArtemisTest {
         given().queryParam("fail", "true")
                 .queryParam("transactional", "true")
                 .body("999")
-                .when()
-                .post("/price").then().statusCode(500);
+        .when()
+                .post("/price")
+        .then()
+                .statusCode(500);
 
         Set<String> s = new HashSet<>(10);
         for (int i = 0; i < 10; i++) {
-            s.add(given()
-                    .when()
-                    .get("/price")
+            s.add(  when()
+                        .get("/price")
                     .then()
-                    .statusCode(200)
-                    .extract().body().asString());
+                        .statusCode(200)
+                        .extract().body().asString());
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -108,19 +111,22 @@ public abstract class AbstractArtemisTest {
     @Test
     @Order(3)
     public void testPriceFail() {
-        given().queryParam("fail", "true", "transactional", "false")
+        given()
+                .queryParam("fail", "true")
+                .queryParam("transactional", "false")
                 .body("69")
-                .when()
-                .post("/price").then().statusCode(500);
+        .when()
+                .post("/price")
+        .then()
+                .statusCode(500);
 
         Set<String> s = new HashSet<>(10);
         for (int i = 0; i < 10; i++) {
-            s.add(given()
-                    .when()
-                    .get("/price")
+            s.add(  when()
+                        .get("/price")
                     .then()
-                    .statusCode(200)
-                    .extract().body().asString());
+                        .statusCode(200)
+                        .extract().body().asString());
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -128,8 +134,7 @@ public abstract class AbstractArtemisTest {
             }
         }
         LOG.info("Retrieved data from queues: " + s);
-        assertThat("One queue should have been updated." +
-                " Retrieved data from queues: " + s, s.contains("69:"));
+        assertThat("One queue should have been updated. Retrieved data: " + s, s.contains("69:"));
     }
 
     /**
@@ -149,12 +154,14 @@ public abstract class AbstractArtemisTest {
     private void clientAck(int size, List<String> expected, boolean ack) {
         List<String> actual = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
-            actual.add(given().queryParam("ack", ack)
+            actual.add(
+                    given()
+                            .queryParam("ack", ack)
                     .when()
-                    .get("/noAck")
+                            .get("/noAck")
                     .then()
-                    .statusCode(200)
-                    .extract().body().asString());
+                            .statusCode(200)
+                            .extract().body().asString());
         }
         LOG.info("Retrieved data from queues: " + actual);
         assertThat("Expected list " + expected.toString() + " does not match th actual one: " + actual.toString(),

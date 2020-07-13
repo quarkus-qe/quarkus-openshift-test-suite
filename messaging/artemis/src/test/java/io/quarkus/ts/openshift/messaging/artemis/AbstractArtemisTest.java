@@ -7,7 +7,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.concurrent.TimeUnit;
 
-import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.when;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
@@ -29,8 +29,7 @@ public abstract class AbstractArtemisTest {
     public void testLastPrice() {
         await().atMost(60, TimeUnit.SECONDS).untilAsserted(() -> {
             String value =
-                    given()
-                    .when()
+                    when()
                             .get("/prices/last")
                     .then()
                             .statusCode(200)
