@@ -1,4 +1,4 @@
-package io.quarkus.ts.openshift.configmap;
+package io.quarkus.ts.openshift.configmap.file.system;
 
 import io.quarkus.runtime.annotations.RegisterForReflection;
 

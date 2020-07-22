@@ -17,7 +17,7 @@
         <module>common</module>
 
         <module>http</module>
-        <module>configmap</module>
+        <module>configmap/file-system</module>
         <module>messaging/artemis</module>
         <module>messaging/artemis-jta</module>
         <module>messaging/amqp-reactive</module>

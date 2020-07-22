@@ -1,4 +1,4 @@
-package io.quarkus.ts.openshift.configmap;
+package io.quarkus.ts.openshift.configmap.file.system;
 
 import io.quarkus.ts.openshift.app.metadata.AppMetadata;
 import io.quarkus.ts.openshift.common.AdditionalResources;
@@ -22,7 +22,7 @@ import static org.hamcrest.Matchers.containsString;
 @OpenShiftTest
 @AdditionalResources("classpath:configmap.yaml")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class ConfigMapOpenShiftIT {
+public class ConfigMapFileSystemOpenShiftIT {
     @TestResource
     private AppMetadata metadata;
 
