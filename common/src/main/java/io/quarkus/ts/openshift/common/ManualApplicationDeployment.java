@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * If the test class is annotated {@code ManualApplicationDeployment}, tested application will not be deployed
  * automatically and it is expected that it will be deployed using {@link CustomizeApplicationDeployment} and
- * @link AdditionalResources}. This annotation then provides the necessary information about the tested application.
+ * {@link AdditionalResources}. This annotation then provides the necessary information about the tested application.
  * If {@code CustomizeApplicationDeployment} is used to deploy the application,
  * then {@link CustomizeApplicationUndeployment} should be used to undeploy it.
  */
