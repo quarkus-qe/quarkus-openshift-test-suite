@@ -12,18 +12,19 @@ import org.apache.http.ssl.SSLContexts;
 import org.junit.jupiter.api.Test;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLHandshakeException;
 
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import static io.quarkus.ts.openshift.common.util.HttpsAssertions.assertTlsHandshakeError;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @QuarkusTest
 public class SecurityHttps1wayTest {
     // not using RestAssured because we want 100% control over certificate & hostname verification
+
+    private static final char[] CLIENT_PASSWORD = "client-password".toCharArray();
 
     @TestHTTPResource(value = "/hello", ssl = true)
     private String url;
@@ -35,7 +36,7 @@ public class SecurityHttps1wayTest {
     public void https() throws IOException, GeneralSecurityException {
         SSLContext sslContext = SSLContexts.custom()
                 .setKeyStoreType("pkcs12")
-                .loadTrustMaterial(new File("target/client-truststore.pkcs12"), "client-password".toCharArray())
+                .loadTrustMaterial(new File("target/client-truststore.pkcs12"), CLIENT_PASSWORD)
                 .build();
         try (CloseableHttpClient httpClient = HttpClients.custom()
                 .setSSLContext(sslContext)
@@ -57,7 +58,7 @@ public class SecurityHttps1wayTest {
                 .setSSLHostnameVerifier(new DefaultHostnameVerifier())
                 .build()) {
 
-            assertThrows(SSLHandshakeException.class, () -> {
+            assertTlsHandshakeError(() -> {
                 Executor.newInstance(httpClient).execute(Request.Get(url));
             });
         }

@@ -398,6 +398,15 @@ Uses self-signed certificates generated during the build, so that the test is fu
 
 This test doesn't run on OpenShift (yet).
 
+### `security/https-2way-authz`
+
+Verifies that accessing an HTTPS endpoint with authentication and authorization based on client certificate is possible.
+Quarkus doesn't offer a declarative way to assign roles based on a client certificate, so a `SecurityIdentityAugmentor` is used.
+The client certificate is _not_ required in this test.
+Uses self-signed certificates generated during the build, so that the test is fully self-contained.
+
+This test doesn't run on OpenShift (yet).
+
 ### `microprofile`
 
 Verifies combined usage of MicroProfile RestClient, Fault Tolerance and OpenTracing.
