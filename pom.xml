@@ -17,6 +17,7 @@
         <module>common</module>
 
         <module>http</module>
+        <module>configmap/api-server</module>
         <module>configmap/file-system</module>
         <module>messaging/artemis</module>
         <module>messaging/artemis-jta</module>

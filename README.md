@@ -312,6 +312,11 @@ Verifies that you can deploy a simple HTTP endpoint to OpenShift and access it.
 Checks that the application can read configuration from a ConfigMap.
 The ConfigMap is exposed by mounting it into the container file system.
 
+### `configmap/api-server`
+
+Checks that the application can read configuration from a ConfigMap.
+The ConfigMap is obtained directly from the Kubernetes API server.
+
 ### `sql-db`
 
 Verifies that the application can connect to a SQL database and persist data using Hibernate ORM with Panache.
