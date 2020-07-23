@@ -317,6 +317,16 @@ The ConfigMap is exposed by mounting it into the container file system.
 Checks that the application can read configuration from a ConfigMap.
 The ConfigMap is obtained directly from the Kubernetes API server.
 
+### `config-secret/file-system`
+
+Checks that the application can read configuration from a Secret.
+The Secret is exposed by mounting it into the container file system.
+
+### `config-secret/api-server`
+
+Checks that the application can read configuration from a Secret.
+The Secret is obtained directly from the Kubernetes API server.
+
 ### `sql-db`
 
 Verifies that the application can connect to a SQL database and persist data using Hibernate ORM with Panache.

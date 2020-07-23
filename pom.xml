@@ -19,6 +19,8 @@
         <module>http</module>
         <module>configmap/api-server</module>
         <module>configmap/file-system</module>
+        <module>config-secret/api-server</module>
+        <module>config-secret/file-system</module>
         <module>messaging/artemis</module>
         <module>messaging/artemis-jta</module>
         <module>messaging/amqp-reactive</module>
