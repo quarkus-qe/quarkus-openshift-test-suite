@@ -258,6 +258,23 @@ This currently works automatically for the `target/kubernetes/openshift.yml` fil
 
 Note that it is usually a good idea to set `-Dts.image-overrides` to a _full_ path, because Maven changes the current working directory when running tests.
 
+### Native image
+
+The test suite contains a Maven profile configuring required system properties for native image build. The profile is
+activated by specifying the `native` Quarkus profile (`-Dquarkus.profile=native`). This profile does not specify the 
+container runtime for Quarkus native build, so by default, native build will use local GraalVM. The following command 
+will execute the whole test suite using Docker to run containers for native build:
+
+```
+./mvnw clean verify \
+  -Dquarkus.profile=native \ 
+  -Dquarkus.native.container-runtime=docker \
+  -Dts.authenticated-registry
+```
+
+Currently used builder image is `quarkus/ubi-quarkus-mandrel` and the base image for OpenShift deployment is 
+`quarkus/ubi-quarkus-native-binary-s2i`.
+
 ### TODO
 
 There's a lot of possible improvements that haven't been implemented yet.
@@ -277,6 +294,7 @@ The most interesting probably are:
   Currently, this isn't possible, and doesn't make too much sense, because for some actions, we just run `oc`, while for some, we use the Java client.
   We could possibly move towards doing everything through the Java library, but some things are hard (e.g. `oc start-build`).
   If we ever do this, then it becomes easily possible to consisently apply image overrides everywhere.
+- Implement a build workflow with `ubi8/ubi-minimal` instead of using `quarkus/ubi-quarkus-native-binary-s2i`.
 
 It would also be possible to create a Kubernetes variant: `@KubernetesTest`, `kubernetes.yml`, injection of `KubernetesClient`, etc.
 Most of the code could easily be shared.

@@ -10,11 +10,15 @@ import java.util.UUID;
 @Path("/scaling")
 public class ScalingResource {
 
-    private final static UUID uuid = UUID.randomUUID();
+    private static UUID uuid;
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String get() {
+        // this is not exactly thread safe and should be fixed in the future
+        if (uuid == null) {
+            uuid = UUID.randomUUID();
+        }
         return uuid.toString();
     }
 }
