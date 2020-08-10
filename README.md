@@ -22,6 +22,11 @@ This is configured in the `application.properties` file in each module.
 Since this is standard Quarkus configuration, it's possible to override using a system property.
 Therefore, if you want to run the tests with a different Java S2I image, run `mvn clean verify -Dquarkus.s2i.base-jvm-image=...`.
 
+## Branching Strategy
+The `master` branch is always meant for latest upstream/downstream development. For each downstream major.minor version, there's a corresponding maintenance branch:
+
+  - `1.3` for Red Hat build of Quarkus 1.3.z (corresponding upstream version: `1.3.0.Final+`)
+
 ## Test Framework
 
 The `app-metadata` and `common` directories contain a tiny framework for testing Quarkus applications on OpenShift.
