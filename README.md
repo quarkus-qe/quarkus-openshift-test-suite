@@ -13,14 +13,34 @@ All tests will run in the project you're logged into, so it should be empty.
 If there are resources deployed in the project, you should not expect they will survive.
 
 Running the tests amounts to standard `mvn clean verify`.
-This will use a specific version of Red Hat build of Quarkus, which can be modified by setting the `version.quarkus` property.
-Alternatively, you can use `-Dquarkus-core-only` to run the test suite against upstream Quarkus `999-SNAPSHOT`.
-In that case, make sure you have built Quarkus locally prior to running the tests or adjust the version using the `version.quarkus` property.
+This will use a specific Quarkus version, which can be modified by setting the `version.quarkus` property.
+Alternatively, you can use `-Dquarkus-core-only` to run the test suite against Quarkus `999-SNAPSHOT`.
+In that case, make sure you have built Quarkus locally prior to running the tests.
 
 All the tests currently use the RHEL 7 OpenJDK 11 image.
 This is configured in the `application.properties` file in each module.
 Since this is standard Quarkus configuration, it's possible to override using a system property.
 Therefore, if you want to run the tests with a different Java S2I image, run `mvn clean verify -Dquarkus.s2i.base-jvm-image=...`.
+
+## Running against Red Hat build of Quarkus
+When running against released Red Hat build of Quarkus make sure https://maven.repository.redhat.com/ga/ repository is defined in settings.xml.
+
+Example command for released Red Hat build of Quarkus:
+```
+mvn -fae clean verify \
+ -Dts.use-ephemeral-namespaces -Dts.authenticated-registry \
+ -Dversion.quarkus=1.3.4.Final-redhat-00004 \
+ -Dquarkus.platform.group-id=com.redhat.quarkus
+```
+
+Example command for not yet released version of Red Hat build of Quarkus:
+```
+mvn -fae clean verify \
+ -Dts.use-ephemeral-namespaces -Dts.authenticated-registry \
+ -Dversion.quarkus=1.7.1.Final-redhat-00001 \
+ -Dquarkus.platform.group-id=com.redhat.quarkus \
+ -Dmaven.repo.local=/Users/rsvoboda/Downloads/rh-quarkus-1.7.1.GA-maven-repository/maven-repository
+```
 
 ## Branching Strategy
 The `master` branch is always meant for latest upstream/downstream development. For each downstream major.minor version, there's a corresponding maintenance branch:
