@@ -13,9 +13,9 @@ All tests will run in the project you're logged into, so it should be empty.
 If there are resources deployed in the project, you should not expect they will survive.
 
 Running the tests amounts to standard `mvn clean verify`.
-This will use a specific Quarkus version, which can be modified by setting the `version.quarkus` property.
-Alternatively, you can use `-Dquarkus-core-only` to run the test suite against Quarkus `999-SNAPSHOT`.
-In that case, make sure you have built Quarkus locally prior to running the tests.
+This will use a specific version of Red Hat build of Quarkus, which can be modified by setting the `version.quarkus` property.
+Alternatively, you can use `-Dquarkus-core-only` to run the test suite against upstream Quarkus `999-SNAPSHOT`.
+In that case, make sure you have built Quarkus locally prior to running the tests or adjust the version using the `version.quarkus` property.
 
 All the tests currently use the RHEL 7 OpenJDK 11 image.
 This is configured in the `application.properties` file in each module.
