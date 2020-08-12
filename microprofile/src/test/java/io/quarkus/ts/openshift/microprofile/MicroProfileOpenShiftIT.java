@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 
 @OpenShiftTest
-@AdditionalResources("https://raw.githubusercontent.com/jaegertracing/jaeger-kubernetes/master/all-in-one/jaeger-all-in-one-template.yml")
+@AdditionalResources("classpath:jaeger-all-in-one-template.yml")
 @AdditionalResources("classpath:jaeger-route.yaml")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisabledOnQuarkus(version = "1\\.3\\..*", reason = "https://github.com/quarkusio/quarkus/pull/7987")
