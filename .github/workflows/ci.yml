@@ -1,6 +1,5 @@
-name: "Pull Request / Push Build"
+name: "Pull Request CI"
 on:
-  - push
   - pull_request
 jobs:
   build-released:
