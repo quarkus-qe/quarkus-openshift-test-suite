@@ -1,5 +1,8 @@
 package io.quarkus.ts.openshift.config.secret.file.system;
 
+import io.quarkus.runtime.annotations.RegisterForReflection;
+
+@RegisterForReflection
 public class Hello {
     private final String content;
 
