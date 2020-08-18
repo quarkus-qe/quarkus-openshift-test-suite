@@ -17,7 +17,10 @@
         <module>common</module>
 
         <module>http</module>
-        <module>configmap</module>
+        <module>configmap/api-server</module>
+        <module>configmap/file-system</module>
+        <module>config-secret/api-server</module>
+        <module>config-secret/file-system</module>
         <module>messaging/artemis</module>
         <module>messaging/artemis-jta</module>
         <module>messaging/amqp-reactive</module>
@@ -34,6 +37,7 @@
         <module>security/keycloak-authz</module>
         <module>security/https-1way</module>
         <module>security/https-2way</module>
+        <module>security/https-2way-authz</module>
         <module>microprofile</module>
 
         <module>external-applications/todo-demo-app</module>

@@ -14,14 +14,4 @@ public class Book extends PanacheEntity {
 
     @NotBlank(message = "book author must be set")
     public String author;
-
-    // TODO remove setters when https://github.com/quarkusio/quarkus/issues/6832 is fixed
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
 }

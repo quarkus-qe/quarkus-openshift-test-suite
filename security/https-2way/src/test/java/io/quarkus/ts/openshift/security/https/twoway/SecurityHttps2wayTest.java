@@ -11,19 +11,19 @@ import org.apache.http.ssl.SSLContexts;
 import org.junit.jupiter.api.Test;
 
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLHandshakeException;
 
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import static io.quarkus.ts.openshift.common.util.HttpsAssertions.assertTlsHandshakeError;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @QuarkusTest
 public class SecurityHttps2wayTest {
     // not using RestAssured because we want 100% control over certificate & hostname verification
+
+    private static final char[] CLIENT_PASSWORD = "client-password".toCharArray();
 
     @TestHTTPResource(value = "/hello", ssl = true)
     private String url;
@@ -33,11 +33,10 @@ public class SecurityHttps2wayTest {
 
     @Test
     public void https() throws IOException, GeneralSecurityException {
-        char[] clientPassword = "client-password".toCharArray();
         SSLContext sslContext = SSLContexts.custom()
                 .setKeyStoreType("pkcs12")
-                .loadKeyMaterial(new File("target/client-keystore.pkcs12"), clientPassword, clientPassword)
-                .loadTrustMaterial(new File("target/client-truststore.pkcs12"), "client-password".toCharArray())
+                .loadKeyMaterial(new File("target/client-keystore.pkcs12"), CLIENT_PASSWORD, CLIENT_PASSWORD)
+                .loadTrustMaterial(new File("target/client-truststore.pkcs12"), CLIENT_PASSWORD)
                 .build();
         try (CloseableHttpClient httpClient = HttpClients.custom()
                 .setSSLContext(sslContext)
@@ -47,23 +46,22 @@ public class SecurityHttps2wayTest {
             String response = Executor.newInstance(httpClient)
                     .execute(Request.Get(url))
                     .returnContent().asString();
-            assertEquals("Hello, world!", response);
+            assertEquals("Hello, HTTPS: true", response);
         }
     }
 
     @Test
     public void https_serverCertificateUnknownToClient() throws IOException, GeneralSecurityException {
-        char[] clientPassword = "client-password".toCharArray();
         SSLContext sslContext = SSLContexts.custom()
                 .setKeyStoreType("pkcs12")
-                .loadKeyMaterial(new File("target/client-keystore.pkcs12"), clientPassword, clientPassword)
+                .loadKeyMaterial(new File("target/client-keystore.pkcs12"), CLIENT_PASSWORD, CLIENT_PASSWORD)
                 .build();
         try (CloseableHttpClient httpClient = HttpClients.custom()
                 .setSSLContext(sslContext)
                 .setSSLHostnameVerifier(new DefaultHostnameVerifier())
                 .build()) {
 
-            assertThrows(SSLHandshakeException.class, () -> {
+            assertTlsHandshakeError(() -> {
                 Executor.newInstance(httpClient).execute(Request.Get(url));
             });
         }
@@ -71,18 +69,17 @@ public class SecurityHttps2wayTest {
 
     @Test
     public void https_clientCertificateUnknownToServer() throws IOException, GeneralSecurityException {
-        char[] clientPassword = "client-password".toCharArray();
         SSLContext sslContext = SSLContexts.custom()
                 .setKeyStoreType("pkcs12")
-                .loadKeyMaterial(new File("target/unknown-client-keystore.pkcs12"), clientPassword, clientPassword)
-                .loadTrustMaterial(new File("target/client-truststore.pkcs12"), clientPassword)
+                .loadKeyMaterial(new File("target/unknown-client-keystore.pkcs12"), CLIENT_PASSWORD, CLIENT_PASSWORD)
+                .loadTrustMaterial(new File("target/client-truststore.pkcs12"), CLIENT_PASSWORD)
                 .build();
         try (CloseableHttpClient httpClient = HttpClients.custom()
                 .setSSLContext(sslContext)
                 .setSSLHostnameVerifier(new DefaultHostnameVerifier())
                 .build()) {
 
-            assertThrows(SSLException.class, () -> {
+            assertTlsHandshakeError(() -> {
                 Executor.newInstance(httpClient).execute(Request.Get(url));
             });
         }
@@ -90,19 +87,24 @@ public class SecurityHttps2wayTest {
 
     @Test
     public void https_serverCertificateUnknownToClient_clientCertificateUnknownToServer() throws IOException, GeneralSecurityException {
-        char[] clientPassword = "client-password".toCharArray();
         SSLContext sslContext = SSLContexts.custom()
                 .setKeyStoreType("pkcs12")
-                .loadKeyMaterial(new File("target/unknown-client-keystore.pkcs12"), clientPassword, clientPassword)
+                .loadKeyMaterial(new File("target/unknown-client-keystore.pkcs12"), CLIENT_PASSWORD, CLIENT_PASSWORD)
                 .build();
         try (CloseableHttpClient httpClient = HttpClients.custom()
                 .setSSLContext(sslContext)
                 .setSSLHostnameVerifier(new DefaultHostnameVerifier())
                 .build()) {
 
-            assertThrows(SSLException.class, () -> {
+            assertTlsHandshakeError(() -> {
                 Executor.newInstance(httpClient).execute(Request.Get(url));
             });
         }
+    }
+
+    @Test
+    public void http() throws IOException {
+        String response = Request.Get(insecureUrl).execute().returnContent().asString();
+        assertEquals("Hello, HTTPS: false", response);
     }
 }

@@ -307,10 +307,25 @@ The main difference is that there's no S2I in Kubernetes, so we'd have to do the
 A smoke test, really.
 Verifies that you can deploy a simple HTTP endpoint to OpenShift and access it.
 
-### `configmap`
+### `configmap/file-system`
 
 Checks that the application can read configuration from a ConfigMap.
 The ConfigMap is exposed by mounting it into the container file system.
+
+### `configmap/api-server`
+
+Checks that the application can read configuration from a ConfigMap.
+The ConfigMap is obtained directly from the Kubernetes API server.
+
+### `config-secret/file-system`
+
+Checks that the application can read configuration from a Secret.
+The Secret is exposed by mounting it into the container file system.
+
+### `config-secret/api-server`
+
+Checks that the application can read configuration from a Secret.
+The Secret is obtained directly from the Kubernetes API server.
 
 ### `sql-db`
 
@@ -379,6 +394,15 @@ This test doesn't run on OpenShift (yet).
 
 Verifies that accessing an HTTPS endpoint with client certificate is possible.
 The client certificate is required in this test.
+Uses self-signed certificates generated during the build, so that the test is fully self-contained.
+
+This test doesn't run on OpenShift (yet).
+
+### `security/https-2way-authz`
+
+Verifies that accessing an HTTPS endpoint with authentication and authorization based on client certificate is possible.
+Quarkus doesn't offer a declarative way to assign roles based on a client certificate, so a `SecurityIdentityAugmentor` is used.
+The client certificate is _not_ required in this test.
 Uses self-signed certificates generated during the build, so that the test is fully self-contained.
 
 This test doesn't run on OpenShift (yet).

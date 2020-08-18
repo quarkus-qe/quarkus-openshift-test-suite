@@ -219,6 +219,7 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
         boolean testsFailed = getTestsStatus(context).failed;
 
         if (testsFailed) {
+            System.out.println("---------- OpenShiftTest failure ----------");
             System.out.println(ansi().a("test ").fgYellow().a(context.getDisplayName()).reset()
                     .a(" failed, showing current namespace status"));
             new Command("oc", "status", "--suggest").runAndWait();

@@ -58,9 +58,8 @@ public class BookResource {
             throw new NotFoundException("book '" + id + "' not found");
         }
 
-        // TODO don't call setters when https://github.com/quarkusio/quarkus/issues/6832 is fixed
-        book.setTitle(newBook.title);
-        book.setAuthor(newBook.author);
+        book.title = newBook.title;
+        book.author = newBook.author;
         return book;
     }
 
