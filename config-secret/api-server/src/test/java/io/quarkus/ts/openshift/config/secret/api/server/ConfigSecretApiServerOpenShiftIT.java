@@ -1,4 +1,4 @@
-package io.quarkus.ts.openshift.config.system.api.server;
+package io.quarkus.ts.openshift.config.secret.api.server;
 
 import io.quarkus.ts.openshift.app.metadata.AppMetadata;
 import io.quarkus.ts.openshift.common.AdditionalResources;

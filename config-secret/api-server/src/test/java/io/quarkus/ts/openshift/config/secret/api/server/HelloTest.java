@@ -1,4 +1,4 @@
-package io.quarkus.ts.openshift.config.system.api.server;
+package io.quarkus.ts.openshift.config.secret.api.server;
 
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
