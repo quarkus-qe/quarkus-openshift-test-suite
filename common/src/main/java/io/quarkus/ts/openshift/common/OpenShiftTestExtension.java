@@ -55,6 +55,10 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
         return context.getElement().map(it -> it.getAnnotation(ManualApplicationDeployment.class));
     }
 
+    private Optional<CustomAppMetadata> getCustomAppMetadataAnnotation(ExtensionContext context) {
+        return context.getElement().map(it -> it.getAnnotation(CustomAppMetadata.class));
+    }
+
     private OpenShiftClient getOpenShiftClient(ExtensionContext context) {
         return getStore(context)
                 .getOrComputeIfAbsent(OpenShiftClientResource.class.getName(), ignored -> OpenShiftClientResource.createDefault(), OpenShiftClientResource.class)
@@ -66,13 +70,13 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
     }
 
     private AppMetadata getAppMetadata(ExtensionContext context) {
-        Optional<ManualApplicationDeployment> manualDeployment = getManualDeploymentAnnotation(context);
-        if (manualDeployment.isPresent()) {
+        Optional<CustomAppMetadata> customAppMetadata = getCustomAppMetadataAnnotation(context);
+        if (customAppMetadata.isPresent()) {
             return getStore(context)
                     .getOrComputeIfAbsent(AppMetadata.class.getName(), ignored -> new AppMetadata(
-                            manualDeployment.get().appName(),
-                            manualDeployment.get().httpRoot(),
-                            manualDeployment.get().knownEndpoint()
+                            customAppMetadata.get().appName(),
+                            customAppMetadata.get().httpRoot(),
+                            customAppMetadata.get().knownEndpoint()
                     ), AppMetadata.class);
         }
 

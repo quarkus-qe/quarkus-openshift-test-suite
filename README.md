@@ -227,10 +227,10 @@ In such case, the `reason` attribute of the annotation should point to correspon
 
 If the test class is annotated `@ManualApplicationDeployment`, the `target/kubernetes/openshift.yml` file is ignored and the test application is _not_ deployed automatically.
 Instead, you should use `@AdditionalResources`, `@CustomizeApplicationDeployment` and `@CustomizeApplicationUndeployment` to deploy the application manually.
-The `@ManualApplicationDeployment` annotation then provides the necessary info about the application (such as the name or a known endpoint).
 
 This can be used to write tests that excersise an external application.
 You have full control over the application deployment and undeployment process, but the rest of the test can be written as if the application was part of the test suite.
+In such case, the deployed application can't use the `app-metadata` Quarkus extension, and you have to use the `@CustomAppMetadata` annotation to provide all the necessary information.
 
 ### Image overrides
 
