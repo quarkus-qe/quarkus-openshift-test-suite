@@ -22,6 +22,10 @@
             <artifactId>openshift-client</artifactId>
         </dependency>
         <dependency>
+            <groupId>io.fabric8</groupId>
+            <artifactId>knative-client</artifactId>
+        </dependency>
+        <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-builder</artifactId>
         </dependency>

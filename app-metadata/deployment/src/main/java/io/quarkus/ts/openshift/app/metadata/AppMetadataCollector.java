@@ -7,6 +7,7 @@ import io.quarkus.deployment.builditem.GeneratedFileSystemResourceBuildItem;
 import io.quarkus.kubernetes.spi.KubernetesHealthLivenessPathBuildItem;
 import io.quarkus.kubernetes.spi.KubernetesHealthReadinessPathBuildItem;
 import io.quarkus.vertx.http.deployment.HttpRootPathBuildItem;
+import org.eclipse.microprofile.config.ConfigProvider;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
@@ -34,10 +35,14 @@ public class AppMetadataCollector {
             knownEndpoint = httpRoot.adjustPath("/"); // TODO ?
         }
 
+        String deploymentTarget = ConfigProvider.getConfig()
+                .getOptionalValue("quarkus.kubernetes.deployment-target", String.class).orElse("");
+
         AppMetadata result = new AppMetadata(
                 appName,
                 httpRoot.getRootPath(),
-                knownEndpoint
+                knownEndpoint,
+                deploymentTarget
         );
 
         output.produce(new GeneratedFileSystemResourceBuildItem(
