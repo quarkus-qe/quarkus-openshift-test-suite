@@ -169,6 +169,7 @@ public class HelloOpenShiftIT {
 The full set of objects that you can inject is:
 
 - `OpenShiftClient`: the Fabric8 Kubernetes client, in default configuration
+- `KnativeClient`: the Fabric8 Knative client, in default configuration
 - `AppMetadata`: provides convenient access to data collected in `target/app-metadata.properties`
 - `AwaitUtil`: utility to wait for some OpenShift resources
 - `OpenShiftUtil`: utility to perform higher-level actions on some OpenShift resources
@@ -274,6 +275,18 @@ will execute the whole test suite using Docker to run containers for native buil
 
 Currently used builder image is `quarkus/ubi-quarkus-mandrel` and the base image for OpenShift deployment is 
 `quarkus/ubi-quarkus-native-binary-s2i`.
+
+### OpenShift Serverless / Knative
+
+The test suite contains a Maven profile activated using the `include.serverless` property or `serverless` profile name.
+This profile includes additional modules with serverless test coverage into the execution of the testsuite.
+Serverless test coverage supports both JVM and Native mode.
+
+The following command will execute the whole test suite including serverless tests:
+
+```
+./mvnw clean verify -Dinclude.serverless
+```
 
 ### TODO
 
@@ -486,6 +499,12 @@ function properly on OpenShift, as well as the database integrations.
 ### `deployment-strategies/quarkus`
 
 A smoke test for deploying the application to OpenShift via `quarkus.kubernetes.deploy`.
+The test itself only verifies that a simple HTTP endpoint can be accessed.
+
+### `deployment-strategies/quarkus-serverless`
+
+A smoke test for deploying the application to OpenShift Serverless using combination of `quarkus.container-image.build`
+and `oc apply -f target/kubernetes/knative.yml` with slightly adjusted `knative.yml` file.
 The test itself only verifies that a simple HTTP endpoint can be accessed.
 
 ## Debugging failing tests

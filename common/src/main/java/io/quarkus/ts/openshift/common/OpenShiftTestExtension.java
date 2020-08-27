@@ -1,5 +1,6 @@
 package io.quarkus.ts.openshift.common;
 
+import io.fabric8.knative.client.KnativeClient;
 import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.client.OpenShiftClient;
@@ -76,7 +77,8 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
                     .getOrComputeIfAbsent(AppMetadata.class.getName(), ignored -> new AppMetadata(
                             customAppMetadata.get().appName(),
                             customAppMetadata.get().httpRoot(),
-                            customAppMetadata.get().knownEndpoint()
+                            customAppMetadata.get().knownEndpoint(),
+                            customAppMetadata.get().deploymentTarget()
                     ), AppMetadata.class);
         }
 
@@ -205,15 +207,29 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
     private void setUpRestAssured(ExtensionContext context) throws Exception {
         OpenShiftClient oc = getOpenShiftClient(context);
         AppMetadata metadata = getAppMetadata(context);
-        Route route = oc.routes().withName(metadata.appName).get();
-        if (route == null) {
-            throw new OpenShiftTestException("Missing route " + metadata.appName + ", did you set quarkus.openshift.expose=true?");
-        }
-        if (route.getSpec().getTls() != null) {
-            RestAssured.useRelaxedHTTPSValidation();
-            RestAssured.baseURI = "https://" + route.getSpec().getHost();
+
+        if (metadata.deploymentTarget.isEmpty() || !metadata.deploymentTarget.contains("knative")) {
+            System.out.println(ansi().a("using ").fgYellow().a("OpenShiftClient").reset().a(" to get the route"));
+
+            Route route = oc.routes().withName(metadata.appName).get();
+            if (route == null) {
+                throw new OpenShiftTestException("Missing route " + metadata.appName + ", did you set quarkus.openshift.expose=true?");
+            }
+            if (route.getSpec().getTls() != null) {
+                RestAssured.useRelaxedHTTPSValidation();
+                RestAssured.baseURI = "https://" + route.getSpec().getHost();
+            } else {
+                RestAssured.baseURI = "http://" + route.getSpec().getHost();
+            }
         } else {
-            RestAssured.baseURI = "http://" + route.getSpec().getHost();
+            System.out.println(ansi().a("using ").fgYellow().a("KnativeClient").reset().a(" to get the route"));
+
+            KnativeClient kn = oc.adapt(KnativeClient.class);
+            io.fabric8.knative.serving.v1.Route knRoute = kn.routes().withName(metadata.appName).get();
+            if (knRoute == null) {
+                throw new OpenShiftTestException("Missing route " + metadata.appName);
+            }
+            RestAssured.baseURI = knRoute.getStatus().getUrl();
         }
         RestAssured.basePath = metadata.httpRoot;
     }
@@ -348,6 +364,8 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
     private Object valueFor(InjectionPoint injectionPoint, ExtensionContext context) throws OpenShiftTestException {
         if (OpenShiftClient.class.equals(injectionPoint.type())) {
             return getOpenShiftClient(context);
+        } else if (KnativeClient.class.equals(injectionPoint.type())) {
+            return getOpenShiftClient(context).adapt(KnativeClient.class);
         } else if (AppMetadata.class.equals(injectionPoint.type())) {
             return getAppMetadata(context);
         } else if (AwaitUtil.class.equals(injectionPoint.type())) {

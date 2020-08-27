@@ -36,11 +36,18 @@ public final class AppMetadata {
      * Otherwise, {@code /} is used.
      */
     public final String knownEndpoint;
+    /**
+     * The target deployment platform. Value can be kubernetes, openshift, knative,
+     * minikube etc, or any combination of the above as comma separated list.
+     * If not customized via {@code quarkus.kubernetes.deployment-target}, defaults to {@code kubernetes}.
+     */
+    public final String deploymentTarget;
 
-    public AppMetadata(String appName, String httpRoot, String knownEndpoint) {
+    public AppMetadata(String appName, String httpRoot, String knownEndpoint, String deploymentTarget) {
         this.appName = appName;
         this.httpRoot = httpRoot;
         this.knownEndpoint = knownEndpoint;
+        this.deploymentTarget = deploymentTarget;
     }
 
     @Override
@@ -49,6 +56,7 @@ public final class AppMetadata {
         data.put("app-name", appName);
         data.put("http-root", httpRoot);
         data.put("known-endpoint", knownEndpoint);
+        data.put("deployment-target", deploymentTarget);
         return data.entrySet()
                 .stream()
                 .map(entry -> entry.getKey() + "=" + entry.getValue() + "\n")
@@ -62,7 +70,8 @@ public final class AppMetadata {
             return new AppMetadata(
                     props.getProperty("app-name"),
                     props.getProperty("http-root"),
-                    props.getProperty("known-endpoint")
+                    props.getProperty("known-endpoint"),
+                    props.getProperty("deployment-target")
             );
         } catch (NoSuchFileException e) {
             throw new RuntimeException(file + " not found, did you add the app-metadata extension?", e);

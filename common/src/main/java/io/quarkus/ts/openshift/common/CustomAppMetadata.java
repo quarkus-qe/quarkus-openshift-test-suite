@@ -35,4 +35,10 @@ public @interface CustomAppMetadata {
      * @see io.quarkus.ts.openshift.app.metadata.AppMetadata#knownEndpoint
      */
     String knownEndpoint();
+
+    /**
+     * The target deployment platform.
+     * @see io.quarkus.ts.openshift.app.metadata.AppMetadata#deploymentTarget
+     */
+    String deploymentTarget() default "";
 }
