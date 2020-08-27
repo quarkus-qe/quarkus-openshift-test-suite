@@ -21,7 +21,7 @@ jobs:
         with:
           java-version: openjdk${{ matrix.java }}
       - name: Build with Maven
-        run: mvn -V -B clean test
+        run: mvn -fae -V -B clean test
       - name: Zip Artifacts
         run: |
           zip -R artifacts-jvm${{ matrix.java }}.zip 'surefire-reports/*'
@@ -49,7 +49,7 @@ jobs:
           java-version: openjdk${{ matrix.java }}
       - name: Build with Maven
         run: |
-          mvn -V -B clean install -DskipTests -DskipITs -pl 'app-metadata/deployment,app-metadata/runtime,common,http' -Dquarkus.profile=native -Dquarkus.native.container-runtime=docker
+          mvn -fae -V -B clean install -DskipTests -DskipITs -pl 'app-metadata/deployment,app-metadata/runtime,common,http' -Dquarkus.profile=native -Dquarkus.native.container-runtime=docker
   build-master:
     name: JVM build - Quarkus master
     runs-on: ubuntu-latest
@@ -71,7 +71,7 @@ jobs:
       - name: Build Quarkus master
         run: git clone https://github.com/quarkusio/quarkus.git && cd quarkus && mvn -B clean install -DskipTests -DskipITs -DskipDocs
       - name: Build with Maven
-        run: mvn -V -B clean test -Dquarkus-core-only
+        run: mvn -fae -V -B clean test -Dquarkus-core-only
       - name: Zip Artifacts
         run: |
           zip -R artifacts-jvm${{ matrix.java }}.zip 'surefire-reports/*'
@@ -101,4 +101,4 @@ jobs:
         run: git clone https://github.com/quarkusio/quarkus.git && cd quarkus && mvn -B clean install -DskipTests -DskipITs -DskipDocs
       - name: Build with Maven
         run: |
-          mvn -V -B clean install -Dquarkus-core-only -DskipTests -DskipITs -pl 'app-metadata/deployment,app-metadata/runtime,common,http' -Dquarkus.profile=native -Dquarkus.native.container-runtime=docker
+          mvn -fae -V -B clean install -Dquarkus-core-only -DskipTests -DskipITs -pl 'app-metadata/deployment,app-metadata/runtime,common,http' -Dquarkus.profile=native -Dquarkus.native.container-runtime=docker
