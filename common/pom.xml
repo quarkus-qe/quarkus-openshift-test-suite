@@ -25,15 +25,6 @@
             <groupId>io.fabric8</groupId>
             <artifactId>knative-client</artifactId>
         </dependency>
-        <!--
-        This dependency is workaround for https://issues.redhat.com/browse/QUARKUS-440.
-        knative-client brings in inaccessible version of jakarta.xml.bind-api through dependency managament.
-        -->
-        <dependency>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>2.3.2</version>
-        </dependency>
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-builder</artifactId>
