@@ -1,7 +1,6 @@
 package io.quarkus.ts.openshift.common.util;
 
 import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.client.internal.readiness.Readiness;
 import io.fabric8.openshift.client.OpenShiftClient;
 
 import java.io.File;
@@ -59,7 +58,7 @@ public final class OpenShiftUtil {
             // but that's only available since OpenShift 3.5
             List<Pod> pods = listPodsForDeploymentConfig(deploymentConfigName);
             try {
-                return pods.size() == expectedReplicas && pods.stream().allMatch(Readiness::isPodReady);
+                return pods.size() == expectedReplicas && pods.stream().allMatch(ReadinessUtil::isPodReady);
             } catch (IllegalStateException e) {
                 // the 'Ready' condition can be missing sometimes, in which case Readiness.isPodReady throws an exception
                 // here, we'll swallow that exception in hope that the 'Ready' condition will appear later
@@ -73,7 +72,7 @@ public final class OpenShiftUtil {
 
         int number = 0;
         for (Pod pod : pods) {
-            if (Readiness.isPodReady(pod)) {
+            if (ReadinessUtil.isPodReady(pod)) {
                 number++;
             }
         }

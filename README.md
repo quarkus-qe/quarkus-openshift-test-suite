@@ -22,7 +22,14 @@ This is configured in the `application.properties` file in each module.
 Since this is standard Quarkus configuration, it's possible to override using a system property.
 Therefore, if you want to run the tests with a different Java S2I image, run `mvn clean verify -Dquarkus.s2i.base-jvm-image=...`.
 
+### Other prerequisites
+
+In addition to common prerequisites for Java projects (JDK, Maven) and OpenShift (`oc`), the following utilities must also be installed on the machine where the test suite is being executed:
+
+- `tar`
+
 ## Running against Red Hat build of Quarkus
+
 When running against released Red Hat build of Quarkus make sure https://maven.repository.redhat.com/ga/ repository is defined in settings.xml.
 
 Example command for released Red Hat build of Quarkus:
@@ -34,6 +41,7 @@ mvn -fae clean verify \
 ```
 
 Example command for not yet released version of Red Hat build of Quarkus:
+
 ```
 mvn -fae clean verify \
  -Dts.use-ephemeral-namespaces -Dts.authenticated-registry \
@@ -43,6 +51,7 @@ mvn -fae clean verify \
 ```
 
 ## Branching Strategy
+
 The `master` branch is always meant for latest upstream/downstream development. For each downstream major.minor version, there's a corresponding maintenance branch:
 
   - `1.3` for Red Hat build of Quarkus 1.3.z (corresponding upstream version: `1.3.0.Final+`)
