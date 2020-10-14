@@ -46,6 +46,7 @@ mvn -fae clean verify \
 The `master` branch is always meant for latest upstream/downstream development. For each downstream major.minor version, there's a corresponding maintenance branch:
 
   - `1.3` for Red Hat build of Quarkus 1.3.z (corresponding upstream version: `1.3.0.Final+`)
+  - `1.7` for Red Hat build of Quarkus 1.7.z (corresponding upstream version: `1.7.0.Final+`)
 
 ## Test Framework
 
