@@ -3,7 +3,6 @@ package io.quarkus.ts.openshift.common.util;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.kubernetes.client.Handlers;
 import io.fabric8.kubernetes.client.ResourceHandler;
-import io.fabric8.kubernetes.client.internal.readiness.Readiness;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.quarkus.ts.openshift.app.metadata.AppMetadata;
 import io.quarkus.ts.openshift.common.OpenShiftTestException;
@@ -50,7 +49,7 @@ public final class AwaitUtil {
 
     public void awaitReadiness(List<HasMetadata> resources) {
         resources.stream()
-                .filter(it -> Readiness.isReadinessApplicable(it.getClass()))
+                .filter(it -> ReadinessUtil.isReadinessApplicable(it.getClass()))
                 .forEach(it -> {
                     System.out.println(ansi().a("waiting for ").a(readableKind(it.getKind())).a(" ")
                             .fgYellow().a(it.getMetadata().getName()).reset().a(" to become ready"));
@@ -67,7 +66,7 @@ public final class AwaitUtil {
                             throw new OpenShiftTestException("Couldn't load " + readableKind(it.getKind()) + " '"
                                     + it.getMetadata().getName() + "' from API server");
                         }
-                        return Readiness.isReady(current);
+                        return ReadinessUtil.isReady(current);
                     });
                 });
     }
