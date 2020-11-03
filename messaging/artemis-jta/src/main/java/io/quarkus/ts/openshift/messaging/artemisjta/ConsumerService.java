@@ -1,6 +1,8 @@
 package io.quarkus.ts.openshift.messaging.artemisjta;
 
 import io.quarkus.scheduler.Scheduled;
+import io.quarkus.scheduler.Scheduled.ConcurrentExecution;
+
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -11,6 +13,8 @@ import javax.jms.JMSContext;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
+
+import java.util.function.Consumer;
 
 @ApplicationScoped
 public class ConsumerService {
@@ -38,28 +42,14 @@ public class ConsumerService {
         this.price2 = price;
     }
 
-    @Scheduled(every = "1s")
-    public void receiveMessages() throws JMSException {
-        try (JMSContext context = connectionFactory.createContext(Session.AUTO_ACKNOWLEDGE)) {
-            JMSConsumer consumer = context.createConsumer(context.createQueue("custom-prices-1"));
-            Message message = consumer.receive(500);
-            if (message != null) {
-                String price = message.getBody(String.class);
-                setPrice1(price);
-                LOG.info("Price 1 set to " + price);
-            } else {
-                LOG.info("Nothing to see in queue custom-prices-1.");
-            }
-            consumer = context.createConsumer(context.createQueue("custom-prices-2"));
-            message = consumer.receive(500);
-            if (message != null) {
-                String price = message.getBody(String.class);
-                setPrice2(price);
-                LOG.info("Price 2 set to " + price);
-            } else {
-                LOG.info("Nothing to see in queue custom-prices-2.");
-            }
-        }
+    @Scheduled(every = "1s", concurrentExecution = ConcurrentExecution.SKIP)
+    public void receiveMessagesInCustomPriceOne() throws JMSException {
+        receiveMessagesInQueue("custom-prices-1", this::setPrice1);
+    }
+
+    @Scheduled(every = "1s", concurrentExecution = ConcurrentExecution.SKIP)
+    public void receiveMessagesInCustomPriceTwo() throws JMSException {
+        receiveMessagesInQueue("custom-prices-2", this::setPrice2);
     }
 
     public String receiveAndAck(boolean ackIt) throws JMSException {
@@ -71,6 +61,20 @@ public class ConsumerService {
                 context.acknowledge();
             }
             return messageBody;
+        }
+    }
+
+    private void receiveMessagesInQueue(String queueName, Consumer<String> setter) throws JMSException {
+        try (JMSContext context = connectionFactory.createContext(Session.AUTO_ACKNOWLEDGE)) {
+            JMSConsumer consumer = context.createConsumer(context.createQueue(queueName));
+            Message message = consumer.receive(500);
+            if (message != null) {
+                String price = message.getBody(String.class);
+                setter.accept(price);
+                LOG.info("Price set to " + price + " from " + queueName);
+            } else {
+                LOG.info("Nothing to see in queue " + queueName);
+            }
         }
     }
 }

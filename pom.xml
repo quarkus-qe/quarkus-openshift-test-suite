@@ -21,13 +21,10 @@
         <module>configmap/file-system</module>
         <module>config-secret/api-server</module>
         <module>config-secret/file-system</module>
-        <!-- The messaging tests and integration tests are currently flaky and require investigation.
-             Disabling them until further notice.
         <module>messaging/artemis</module>
         <module>messaging/artemis-jta</module>
         <module>messaging/amqp-reactive</module>
         <module>messaging/qpid</module>
-	-->
         <module>scaling</module>
         <module>sql-db/app</module>
         <module>sql-db/postgresql</module>
