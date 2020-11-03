@@ -22,7 +22,15 @@ public final class OpenShiftUtil {
         this.await = await;
     }
 
-    private List<Pod> listPodsForDeploymentConfig(String deploymentConfigName) {
+    public String getNamespace() {
+        return oc.getNamespace();
+    }
+
+    public List<Pod> getPods() {
+        return oc.pods().list().getItems();
+    }
+
+    public List<Pod> listPodsForDeploymentConfig(String deploymentConfigName) {
         return oc.pods()
                 .inNamespace(oc.getNamespace())
                 .withLabel("deploymentconfig", deploymentConfigName)

@@ -298,6 +298,14 @@ The following command will execute the whole test suite including serverless tes
 ./mvnw clean verify -Dinclude.serverless
 ```
 
+### OpenShift Pod Logs on Failures
+
+When a test fails, the test suite will copy the pod logs in order to troubleshoot the issue. These logs will be copied in the `[module]/target/logs/[namespace]` folder. We can configure the output folder using the `ts.instance-logs` property: 
+
+```
+./mvnw clean verify -Dts.instance-logs=../custom/path
+```
+
 ### TODO
 
 There's a lot of possible improvements that haven't been implemented yet.
