@@ -36,7 +36,7 @@ public final class AwaitUtil {
     public void awaitAppRoute() {
         System.out.println(ansi().a("waiting for route ").fgYellow().a(metadata.appName).reset()
                 .a(" to start responding at ").fgYellow().a(metadata.knownEndpoint).reset());
-        await().atMost(5, TimeUnit.MINUTES).untilAsserted(() -> {
+        await().ignoreExceptions().atMost(5, TimeUnit.MINUTES).untilAsserted(() -> {
             given()
                     // known endpoint is already httpRoot-adjusted
                     .basePath("/")
@@ -53,7 +53,9 @@ public final class AwaitUtil {
                 .forEach(it -> {
                     System.out.println(ansi().a("waiting for ").a(readableKind(it.getKind())).a(" ")
                             .fgYellow().a(it.getMetadata().getName()).reset().a(" to become ready"));
-                    await().atMost(5, TimeUnit.MINUTES).until(() -> {
+                    await().pollInterval(1, TimeUnit.SECONDS)
+                           .atMost(5, TimeUnit.MINUTES)
+                           .until(() -> {
                         HasMetadata current = oc.resource(it).fromServer().get();
                         if (current == null) {
                             ResourceHandler<HasMetadata, ?> handler = Handlers.get(it.getKind(), it.getApiVersion());

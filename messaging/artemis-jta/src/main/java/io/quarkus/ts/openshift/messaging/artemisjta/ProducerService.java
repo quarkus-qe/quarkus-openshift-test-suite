@@ -31,7 +31,7 @@ public class ProducerService {
             LOG.info(customPrice + " sent to queue custom-prices-2");
             context.commit();
             context.acknowledge();
-             context.setAutoStart(true);
+            context.setAutoStart(true);
         }
     }
 
