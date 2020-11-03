@@ -5,6 +5,7 @@ import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.quarkus.ts.openshift.app.metadata.AppMetadata;
+import io.quarkus.ts.openshift.common.actions.OnOpenShiftFailureAction;
 import io.quarkus.ts.openshift.common.config.Config;
 import io.quarkus.ts.openshift.common.injection.InjectionPoint;
 import io.quarkus.ts.openshift.common.injection.TestResource;
@@ -38,15 +39,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.ServiceLoader;
 import java.util.stream.Stream;
 
 import static org.fusesource.jansi.Ansi.ansi;
 import static org.junit.platform.commons.util.AnnotationUtils.findAnnotatedFields;
 
-// TODO at this point, this class is close to becoming unreadable, and could use some refactoring
+// TODO at this point, this class is close to becoming unreadable, and could use some refactoring. 
+// Raised https://github.com/quarkus-qe/quarkus-openshift-test-suite/issues/108 for the refactoring.
 final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallback, BeforeEachCallback,
         TestInstancePostProcessor, ParameterResolver,
         LifecycleMethodExecutionExceptionHandler, TestExecutionExceptionHandler {
+
+    private final ServiceLoader<OnOpenShiftFailureAction> onFailureActions = ServiceLoader.load(OnOpenShiftFailureAction.class);
 
     private Store getStore(ExtensionContext context) {
         return context.getStore(Namespace.create(getClass()));
@@ -249,7 +254,8 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
             System.out.println("---------- OpenShiftTest failure ----------");
             System.out.println(ansi().a("test ").fgYellow().a(context.getDisplayName()).reset()
                     .a(" failed, showing current namespace status"));
-            new Command("oc", "status", "--suggest").runAndWait();
+
+            onFailureActions.forEach(action -> this.runOnFailureAction(context, action));
         }
 
         System.out.println("---------- OpenShiftTest tear down ----------");
@@ -344,13 +350,7 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
 
     @Override
     public void postProcessTestInstance(Object testInstance, ExtensionContext context) throws Exception {
-        for (Field field : findAnnotatedFields(testInstance.getClass(), TestResource.class, ignored -> true)) {
-            InjectionPoint injectionPoint = InjectionPoint.forField(field);
-            if (!field.isAccessible()) {
-                field.setAccessible(true);
-            }
-            field.set(testInstance, valueFor(injectionPoint, context));
-        }
+        injectDependencies(testInstance, context);
     }
 
     @Override
@@ -448,6 +448,25 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
     public void handleTestExecutionException(ExtensionContext context, Throwable throwable) throws Throwable {
         failureOccured(context);
         throw throwable;
+    }
+
+    private void runOnFailureAction(ExtensionContext context, OnOpenShiftFailureAction action) {
+        try {
+            injectDependencies(action, context);
+            action.execute();
+        } catch (Exception ex) {
+            System.out.println(ansi().a("Error running post failure action. Caused by: " + ex).reset());
+        }
+    }
+    
+    private void injectDependencies(Object instance, ExtensionContext context) throws Exception {
+        for (Field field : findAnnotatedFields(instance.getClass(), TestResource.class, ignored -> true)) {
+            InjectionPoint injectionPoint = InjectionPoint.forField(field);
+            if (!field.isAccessible()) {
+                field.setAccessible(true);
+            }
+            field.set(instance, valueFor(injectionPoint, context));
+        }
     }
 
     private void failureOccured(ExtensionContext context) {
