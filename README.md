@@ -482,6 +482,14 @@ There is a PriceProducer that generates message every second, the value of the m
 PriceConsumer puts received number into ConcurrentLinkedQueue of Integers.
 State of this queue is exposed using PriceResource which is called from the test.
 
+### `messaging/kafka-streams-reactive-messaging`
+
+Verifies that `Quarkus Kafka Stream extension` and `Quarkus SmallRye Reactive Messaging extension` works as expected. 
+
+There is an EventsProducer that generate login status events every 100ms. 
+A Kafka stream called `WindowedLoginDeniedStream`  will aggregate these events in fixed time windows of 3 seconds. 
+So if the number of wrong access excess a threshold, then a new alert event is thrown. All aggregated events(not only unauthorized) are persisted. 
+
 ### `messaging/qpid`
 
 Verifies that JMS server is up and running and Quarkus can communicate with this service.

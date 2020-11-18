@@ -2,7 +2,6 @@ package io.quarkus.ts.openshift.messaging.artemisjta;
 
 import io.quarkus.scheduler.Scheduled;
 import io.quarkus.scheduler.Scheduled.ConcurrentExecution;
-
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
