@@ -2,10 +2,8 @@ package io.quarkus.ts.openshift.messaging.artemisjta;
 
 import javax.inject.Inject;
 import javax.jms.JMSException;
-import javax.transaction.Transactional;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -24,35 +22,37 @@ public class PriceResource {
     ProducerService p;
 
     @POST
-    @Path("/price")
+    @Path("/price-tx")
     @Consumes(MediaType.TEXT_PLAIN)
     @Produces(MediaType.TEXT_PLAIN)
-    @Transactional
-    public Response postCustom(@QueryParam("fail") boolean fail,
-                               @QueryParam("transactional") boolean transactional,
-                               @NotNull String price) {
-        if (transactional) {
-            p.produceCustomPrice(price, fail);
-        } else {
-            p.produceCustomPriceNoJTA(price, fail);
-        }
+    public Response postCustomUsingTransactional(@QueryParam("fail") boolean fail,
+            @NotNull String price) {
+        p.produceCustomPrice(price, fail);
+        return Response.ok().build();
+    }
+
+    @POST
+    @Path("/price-non-tx")
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.TEXT_PLAIN)
+    public Response postCustomWithoutTransactional(@QueryParam("fail") boolean fail,
+            @NotNull String price) {
+        p.produceCustomPriceNoJTA(price, fail);
         return Response.ok().build();
     }
 
     @GET
-    @Path("/price")
+    @Path("/price-1")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response getCustom() {
-        return Response.ok(c.getPrice(), MediaType.TEXT_PLAIN).build();
+    public Response getPriceOne() {
+        return Response.ok(c.readPriceOne()).build();
     }
 
-    @DELETE
-    @Path("/price")
+    @GET
+    @Path("/price-2")
     @Produces(MediaType.TEXT_PLAIN)
-    public Response deleteCustom() {
-        c.setPrice1("");
-        c.setPrice2("");
-        return Response.ok().build();
+    public Response getPriceTwo() {
+        return Response.ok(c.readPriceTwo()).build();
     }
 
     @POST
@@ -68,7 +68,7 @@ public class PriceResource {
     @Path("/noAck")
     @Produces(MediaType.TEXT_PLAIN)
     public Response getNoAck(@QueryParam("ack") boolean ack) throws JMSException {
-        return Response.ok(c.receiveAndAck(ack), MediaType.TEXT_PLAIN).build();
+        return Response.ok(c.receiveAndAck(ack)).build();
     }
 
     @GET

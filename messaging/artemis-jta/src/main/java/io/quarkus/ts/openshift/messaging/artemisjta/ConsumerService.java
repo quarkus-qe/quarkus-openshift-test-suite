@@ -1,8 +1,6 @@
 package io.quarkus.ts.openshift.messaging.artemisjta;
 
-import io.quarkus.scheduler.Scheduled;
-import io.quarkus.scheduler.Scheduled.ConcurrentExecution;
-
+import org.apache.commons.lang3.StringUtils;
 import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -14,8 +12,6 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
-import java.util.function.Consumer;
-
 @ApplicationScoped
 public class ConsumerService {
 
@@ -24,37 +20,17 @@ public class ConsumerService {
     @Inject
     ConnectionFactory connectionFactory;
 
-    private volatile String price1 = "dead";
-    private volatile String price2 = "dead";
-
-    /*
-    Why empty getter and setter? CDI proxy...
-    */
-    public String getPrice() {
-        return price1 + ":" + price2;
+    public String readPriceOne() {
+        return receiveMessagesInQueue("custom-prices-1");
     }
 
-    public void setPrice1(String price) {
-        this.price1 = price;
-    }
-
-    public void setPrice2(String price) {
-        this.price2 = price;
-    }
-
-    @Scheduled(every = "1s", concurrentExecution = ConcurrentExecution.SKIP)
-    public void receiveMessagesInCustomPriceOne() throws JMSException {
-        receiveMessagesInQueue("custom-prices-1", this::setPrice1);
-    }
-
-    @Scheduled(every = "1s", concurrentExecution = ConcurrentExecution.SKIP)
-    public void receiveMessagesInCustomPriceTwo() throws JMSException {
-        receiveMessagesInQueue("custom-prices-2", this::setPrice2);
+    public String readPriceTwo() {
+        return receiveMessagesInQueue("custom-prices-2");
     }
 
     public String receiveAndAck(boolean ackIt) throws JMSException {
-        try (JMSContext context = connectionFactory.createContext(Session.CLIENT_ACKNOWLEDGE)) {
-            JMSConsumer consumer = context.createConsumer(context.createQueue("custom-prices-cack"));
+        try (JMSContext context = connectionFactory.createContext(Session.CLIENT_ACKNOWLEDGE);
+                JMSConsumer consumer = context.createConsumer(context.createQueue("custom-prices-cack"))) {
             Message message = consumer.receiveNoWait();
             String messageBody = (message != null) ? message.getBody(String.class) : "";
             if (ackIt) {
@@ -64,17 +40,21 @@ public class ConsumerService {
         }
     }
 
-    private void receiveMessagesInQueue(String queueName, Consumer<String> setter) throws JMSException {
-        try (JMSContext context = connectionFactory.createContext(Session.AUTO_ACKNOWLEDGE)) {
-            JMSConsumer consumer = context.createConsumer(context.createQueue(queueName));
+    private String receiveMessagesInQueue(String queueName) {
+        String price = StringUtils.EMPTY;
+        try (JMSContext context = connectionFactory.createContext(Session.AUTO_ACKNOWLEDGE);
+                JMSConsumer consumer = context.createConsumer(context.createQueue(queueName))) {
             Message message = consumer.receive(500);
             if (message != null) {
-                String price = message.getBody(String.class);
-                setter.accept(price);
+                price = message.getBody(String.class);
                 LOG.info("Price set to " + price + " from " + queueName);
             } else {
                 LOG.info("Nothing to see in queue " + queueName);
             }
+        } catch (JMSException ex) {
+            LOG.error("Error reading queue. ", ex);
         }
+
+        return price;
     }
 }

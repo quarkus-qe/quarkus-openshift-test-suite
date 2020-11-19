@@ -4,6 +4,7 @@
         <paging-directory>./target/artemis/paging</paging-directory>
         <bindings-directory>./target/artemis/bindings</bindings-directory>
         <journal-directory>./target/artemis/journal</journal-directory>
+        <journal-compact-min-files>0</journal-compact-min-files>
         <large-messages-directory>./target/artemis/large-messages</large-messages-directory>
         <max-disk-usage>100</max-disk-usage>
         <connectors>

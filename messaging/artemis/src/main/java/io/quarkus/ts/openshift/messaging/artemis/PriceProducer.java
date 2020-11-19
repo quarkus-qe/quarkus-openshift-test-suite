@@ -5,7 +5,6 @@ import io.quarkus.runtime.StartupEvent;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
-import javax.inject.Inject;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSContext;
 import javax.jms.Session;
@@ -21,14 +20,14 @@ import java.util.concurrent.TimeUnit;
 @ApplicationScoped
 public class PriceProducer implements Runnable {
 
-    @Inject
-    ConnectionFactory connectionFactory;
-
     private final Random random = new Random();
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
-    void onStart(@Observes StartupEvent ev) {
-        scheduler.scheduleWithFixedDelay(this, 0L, 1L, TimeUnit.SECONDS);
+    private ConnectionFactory connectionFactory;
+
+    void onStart(@Observes StartupEvent ev, ConnectionFactory connectionFactory) {
+        this.connectionFactory = connectionFactory;
+        this.scheduler.scheduleWithFixedDelay(this, 0L, 1L, TimeUnit.SECONDS);
     }
 
     void onStop(@Observes ShutdownEvent ev) {
