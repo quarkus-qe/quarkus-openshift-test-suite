@@ -11,9 +11,9 @@
         <relativePath>../..</relativePath>
     </parent>
 
-    <artifactId>messaging-kafka</artifactId>
+    <artifactId>kafka-streams-reactive-messaging</artifactId>
 
-    <name>Quarkus OpenShift TS: Messaging: Kafka</name>
+    <name>Quarkus OpenShift TS: Messaging: kafka-streams-reactive-messaging</name>
 
     <dependencies>
 

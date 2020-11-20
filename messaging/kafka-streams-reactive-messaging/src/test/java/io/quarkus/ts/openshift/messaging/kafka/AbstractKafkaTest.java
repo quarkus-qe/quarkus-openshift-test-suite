@@ -43,6 +43,6 @@ public class AbstractKafkaTest {
     }
 
     public void thenVerifyAllEventsArrived(){
-        assertEquals(true, completed);
+        assertEquals(true, completed, "Not all expected kafka events has been consumed.");
     }
 }
