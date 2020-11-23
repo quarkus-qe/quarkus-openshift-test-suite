@@ -1,7 +1,6 @@
 package io.quarkus.ts.openshift.messaging.artemisjta;
 
 import org.jboss.logging.Logger;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -9,9 +8,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static io.restassured.RestAssured.given;
@@ -34,14 +31,6 @@ public abstract class AbstractArtemisTest {
     private static final Logger LOG = Logger.getLogger(AbstractArtemisTest.class.getName());
 
     /**
-     * The ConsumerService holds state between tests. We clean it here.
-     */
-    @BeforeEach
-    public void clean() {
-        when().delete("/price").then().statusCode(200);
-    }
-
-    /**
      * Number 666 is written to both queues custom-prices-1 and custom-prices-2 within a transaction.
      * The consumer is reading both queues each second and it should at some point see these messages
      * and report 666 from both of them. There is no injected failure here.
@@ -51,20 +40,14 @@ public abstract class AbstractArtemisTest {
     public void testPrice() {
         given()
                 .queryParam("fail", "false")
-                .queryParam("transactional", "true")
                 .body("666")
         .when()
-                .post("/price")
+                .post("/price-tx")
         .then()
                 .statusCode(200);
 
-        await().pollInterval(1, TimeUnit.SECONDS)
-                .atMost(5, TimeUnit.SECONDS).untilAsserted(() ->
-                    when()
-                        .get("/price")
-                    .then()
-                        .statusCode(200)
-                        .body(equalTo("666:666")));
+        thenPriceOneIs("666");
+        thenPriceTwoIs("666");
     }
 
     /**
@@ -76,36 +59,19 @@ public abstract class AbstractArtemisTest {
     @Order(2)
     public void testJTAPriceFail() {
         given().queryParam("fail", "true")
-                .queryParam("transactional", "true")
                 .body("999")
         .when()
-                .post("/price")
+                .post("/price-tx")
         .then()
                 .statusCode(500);
 
-        Set<String> s = new HashSet<>(10);
-        for (int i = 0; i < 10; i++) {
-            s.add(  when()
-                        .get("/price")
-                    .then()
-                        .statusCode(200)
-                        .extract().body().asString());
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
-        LOG.info("Retrieved data from queues: " + s);
-        assertThat("Only one queue was updated and that should not have happened." +
-                " Retrieved data from queues: " + s, !s.contains("999:"));
-        assertThat("Empty reading from both queues was expected to occur." +
-                " Retrieved data from queues: " + s, s.contains(":"));
+        thenPriceOneIs("");
+        thenPriceTwoIs("");
     }
 
     /**
      * Continuation of the above. This time there is no transaction and there is an error
-     * between writing to both queues. Not being wrapped in atransaction means that there will
+     * between writing to both queues. Not being wrapped in a transaction means that there will
      * be an expected inconsistency: one queue gets updated while the other doesn't.
      */
     @Test
@@ -113,28 +79,14 @@ public abstract class AbstractArtemisTest {
     public void testPriceFail() {
         given()
                 .queryParam("fail", "true")
-                .queryParam("transactional", "false")
                 .body("69")
         .when()
-                .post("/price")
+                .post("/price-non-tx")
         .then()
                 .statusCode(500);
 
-        Set<String> s = new HashSet<>(10);
-        for (int i = 0; i < 10; i++) {
-            s.add(  when()
-                        .get("/price")
-                    .then()
-                        .statusCode(200)
-                        .extract().body().asString());
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        }
-        LOG.info("Retrieved data from queues: " + s);
-        assertThat("One queue should have been updated. Retrieved data: " + s, s.contains("69:"));
+        thenPriceOneIs("69");
+        thenPriceTwoIs("");
     }
 
     /**
@@ -166,5 +118,22 @@ public abstract class AbstractArtemisTest {
         LOG.info("Retrieved data from queues: " + actual);
         assertThat("Expected list " + expected.toString() + " does not match th actual one: " + actual.toString(),
                 expected.equals(actual));
+    }
+
+    private void thenPriceOneIs(String expected) {
+        thenPriceIs("/price-1", expected);
+    }
+
+    private void thenPriceTwoIs(String expected) {
+        thenPriceIs("/price-2", expected);
+    }
+
+    private void thenPriceIs(String pricePath, String expected) {
+        await().pollInterval(1, TimeUnit.SECONDS)
+                .atMost(10, TimeUnit.SECONDS).untilAsserted(() -> when()
+                        .get(pricePath)
+                        .then()
+                        .statusCode(200)
+                        .body(equalTo(expected)));
     }
 }
