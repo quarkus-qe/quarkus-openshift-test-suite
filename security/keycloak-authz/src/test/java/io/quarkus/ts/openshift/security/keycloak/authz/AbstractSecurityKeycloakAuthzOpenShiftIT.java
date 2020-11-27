@@ -7,9 +7,7 @@ import io.fabric8.kubernetes.client.utils.Serialization;
 import io.fabric8.openshift.api.model.DeploymentConfig;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.quarkus.ts.openshift.app.metadata.AppMetadata;
-import io.quarkus.ts.openshift.common.AdditionalResources;
 import io.quarkus.ts.openshift.common.CustomizeApplicationDeployment;
-import io.quarkus.ts.openshift.common.OpenShiftTest;
 import io.quarkus.ts.openshift.common.injection.TestResource;
 import io.quarkus.ts.openshift.common.injection.WithName;
 import org.apache.http.impl.client.HttpClients;
@@ -22,16 +20,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
-@OpenShiftTest
-@AdditionalResources("classpath:keycloak-realm.yaml")
-@AdditionalResources("classpath:keycloak.yaml")
-public class SecurityKeycloakAuthzOpenShiftIT {
+public abstract class AbstractSecurityKeycloakAuthzOpenShiftIT {
 
     static String keycloakUrl;
     static String keycloakRealmUrl;
@@ -71,9 +66,7 @@ public class SecurityKeycloakAuthzOpenShiftIT {
                 keycloakUrl,
                 "test-realm",
                 "test-application-client",
-                new HashMap<String, Object>() {{
-                    put("secret", "test-application-client-secret");
-                }},
+                Collections.singletonMap("secret", "test-application-client-secret"),
                 HttpClients.createDefault()
         ));
     }
