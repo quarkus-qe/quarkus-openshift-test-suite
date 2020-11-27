@@ -22,6 +22,7 @@ items:
         contextDir: quarkus-workshop-super-heroes/super-heroes/rest-villain
         git:
           uri: https://github.com/quarkusio/quarkus-workshops.git
+          ref: 2bcac8effec0d71f0292661da2339ffd1ed646bd
         type: Git
       strategy:
         type: Source
