@@ -154,14 +154,21 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
 
             awaitImageStreams(context, openshiftResources);
 
-            // when generating Kubernetes resources, Quarkus expects that all application files
-            // will reside in `/deployments/target`, but if we did just `oc start-build my-app --from-dir=target`,
-            // the files would end up in `/deployments`
-            // using `tar` works around that nicely, because the tarball created with this command will have
-            // a single root directory named `target`, which the S2I builder image will unpack to `/deployments`
-            new Command("tar", "czf", "app.tar.gz", "target").runAndWait();
-            new Command("oc", "start-build", getAppMetadata(context).appName, "--from-archive=app.tar.gz", "--follow").runAndWait();
-            new Command("rm", "app.tar.gz").runAndWait();
+            Optional<String> binary = findNativeBinary();
+            if (binary.isPresent()) {
+                new Command("oc", "start-build", getAppMetadata(context).appName, "--from-file=" + binary.get(), "--follow")
+                        .runAndWait();
+            } else {
+                // when generating Kubernetes resources, Quarkus expects that all application files
+                // will reside in `/deployments/target`, but if we did just `oc start-build my-app --from-dir=target`,
+                // the files would end up in `/deployments`
+                // using `tar` works around that nicely, because the tarball created with this command will have
+                // a single root directory named `target`, which the S2I builder image will unpack to `/deployments`
+                new Command("tar", "czf", "app.tar.gz", "target").runAndWait();
+                new Command("oc", "start-build", getAppMetadata(context).appName, "--from-archive=app.tar.gz", "--follow")
+                        .runAndWait();
+                new Command("rm", "app.tar.gz").runAndWait();
+            }
         }
 
         setUpRestAssured(context);
@@ -471,5 +478,13 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
 
     private void failureOccured(ExtensionContext context) {
         getTestsStatus(context).failed = true;
+    }
+
+    private Optional<String> findNativeBinary() throws Exception {
+        try (Stream<Path> binariesFound = Files
+                .find(Paths.get("target/"), Integer.MAX_VALUE,
+                        (path, basicFileAttributes) -> path.toFile().getName().matches(".*-runner"))) {
+            return binariesFound.map(path -> path.normalize().toString()).findFirst();
+        }
     }
 }
