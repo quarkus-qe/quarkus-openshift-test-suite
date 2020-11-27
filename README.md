@@ -223,6 +223,7 @@ In such case, when you enable retaining resources on test failure, it's best to 
 ### Enabling/disabling tests
 
 The `@OnlyIfConfigured` annotation can be used to selectively enable/disable execution of tests based on a configuration property.
+Similarly, the `@OnlyIfNotConfigured` annotation can be used to selectively enable/disable the execution of tests based on a configuration property unavailability.
 
 This can be used for example to disable tests that require access to authenticated registry.
 The tests that do require such access are annotated `@OnlyIfConfigured("ts.authenticated-registry")` and are not executed by default.
