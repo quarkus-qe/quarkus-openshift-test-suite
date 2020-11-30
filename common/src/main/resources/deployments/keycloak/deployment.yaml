@@ -1,19 +1,6 @@
 apiVersion: v1
 kind: List
 items:
-- apiVersion: image.openshift.io/v1
-  kind: ImageStream
-  metadata:
-    name: keycloak
-  spec:
-    lookupPolicy:
-      local: false
-    tags:
-      - name: latest
-        from:
-          kind: DockerImage
-          name: registry.access.redhat.com/redhat-sso-7/sso73-openshift
-
 - apiVersion: apps.openshift.io/v1
   kind: DeploymentConfig
   metadata:

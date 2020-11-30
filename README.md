@@ -223,6 +223,7 @@ In such case, when you enable retaining resources on test failure, it's best to 
 ### Enabling/disabling tests
 
 The `@OnlyIfConfigured` annotation can be used to selectively enable/disable execution of tests based on a configuration property.
+Similarly, the `@OnlyIfNotConfigured` annotation can be used to selectively enable/disable the execution of tests based on a configuration property unavailability.
 
 This can be used for example to disable tests that require access to authenticated registry.
 The tests that do require such access are annotated `@OnlyIfConfigured("ts.authenticated-registry")` and are not executed by default.
@@ -484,7 +485,7 @@ State of this queue is exposed using PriceResource which is called from the test
 
 ### `messaging/kafka-streams-reactive-messaging`
 
-Verifies that `Quarkus Kafka Stream extension` and `Quarkus SmallRye Reactive Messaging extension` works as expected. 
+Verifies that `Quarkus Kafka Stream` and `Quarkus SmallRye Reactive Messaging` extensions works as expected. 
 
 There is an EventsProducer that generate login status events every 100ms. 
 A Kafka stream called `WindowedLoginDeniedStream`  will aggregate these events in fixed time windows of 3 seconds. 

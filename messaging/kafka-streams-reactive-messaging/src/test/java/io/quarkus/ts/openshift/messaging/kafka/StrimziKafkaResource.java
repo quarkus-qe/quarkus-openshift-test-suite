@@ -3,7 +3,6 @@ package io.quarkus.ts.openshift.messaging.kafka;
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import io.strimzi.StrimziKafkaContainer;
 import org.jboss.logging.Logger;
-import org.testcontainers.containers.Network;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -15,8 +14,7 @@ public class StrimziKafkaResource implements QuarkusTestResourceLifecycleManager
 
     @Override
     public Map<String, String> start() {
-        Network network = Network.newNetwork();
-        kafkaContainer = new StrimziKafkaContainer("0.18.0-kafka-2.5.0").withNetwork(network);
+        kafkaContainer = new StrimziKafkaContainer("0.18.0-kafka-2.5.0");
         kafkaContainer.start();
 
         String kafkaUrl = kafkaContainer.getBootstrapServers();

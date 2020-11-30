@@ -1,6 +1,6 @@
 package io.quarkus.ts.openshift.messaging.kafka.aggregator.rest;
 
-import io.smallrye.reactive.messaging.annotations.Channel;
+import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.jboss.resteasy.annotations.SseElementType;
 import org.reactivestreams.Publisher;
 

@@ -4,9 +4,9 @@ import io.quarkus.runtime.annotations.RegisterForReflection;
 
 @RegisterForReflection
 public class LoginAttempt {
-    public String id;
-    public String endpoint;
-    public int code;
+    private String id;
+    private String endpoint;
+    private int code;
 
     public LoginAttempt(String id, String endpoint, int code) {
         this.id = id;
@@ -16,4 +16,27 @@ public class LoginAttempt {
 
     public LoginAttempt() { }
 
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public String getEndpoint() {
+        return endpoint;
+    }
+
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public void setCode(int code) {
+        this.code = code;
+    }
 }

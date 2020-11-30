@@ -13,14 +13,16 @@ import javax.transaction.Transactional;
 @ApplicationScoped
 public class ProducerService {
 
+    private static final Logger LOG = Logger.getLogger(ProducerService.class.getName());
+
     @Inject
     ConnectionFactory connectionFactory;
-
-    private static final Logger LOG = Logger.getLogger(ProducerService.class.getName());
 
     @Transactional
     public void produceCustomPrice(String customPrice, boolean fail) {
         try (JMSContext context = connectionFactory.createContext(Session.SESSION_TRANSACTED)) {
+            context.setAutoStart(true);
+            context.acknowledge();
             JMSProducer p = context.createProducer();
             p.send(context.createQueue("custom-prices-1"), customPrice);
             LOG.info(customPrice + " sent to queue custom-prices-1");
@@ -28,10 +30,8 @@ public class ProducerService {
                 throw new IllegalStateException("Bad hair day");
             }
             p.send(context.createQueue("custom-prices-2"), customPrice);
-            LOG.info(customPrice + " sent to queue custom-prices-2");
             context.commit();
-            context.acknowledge();
-            context.setAutoStart(true);
+            LOG.info(customPrice + " sent to queue custom-prices-2");
         }
     }
 

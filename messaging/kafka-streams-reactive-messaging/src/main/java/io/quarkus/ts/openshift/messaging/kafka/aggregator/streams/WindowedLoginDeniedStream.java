@@ -15,7 +15,6 @@ import org.apache.kafka.streams.state.WindowStore;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
-import org.jboss.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
@@ -28,17 +27,15 @@ import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
 @ApplicationScoped
 public class WindowedLoginDeniedStream {
 
-    private static final Logger LOG = Logger.getLogger(WindowedLoginDeniedStream.class);
-
     static final String LOGIN_AGGREGATION_STORE = "login-aggregation-store";
     static final String LOGIN_ATTEMPTS_TOPIC = "login-http-response-values";
     static final String LOGIN_DENIED_AGGREGATED_TOPIC = "login-denied";
 
     @ConfigProperty(name = "login.denied.windows.sec")
-    int WINDOWS_LOGIN_SEC;
+    int windowsLoginSec;
 
     @ConfigProperty(name = "login.denied.threshold")
-    int THRESHOLD;
+    int threshold;
 
     @Produces
     public Topology buildTopology() {
@@ -49,15 +46,15 @@ public class WindowedLoginDeniedStream {
 
         builder.stream(LOGIN_ATTEMPTS_TOPIC, Consumed.with(Serdes.String(), loginAttemptSerde))
                 .groupByKey()
-                .windowedBy(TimeWindows.of(Duration.ofSeconds(WINDOWS_LOGIN_SEC)))
+                .windowedBy(TimeWindows.of(Duration.ofSeconds(windowsLoginSec)))
                 .aggregate(LoginAggregation::new,
                         (id, value, aggregation) -> aggregation.updateFrom(value),
                         Materialized.<String, LoginAggregation, WindowStore<Bytes, byte[]>> as(LOGIN_AGGREGATION_STORE)
                                 .withKeySerde(Serdes.String())
                                 .withValueSerde(loginAggregationSerde))
                 .toStream()
-                .filter((k, v) -> (v.code == UNAUTHORIZED.getStatusCode() || v.code == FORBIDDEN.getStatusCode()))
-                .filter((k,v) -> v.count > THRESHOLD)
+                .filter((k, v) -> (v.getCode() == UNAUTHORIZED.getStatusCode() || v.getCode() == FORBIDDEN.getStatusCode()))
+                .filter((k,v) -> v.getCount() > threshold)
                 .to(LOGIN_DENIED_AGGREGATED_TOPIC);
 
         return builder.build();

@@ -21,10 +21,10 @@ public class EventsProducer {
     private static final Logger LOG = Logger.getLogger(EventsProducer.class);
 
     @ConfigProperty(name = "producer.httpCodes")
-    List<Integer> HTTP_CODES;
+    List<Integer> httpCodes;
 
     @ConfigProperty(name = "producer.loginUrls")
-    List<String> LOGIN_URLs;
+    List<String> loginUrls;
 
     private Random random = new Random();
 
@@ -43,11 +43,11 @@ public class EventsProducer {
     }
 
     private String getRandomEndpointUrl(){
-        return LOGIN_URLs.get(random.nextInt(LOGIN_URLs.size()));
+        return loginUrls.get(random.nextInt(loginUrls.size()));
     }
 
     private Integer getRandomHttpCode(){
-        return HTTP_CODES.get(random.nextInt(HTTP_CODES.size()));
+        return httpCodes.get(random.nextInt(httpCodes.size()));
     }
 
     private String encodeId(final String id) {
