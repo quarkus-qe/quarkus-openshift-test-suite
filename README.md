@@ -415,6 +415,15 @@ Authorization is based on URL patterns, and Keycloak is used for defining and en
 
 A simple Keycloak realm with 1 client (protected application), 2 users, 2 roles and 2 protected resources is provided in `test-realm.json`.
 
+### `security/keycloak-webapp`
+
+Verifies authorization code flow and role-based authentication to protect web applications.
+Authentication is OIDC, and Keycloak is used for granting user access via login form.
+Authorization is based on roles, which are configured in Keycloak.
+Restrictions are defined using common annotations (`@RolesAllowed` etc.).
+
+A simple Keycloak realm with 1 client (protected application), 2 users and 2 roles is provided in `test-realm.json`.
+
 ### `security/https-1way`
 
 Verifies that accessing an HTTPS endpoint is posible.

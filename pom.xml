@@ -35,6 +35,7 @@
         <module>security/jwt</module>
         <module>security/keycloak</module>
         <module>security/keycloak-authz</module>
+        <module>security/keycloak-webapp</module>
         <module>security/https-1way</module>
         <module>security/https-2way</module>
         <module>security/https-2way-authz</module>
@@ -67,6 +68,7 @@
         <version.maven-jar-plugin>3.2.0</version.maven-jar-plugin>
         <version.maven-surefire-plugin>2.22.2</version.maven-surefire-plugin>
         <version.quarkus>1.10.2.Final</version.quarkus>
+        <version.testcontainers>1.15.0</version.testcontainers>
     </properties>
 
     <dependencyManagement>
@@ -75,6 +77,14 @@
                 <groupId>${quarkus.platform.group-id}</groupId>
                 <artifactId>${quarkus.platform.artifact-id}</artifactId>
                 <version>${version.quarkus}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${version.testcontainers}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
