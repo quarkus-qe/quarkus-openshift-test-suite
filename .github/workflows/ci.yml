@@ -72,7 +72,7 @@ jobs:
         with:
           java-version: openjdk${{ matrix.java }}
       - name: Build Quarkus master
-        run: git clone https://github.com/quarkusio/quarkus.git && cd quarkus && mvn -B clean install -DskipTests -DskipITs -DskipDocs
+        run: git clone https://github.com/quarkusio/quarkus.git && cd quarkus && mvn -B -s .github/mvn-settings.xml clean install -DskipTests -DskipITs -DskipDocs
       - name: Build with Maven
         run: mvn -fae -V -B clean test -Dquarkus-core-only -Dinclude.serverless
       - name: Zip Artifacts
