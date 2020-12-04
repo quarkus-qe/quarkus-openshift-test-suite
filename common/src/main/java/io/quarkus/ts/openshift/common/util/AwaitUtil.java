@@ -7,7 +7,9 @@ import io.fabric8.openshift.client.OpenShiftClient;
 import io.quarkus.ts.openshift.app.metadata.AppMetadata;
 import io.quarkus.ts.openshift.common.OpenShiftTestException;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -34,6 +36,13 @@ public final class AwaitUtil {
     }
 
     public void awaitAppRoute() {
+        // if the route responds with 200, that should imply readiness
+        // unfortunately, with OpenShift 4.6, that doesn't seem to be the case :-/
+        awaitReadiness(Arrays.asList(
+                oc.deploymentConfigs().withName(metadata.appName).get(),
+                oc.apps().deployments().withName(metadata.appName).get()
+        ));
+
         System.out.println(ansi().a("waiting for route ").fgYellow().a(metadata.appName).reset()
                 .a(" to start responding at ").fgYellow().a(metadata.knownEndpoint).reset());
         await().ignoreExceptions().atMost(5, TimeUnit.MINUTES).untilAsserted(() -> {
@@ -49,6 +58,7 @@ public final class AwaitUtil {
 
     public void awaitReadiness(List<HasMetadata> resources) {
         resources.stream()
+                .filter(Objects::nonNull)
                 .filter(it -> ReadinessUtil.isReadinessApplicable(it.getClass()))
                 .forEach(it -> {
                     System.out.println(ansi().a("waiting for ").a(readableKind(it.getKind())).a(" ")
