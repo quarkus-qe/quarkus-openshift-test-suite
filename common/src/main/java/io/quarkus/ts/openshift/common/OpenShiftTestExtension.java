@@ -27,6 +27,7 @@ import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
 import org.junit.jupiter.api.extension.TestInstancePostProcessor;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
@@ -40,6 +41,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.ServiceLoader;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import static org.fusesource.jansi.Ansi.ansi;
@@ -50,6 +54,14 @@ import static org.junit.platform.commons.util.AnnotationUtils.findAnnotatedField
 final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallback, BeforeEachCallback,
         TestInstancePostProcessor, ParameterResolver,
         LifecycleMethodExecutionExceptionHandler, TestExecutionExceptionHandler {
+
+    static {
+        try (InputStream in = OpenShiftTestExtension.class.getResourceAsStream("/logging.properties")) {
+            LogManager.getLogManager().readConfiguration(in);
+        } catch (IOException e) {
+            Logger.getAnonymousLogger().log(Level.SEVERE, "Could not load logging.properties", e);
+        }
+    }
 
     private final ServiceLoader<OnOpenShiftFailureAction> onFailureActions = ServiceLoader.load(OnOpenShiftFailureAction.class);
 
