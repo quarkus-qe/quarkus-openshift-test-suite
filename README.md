@@ -384,6 +384,29 @@ Container images used in the tests are:
   - version 10.3: `registry.redhat.io/rhscl/mariadb-103-rhel7` (only if `ts.authenticated-registry` is set)
 - MSSQL: `mcr.microsoft.com/mssql/rhel/server`
 
+### `infinispan-client`
+
+Verifies the way of sharing cache with Datagrid operator.
+
+#### Prerequisities
+- Datagrid operator installed in `datagrid-operator` namespace. This needs cluster-admin rights to install.
+- The operator supports only single-namespace so it has to watch another well-known namespace `datagrid-cluster`. 
+This namespace must be created by "qe" user or this user must have access to it because infinispan tests are connecting to it.
+- These namespaces should be prepared after the Openshift installation - See [Installing Data Grid Operator](https://access.redhat.com/documentation/en-us/red_hat_data_grid/8.1/html/running_data_grid_on_openshift/installation)
+
+Tests are creating an infinispan cluster in the `datagrid-cluster` namespace. Cluster is created before tests by `infinispan_cluster_config.yaml`. 
+To allow parallel runs of tests this cluster must be renamed for every test run - along with configmap `infinispan-config`. The configmap contains 
+configuration property `quarkus.infinispan-client.server-list`. Value of this property is a path to the infinispan cluster from test namespace, 
+its structure is `infinispan-cluster-name.datagrid-cluster-namespace.svc.cluster.local:11222`. It is because testsuite using dynamically generated 
+namespaces for tests. So this path is needed for tests to find infinispan server.
+
+The infinispan cluster needs 2 special secrets - tls-secret with TLS certificate and connect-secret with the credentials.
+TLS certificate is a substitution of `secrets/signing-key` in openshift-service-ca namespace, which "qe" user cannot use (doesn't have rights on it). 
+Clientcert secret is generated for "qe" from the tls-secret mentioned above.
+
+Infinispan client test scenarios are using the cache directly with @Inject and @RemoteCache. The first scenario is one infinispan cluster with 2 replicas and 
+one quarkus application. Through the JAX-RS endpoint we send data into the cache and retrieve it through another JAX-RS endpoint.
+
 ### `security/basic`
 
 Verifies the simplest way of doing authn/authz.
