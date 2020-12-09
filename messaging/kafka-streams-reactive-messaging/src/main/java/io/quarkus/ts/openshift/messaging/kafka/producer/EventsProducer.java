@@ -2,7 +2,7 @@ package io.quarkus.ts.openshift.messaging.kafka.producer;
 
 import io.quarkus.ts.openshift.messaging.kafka.aggregator.model.LoginAttempt;
 import io.smallrye.mutiny.Multi;
-import io.smallrye.reactive.messaging.kafka.Record;
+import io.smallrye.reactive.messaging.kafka.KafkaRecord;
 import io.vertx.core.json.Json;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
@@ -29,7 +29,7 @@ public class EventsProducer {
     private Random random = new Random();
 
     @Outgoing("login-http-response-values")
-    public Multi<Record<String, String>> generate() {
+    public Multi<KafkaRecord<String, String>> generate() {
         return Multi.createFrom().ticks().every(Duration.ofMillis(100))
                 .onOverflow().drop()
                 .map(tick -> {
@@ -38,7 +38,8 @@ public class EventsProducer {
                     Integer httpCode = getRandomHttpCode();
 
                     LOG.infov("Endpoint: {0} ID: {1}, HTTP-code: {2}", loginEndpoint, loginEndpointEnc, httpCode);
-                    return Record.of(loginEndpointEnc, Json.encode(new LoginAttempt(loginEndpointEnc, loginEndpoint, httpCode)));
+                    return KafkaRecord.of(loginEndpointEnc,
+                            Json.encode(new LoginAttempt(loginEndpointEnc, loginEndpoint, httpCode)));
                 });
     }
 
