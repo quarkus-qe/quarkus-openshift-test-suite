@@ -56,7 +56,7 @@ items:
               env:
                 - name: ARTIFACT_COPY_ARGS
                   value: -p -r lib/ *-runner.jar
-                - name: QUARKUS_DATASOURCE_URL
+                - name: QUARKUS_DATASOURCE_JDBC_URL
                   value: jdbc:postgresql://villains-database:5432/villains-database
                 - name: QUARKUS_HTTP_PORT
                   value: "8080"
