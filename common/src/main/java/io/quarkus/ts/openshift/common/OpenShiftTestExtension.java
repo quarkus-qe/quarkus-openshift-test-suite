@@ -168,9 +168,11 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
 
             Optional<String> binary = findNativeBinary();
             if (binary.isPresent()) {
+                System.out.println("ECOOOOOOOOOOOOOOO " +  binary.get());
                 new Command("oc", "start-build", getAppMetadata(context).appName, "--from-file=" + binary.get(), "--follow")
                         .runAndWait();
             } else {
+                System.out.println("ECOOOOOOOOOOOOOOO 2 ");
                 // when generating Kubernetes resources, Quarkus expects that all application files
                 // will reside in `/deployments/target`, but if we did just `oc start-build my-app --from-dir=target`,
                 // the files would end up in `/deployments`

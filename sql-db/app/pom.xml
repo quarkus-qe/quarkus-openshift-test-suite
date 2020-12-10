@@ -17,6 +17,7 @@
     <name>Quarkus OpenShift TS: SQL Database: Application</name>
 
     <dependencies>
+
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-openshift</artifactId>
