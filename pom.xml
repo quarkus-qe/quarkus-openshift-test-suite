@@ -24,6 +24,7 @@
         <module>messaging/artemis</module>
         <module>messaging/artemis-jta</module>
         <module>messaging/amqp-reactive</module>
+        <module>messaging/kafka-avro-reactive-messaging</module>
         <module>messaging/kafka-streams-reactive-messaging</module>
         <module>messaging/qpid</module>
         <module>scaling</module>
@@ -59,6 +60,7 @@
         <quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
 
+        <version.apicurio.registry.utils.serde>1.2.2.Final</version.apicurio.registry.utils.serde>
         <version.strimzi>0.20.0</version.strimzi>
         <version.apache-httpclient-fluent>4.5.12</version.apache-httpclient-fluent> <!-- same as Apache HTTP Client managed by Quarkus BOM -->
         <version.fusesource-jansi>2.1.0</version.fusesource-jansi>
@@ -133,6 +135,11 @@
                 <artifactId>test-container</artifactId>
                 <version>${version.strimzi}</version>
                 <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>io.apicurio</groupId>
+                <artifactId>apicurio-registry-utils-serde</artifactId>
+                <version>${version.apicurio.registry.utils.serde}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.httpcomponents</groupId>
