@@ -3,12 +3,12 @@ package io.quarkus.ts.openshift.scaling;
 import io.quarkus.ts.openshift.common.OpenShiftTest;
 import io.quarkus.ts.openshift.common.injection.TestResource;
 import io.quarkus.ts.openshift.common.util.OpenShiftUtil;
+import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import static io.restassured.RestAssured.given;
@@ -16,11 +16,14 @@ import static javax.ws.rs.core.Response.Status.OK;
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @OpenShiftTest
 public class ScalingOpenShiftIT {
 
     public static final String DC_NAME = "test-scaling";
+    private static final int TIMEOUT_SEC = 60;
+    private static final int DELAY_BETWEEN_REQUEST_MS = 100;
 
     @TestResource
     private OpenShiftUtil openShiftUtil;
@@ -38,28 +41,14 @@ public class ScalingOpenShiftIT {
      */
     @Test
     public void scaleUpTest() {
-        given()
-                .when().get("/scaling")
-                .then()
-                .statusCode(OK.getStatusCode());
+        int REPLICAS = 2;
 
-        openShiftUtil.scale(DC_NAME, 2);
-
-        assertThat(openShiftUtil.countReadyReplicas(DC_NAME)).isEqualTo(2);
-
-        Set<String> uniqueIds = Collections.newSetFromMap(new ConcurrentHashMap<>());
-        await().atMost(1, TimeUnit.MINUTES).untilAsserted(() -> {
-            String uniqueId =
-                    given()
-                            .when().get("/scaling")
-                            .then()
-                            .statusCode(OK.getStatusCode())
-                            .extract().asString();
-            uniqueIds.add(uniqueId);
-
-            assertThat(uniqueIds).hasSize(2);
-        });
+        givenResourcePath("/scaling");
+        whenScaleTo(2);
+        thenCheckReplicasAmount(2);
+        whenMakeRequestTo("/scaling", REPLICAS);
     }
+
 
     /**
      * Workflow:
@@ -68,43 +57,20 @@ public class ScalingOpenShiftIT {
      * * Execute an arbitrary minimal sample of requests and verify that all are served by the same replica.
      */
     @Test
-    public void scaleDownTest() {
-        openShiftUtil.scale(DC_NAME, 2);
+    public void scaleDownTest() throws InterruptedException {
 
-        assertThat(openShiftUtil.countReadyReplicas(DC_NAME)).isEqualTo(2);
+        int REPLICAS = 2;
+        givenResourcePath("/scaling");
+        whenScaleTo(2);
+        thenCheckReplicasAmount(2);
+        whenMakeRequestTo("/scaling", REPLICAS);
 
-        Set<String> uniqueIds = Collections.newSetFromMap(new ConcurrentHashMap<>());
-        await().atMost(1, TimeUnit.MINUTES).untilAsserted(() -> {
-            String uniqueId =
-                    given()
-                            .when().get("/scaling")
-                            .then()
-                            .statusCode(OK.getStatusCode())
-                            .extract().asString();
-            uniqueIds.add(uniqueId);
-
-            assertThat(uniqueIds).hasSize(2);
-        });
-
-        openShiftUtil.scale(DC_NAME, 1);
-
-        assertThat(openShiftUtil.countReadyReplicas(DC_NAME)).isEqualTo(1);
-
-        uniqueIds.clear();
-        for (int i = 0; i < 100; i++) {
-            String uniqueId =
-                    given()
-                            .when().get("/scaling")
-                            .then()
-                            .statusCode(OK.getStatusCode())
-                            .extract().asString();
-            uniqueIds.add(uniqueId);
-        }
-
-        assertThat(uniqueIds).hasSize(1);
-
-        assertThat(openShiftUtil.countReadyReplicas(DC_NAME)).isEqualTo(1);
+        REPLICAS = 1;
+        whenScaleTo(1);
+        thenCheckReplicasAmount(1);
+        whenMakeRequestTo("/scaling", REPLICAS);
     }
+
 
     /**
      * Workflow:
@@ -112,17 +78,44 @@ public class ScalingOpenShiftIT {
      * * Execute an arbitrary minimal sample of requests and verify that all get HTTP 503 response.
      */
     @Test
-    public void scaleToZero() {
-        openShiftUtil.scale(DC_NAME, 0);
+    public void scaleToZero() throws InterruptedException {
 
-        assertThat(openShiftUtil.countReadyReplicas(DC_NAME)).isEqualTo(0);
+        givenResourcePath("/scaling");
+        whenScaleTo(0);
+        thenCheckReplicasAmount(0);
+        makeHttpScalingRequest("/scaling", SERVICE_UNAVAILABLE.getStatusCode());
+    }
 
-        for (int i = 0; i < 100; i++) {
-            given()
-                    .when().get("/scaling")
-                    .then()
-                    .statusCode(SERVICE_UNAVAILABLE.getStatusCode());
-        }
+    private void givenResourcePath(String path) {
+        given()
+                .when().get("/scaling")
+                .then()
+                .statusCode(OK.getStatusCode());
+    }
+
+    private void whenScaleTo(int amount) {
+        openShiftUtil.scale(DC_NAME, amount);
+    }
+
+    private void thenCheckReplicasAmount(int expectedAmount) {
+        assertThat(openShiftUtil.countReadyReplicas(DC_NAME)).isEqualTo(expectedAmount);
+    }
+
+    private void whenMakeRequestTo(String path, int expectedReplicas) {
+        Set<String> replicas = new HashSet<>();
+        await().pollInterval(DELAY_BETWEEN_REQUEST_MS, TimeUnit.MILLISECONDS)
+                .atMost(TIMEOUT_SEC, TimeUnit.SECONDS)
+                .untilAsserted(() -> {
+                    replicas.add(makeHttpScalingRequest(path, OK.getStatusCode()).extract().asString());
+                    assertEquals(expectedReplicas, replicas.size());
+                });
+    }
+
+    private ValidatableResponse makeHttpScalingRequest(String path, int expectedHttpStatus){
+        return given()
+                .when().get(path)
+                .then()
+                .statusCode(expectedHttpStatus);
     }
 
 }
