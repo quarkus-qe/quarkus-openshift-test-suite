@@ -433,9 +433,6 @@ All HTTP endpoints and internal processing is asynchronous, so Context Propagati
 JAX-RS endpoints and RestClient calls are automatically traced with OpenTracing, and some additional logging into the OpenTracing spans is also done.
 Jaeger is deployed in an "all-in-one" configuration, and the OpenShift test verifies the stored traces.
 
-Note that the Fault Tolerance annotations are currently commented out, because of https://github.com/quarkusio/quarkus/issues/8650.
-This is a RESTEasy bug, there is a proposed fix: https://github.com/resteasy/Resteasy/pull/2359
-
 ### `messaging/artemis`
 
 Verifies that JMS server is up and running and Quarkus can communicate with this service.
