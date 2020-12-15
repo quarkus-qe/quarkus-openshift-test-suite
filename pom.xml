@@ -59,7 +59,7 @@
         <quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
 
-        <version.strimzi>0.20.0</version.strimzi>
+        <version.strimzi>0.20.1</version.strimzi>
         <version.apache-httpclient-fluent>4.5.12</version.apache-httpclient-fluent> <!-- same as Apache HTTP Client managed by Quarkus BOM -->
         <version.fusesource-jansi>2.1.0</version.fusesource-jansi>
         <version.impsort-maven-plugin>1.4.1</version.impsort-maven-plugin>
