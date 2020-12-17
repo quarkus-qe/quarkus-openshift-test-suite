@@ -1,4 +1,4 @@
-package io.quarkus.ts.openshift.messaging.kafka;
+package io.quarkus.ts.openshift.messaging.kafka.containers;
 
 import io.strimzi.StrimziKafkaContainer;
 import org.testcontainers.containers.GenericContainer;
@@ -6,16 +6,11 @@ import org.testcontainers.containers.Network;
 
 public class SchemaRegistryContainer extends GenericContainer<SchemaRegistryContainer> {
 
-    private final String image;
-    private final String version;
     private final int port;
 
     public SchemaRegistryContainer(final String image, final String version, final int port) {
         super(image + ":"+ version);
-        this.image = image;
-        this.version = version;
         this.port = port;
-
         withExposedPorts(port);
     }
 

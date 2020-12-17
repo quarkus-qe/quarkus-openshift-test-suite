@@ -1,10 +1,7 @@
 package io.quarkus.ts.openshift.messaging.kafka;
 
 import io.quarkus.ts.openshift.common.injection.TestResource;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -20,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public abstract class AbstractKafkaTest {
 
     private static final int TIMEOUT_SEC = 25;
@@ -35,7 +31,6 @@ public abstract class AbstractKafkaTest {
     private URL sseEndpoint;
 
     @Test
-    @Order(1)
     public void testAlertMonitorEventStream() throws InterruptedException {
         givenAnApplicationEndpoint(getEndpoint() + "/stock-price/stream");
         whenRequestSomeEvents(EVENTS_AMOUNT);

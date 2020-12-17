@@ -17,7 +17,7 @@ import java.util.stream.IntStream;
 @ApplicationScoped
 public class KStockPriceProducer {
 
-    private Logger LOG = Logger.getLogger(KStockPriceProducer.class);
+    private static final Logger LOG = Logger.getLogger(KStockPriceProducer.class);
     private static final int BATCH_SIZE = 100;
 
     @Inject

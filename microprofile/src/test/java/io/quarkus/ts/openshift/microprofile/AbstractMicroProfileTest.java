@@ -1,6 +1,5 @@
 package io.quarkus.ts.openshift.microprofile;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,6 @@ public abstract class AbstractMicroProfileTest {
 
     @Test
     @Order(10)
-    @Disabled("https://github.com/quarkusio/quarkus/issues/8650")
     public void fallback() {
         when()
                 .post("/hello/disable")

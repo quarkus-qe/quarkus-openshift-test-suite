@@ -1,7 +1,6 @@
 package io.quarkus.ts.openshift.messaging.kafka;
 
 import org.eclipse.microprofile.reactive.messaging.Channel;
-import org.jboss.logging.Logger;
 import org.jboss.resteasy.annotations.SseElementType;
 import org.reactivestreams.Publisher;
 
@@ -13,8 +12,6 @@ import javax.ws.rs.core.MediaType;
 
 @Path("/stock-price")
 public class StockPriceEndpoint {
-
-    private Logger LOG = Logger.getLogger(StockPriceEndpoint.class);
 
     @Inject
     @Channel("price-stream")

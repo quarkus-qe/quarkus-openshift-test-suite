@@ -1,4 +1,4 @@
-package io.quarkus.ts.openshift.messaging.kafka;
+package io.quarkus.ts.openshift.messaging.kafka.containers;
 
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import io.strimzi.StrimziKafkaContainer;
@@ -39,5 +39,6 @@ public class StrimziKafkaResource implements QuarkusTestResourceLifecycleManager
     @Override
     public void stop() {
         kafkaContainer.close();
+        schemaRegistry.close();
     }
 }

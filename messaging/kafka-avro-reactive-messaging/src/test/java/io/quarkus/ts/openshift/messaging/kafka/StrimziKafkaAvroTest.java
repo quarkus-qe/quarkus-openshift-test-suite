@@ -2,6 +2,7 @@ package io.quarkus.ts.openshift.messaging.kafka;
 
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.ts.openshift.messaging.kafka.containers.StrimziKafkaResource;
 import org.eclipse.microprofile.config.ConfigProvider;
 
 @QuarkusTest
