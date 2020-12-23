@@ -335,9 +335,8 @@ The main difference is that there's no S2I in Kubernetes, so we'd have to do the
 ## Existing tests
 
 ### `http`
-
-A smoke test, really.
 Verifies that you can deploy a simple HTTP endpoint to OpenShift and access it.
+Verifies Server/Client http_2 and Grpc support.
 
 ### `configmap/file-system`
 
