@@ -11,10 +11,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import java.net.URL;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import static io.restassured.RestAssured.when;
 import static org.awaitility.Awaitility.await;
+import static org.awaitility.Awaitility.with;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 
@@ -41,6 +43,8 @@ public class MicroProfileOpenShiftIT extends AbstractMicroProfileTest {
                     .get(jaegerUrl + "/api/traces?service=test-traced-service")
             .then()
                     .statusCode(200)
+                    .log().body()
+                    .log().status()
                     .body("data", hasSize(1))
                     .body("data[0].spans", hasSize(3))
                     .body("data[0].spans.operationName", hasItems(
