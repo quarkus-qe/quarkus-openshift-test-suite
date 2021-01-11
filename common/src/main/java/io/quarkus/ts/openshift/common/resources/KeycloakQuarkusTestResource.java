@@ -1,4 +1,4 @@
-package io.quarkus.ts.openshift.security.keycloak.containers;
+package io.quarkus.ts.openshift.common.resources;
 
 import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 import org.testcontainers.containers.BindMode;
@@ -7,12 +7,14 @@ import org.testcontainers.containers.wait.strategy.Wait;
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 public class KeycloakQuarkusTestResource implements QuarkusTestResourceLifecycleManager {
 
     private static final String OIDC_AUTH_URL_PROPERTY = "quarkus.oidc.auth-server-url";
+    private static final String OIDC_TOKEN_ISSUER_PROPERTY = "quarkus.oidc.token.issuer";
 
     private static final String USER = "admin";
     private static final String PASSWORD = "admin";
@@ -32,12 +34,12 @@ public class KeycloakQuarkusTestResource implements QuarkusTestResourceLifecycle
                 .withEnv("KEYCLOAK_USER", USER)
                 .withEnv("KEYCLOAK_PASSWORD", PASSWORD)
                 .withEnv("KEYCLOAK_IMPORT", REALM_FILE)
-                .withClasspathResourceMapping("test-realm.json", REALM_FILE, BindMode.READ_ONLY)
+                .withClasspathResourceMapping("keycloak-realm.json", REALM_FILE, BindMode.READ_ONLY)
                 .waitingFor(Wait.forHttp("/auth").withStartupTimeout(Duration.ofMinutes(5)));
         container.addExposedPort(PORT);
         container.start();
 
-        return Collections.singletonMap(OIDC_AUTH_URL_PROPERTY, oidcAuthUrl());
+        return providesQuarkusConfiguration();
     }
 
     @Override
@@ -45,8 +47,28 @@ public class KeycloakQuarkusTestResource implements QuarkusTestResourceLifecycle
         Optional.ofNullable(container).ifPresent(GenericContainer::stop);
     }
 
-    private String oidcAuthUrl() {
+    protected Map<String, String> providesQuarkusConfiguration() {
+        return Collections.emptyMap();
+    }
+
+    protected String oidcAuthUrl() {
         return String.format("http://localhost:%s/auth/realms/%s", container.getMappedPort(PORT), REALM);
+    }
+
+    public static class WithOidcConfig extends KeycloakQuarkusTestResource {
+        @Override
+        protected Map<String, String> providesQuarkusConfiguration() {
+            return Collections.singletonMap(OIDC_AUTH_URL_PROPERTY, oidcAuthUrl());
+        }
+    }
+
+    public static class WithOidcAndTokenIssuerConfig extends WithOidcConfig {
+        @Override
+        protected Map<String, String> providesQuarkusConfiguration() {
+            Map<String, String> properties = new HashMap<>(super.providesQuarkusConfiguration());
+            properties.put(OIDC_TOKEN_ISSUER_PROPERTY, oidcAuthUrl());
+            return properties;
+        }
     }
 
 }

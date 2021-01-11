@@ -307,6 +307,10 @@ When a test fails, the test suite will copy the pod logs in order to troubleshoo
 ./mvnw clean verify -Dts.instance-logs=../custom/path
 ```
 
+### OpenShift Security Configuration
+
+Go to the [Security](security/README.md) guide for further details about how to configure the OpenShift suite with security enabled.
+
 ### TODO
 
 There's a lot of possible improvements that haven't been implemented yet.
@@ -419,6 +423,15 @@ A simple Keycloak realm with 1 client (protected application), 2 users, 2 roles 
 Verifies authorization code flow and role-based authentication to protect web applications.
 Authentication is OIDC, and Keycloak is used for granting user access via login form.
 Authorization is based on roles, which are configured in Keycloak.
+Restrictions are defined using common annotations (`@RolesAllowed` etc.).
+
+A simple Keycloak realm with 1 client (protected application), 2 users and 2 roles is provided in `test-realm.json`.
+
+### `security/keycloak-jwt`
+
+Verifies authorization code flow using JWT token and role-based authentication to protect web applications.
+Authentication is OIDC, and Keycloak is used for granting user access via login form.
+Authorization is based on roles, which are embedded in the token.
 Restrictions are defined using common annotations (`@RolesAllowed` etc.).
 
 A simple Keycloak realm with 1 client (protected application), 2 users and 2 roles is provided in `test-realm.json`.
