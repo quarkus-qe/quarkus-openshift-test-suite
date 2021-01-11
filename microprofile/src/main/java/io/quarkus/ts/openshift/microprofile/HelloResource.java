@@ -1,6 +1,8 @@
 package io.quarkus.ts.openshift.microprofile;
 
 import io.opentracing.Tracer;
+import org.eclipse.microprofile.faulttolerance.Asynchronous;
+import org.eclipse.microprofile.faulttolerance.Retry;
 import org.eclipse.microprofile.opentracing.Traced;
 
 import javax.inject.Inject;
@@ -24,6 +26,8 @@ public class HelloResource {
     Tracer tracer;
 
     @GET
+    @Asynchronous
+    @Retry
     public CompletionStage<String> get(@QueryParam("name") @DefaultValue("World") String name) {
         tracer.activeSpan().log("HelloResource called");
         return hello.get(name);
