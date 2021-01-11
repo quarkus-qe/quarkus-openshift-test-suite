@@ -1,29 +1,24 @@
-name: "Pull Request CI"
+name: "Test Module changes"
 on:
   - pull_request
   - workflow_dispatch
 jobs:
+  detect-modules:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - id: set-matrix
+      run: echo "::set-output name=matrix::$(find -name pom.xml | sed -e 's|pom.xml| |' | sed -e 's|./| |')"
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
   build-released:
+    needs: detect-modules
     name: JVM build - TESSST
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ 11 ]
+          module: ${{ fromJson(needs.detect-modules.outputs.matrix) }}
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/cache@v1
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
-      - name: Install JDK {{ matrix.java }}
-        # Uses sha for added security since tags can be updated
-        uses: joschi/setup-jdk@e87a7cec853d2dd7066adf837fe12bf0f3d45e52
-        with:
-          java-version: openjdk${{ matrix.java }}
-      - name: list files
-        run: |
-          URL="https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${{ github.event.pull_request.number }}/files"
-          FILES=$(curl -s -X GET -G $URL | jq -r '.[] | .filename')
-          echo $FILES
+      - run: echo ${matrix.module}
