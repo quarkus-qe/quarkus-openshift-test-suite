@@ -26,7 +26,7 @@ public abstract class AbstractMicroProfileTest {
         with().pollInterval(Duration.ofSeconds(1)).and()
                 .with().pollDelay(Duration.ofSeconds(10)).await()
                 .atLeast(Duration.ofSeconds(1))
-                .atMost(25, TimeUnit.SECONDS)
+                .atMost(59, TimeUnit.SECONDS)
                 .with()
                 .untilAsserted(() -> {
                     when()

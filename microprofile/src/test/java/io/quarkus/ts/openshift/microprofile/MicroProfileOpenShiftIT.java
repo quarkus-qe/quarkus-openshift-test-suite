@@ -11,12 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import java.net.URL;
-import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import static io.restassured.RestAssured.when;
 import static org.awaitility.Awaitility.await;
-import static org.awaitility.Awaitility.with;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 
