@@ -335,9 +335,8 @@ The main difference is that there's no S2I in Kubernetes, so we'd have to do the
 ## Existing tests
 
 ### `http`
-
-A smoke test, really.
 Verifies that you can deploy a simple HTTP endpoint to OpenShift and access it.
+Verifies Server/Client http_2 and Grpc support.
 
 ### `configmap/file-system`
 
@@ -496,6 +495,14 @@ Verifies that `Quarkus Kafka Stream` and `Quarkus SmallRye Reactive Messaging` e
 There is an EventsProducer that generate login status events every 100ms. 
 A Kafka stream called `WindowedLoginDeniedStream`  will aggregate these events in fixed time windows of 3 seconds. 
 So if the number of wrong access excess a threshold, then a new alert event is thrown. All aggregated events(not only unauthorized) are persisted. 
+
+### `messaging/kafka-avro-reactive-messaging`
+
+Verifies that `Quarkus Kafka` + `Apicurio Kakfa Registry`(AVRO) and `Quarkus SmallRye Reactive Messaging` extensions work as expected. 
+
+There is an EventsProducer that generate stock prices events every 1s. The events are typed by an AVRO schema.  
+A Kafka consumer will read these events serialized by AVRO and change an `status` property to `COMPLETED`. 
+The streams of completed events will be exposed through an SSE endpoint. 
 
 ### `messaging/qpid`
 
