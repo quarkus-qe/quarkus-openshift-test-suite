@@ -41,6 +41,8 @@ public class MicroProfileOpenShiftIT extends AbstractMicroProfileTest {
                     .get(jaegerUrl + "/api/traces?service=test-traced-service")
             .then()
                     .statusCode(200)
+                    .log().body()
+                    .log().status()
                     .body("data", hasSize(1))
                     .body("data[0].spans", hasSize(3))
                     .body("data[0].spans.operationName", hasItems(
