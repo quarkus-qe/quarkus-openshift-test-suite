@@ -283,7 +283,7 @@
             <properties>
                 <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
                 <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
-                <version.qpid-jms>0.21.0</version.qpid-jms>
+                <version.qpid-jms>0.22.0</version.qpid-jms>
                 <version.quarkus>999-SNAPSHOT</version.quarkus>
             </properties>
             <dependencyManagement>
