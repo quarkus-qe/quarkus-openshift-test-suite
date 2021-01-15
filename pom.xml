@@ -325,5 +325,17 @@
             </modules>
         </profile>
 
+        <profile>
+            <id>datagrid</id>
+            <activation>
+                <property>
+                    <name>include.datagrid</name>
+                </property>
+            </activation>
+            <modules>
+                <module>infinispan-client</module>
+            </modules>
+        </profile>
+
     </profiles>
 </project>

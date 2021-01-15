@@ -1,0 +1,23 @@
+apiVersion: infinispan.org/v1
+kind: Infinispan
+metadata:
+  name: totally-random-infinispan-cluster-name
+  namespace: datagrid-cluster
+spec:
+  replicas: 2
+  service:
+    type: Cache
+  autoscale:
+    maxMemUsagePercent: 15
+    maxReplicas: 5
+    minMemUsagePercent: 10
+    minReplicas: 2
+  container:
+    memory: 500Mi
+  security:
+    endpointSecretName: connect-secret
+    endpointEncryption:
+      type: Secret
+      certSecretName: tls-secret
+  expose:
+    type: LoadBalancer
