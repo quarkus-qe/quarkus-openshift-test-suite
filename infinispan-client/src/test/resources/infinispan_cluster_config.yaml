@@ -4,16 +4,11 @@ metadata:
   name: totally-random-infinispan-cluster-name
   namespace: datagrid-cluster
 spec:
-  replicas: 2
+  replicas: 1
   service:
     type: Cache
-  autoscale:
-    maxMemUsagePercent: 15
-    maxReplicas: 5
-    minMemUsagePercent: 10
-    minReplicas: 2
   container:
-    memory: 500Mi
+    memory: 1Gi
   security:
     endpointSecretName: connect-secret
     endpointEncryption:

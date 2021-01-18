@@ -35,7 +35,9 @@ public class InfinispanClientApp {
         RemoteCache<Object, Object> cache = cacheManager.administration().getOrCreateCache("mycache",
                 new XMLStringConfiguration(String.format(CACHE_CONFIG, "mycache")));
         cache.addClientListener(new EventPrintListener());
-        cache.put("hello", "Hello World, Infinispan is up!");
+        if (cache.isEmpty()) {
+            cache.put("counter", 0);
+        }
     }
 
     @ClientListener
