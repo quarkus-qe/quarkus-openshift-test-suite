@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @OpenShiftTest
 @ManualApplicationDeployment
 @CustomAppMetadata(appName = "quarkus-workshop-villain", httpRoot = "/", knownEndpoint = "/")
-@AdditionalResources("classpath:openjdk-11-rhel7.yaml")
+@AdditionalResources("classpath:openjdk-11.yaml")
 @AdditionalResources("classpath:villains-database.yaml")
 @AdditionalResources("classpath:villain.yaml")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)

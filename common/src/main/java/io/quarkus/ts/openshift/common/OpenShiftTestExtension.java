@@ -171,15 +171,7 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
                 new Command("oc", "start-build", getAppMetadata(context).appName, "--from-file=" + binary.get(), "--follow")
                         .runAndWait();
             } else {
-                // when generating Kubernetes resources, Quarkus expects that all application files
-                // will reside in `/deployments/target`, but if we did just `oc start-build my-app --from-dir=target`,
-                // the files would end up in `/deployments`
-                // using `tar` works around that nicely, because the tarball created with this command will have
-                // a single root directory named `target`, which the S2I builder image will unpack to `/deployments`
-                new Command("tar", "czf", "app.tar.gz", "target").runAndWait();
-                new Command("oc", "start-build", getAppMetadata(context).appName, "--from-archive=app.tar.gz", "--follow")
-                        .runAndWait();
-                new Command("rm", "app.tar.gz").runAndWait();
+                new Command("oc", "start-build", getAppMetadata(context).appName, "--from-dir=target", "--follow").runAndWait();
             }
         }
 
