@@ -24,10 +24,18 @@ public class ClientResource {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    @Asynchronous
-    @Retry
     public CompletionStage<String> get() {
         tracer.activeSpan().log("ClientResource called");
         return hello.get().thenApply(result -> "Client got: " + result);
+    }
+
+    @GET
+    @Path("/fallback")
+    @Produces(MediaType.TEXT_PLAIN)
+    @Asynchronous
+    @Retry
+    public CompletionStage<String> getWithFallback() {
+        tracer.activeSpan().log("ClientResource called");
+        return hello.getWithFallback().thenApply(result -> "Client got: " + result);
     }
 }

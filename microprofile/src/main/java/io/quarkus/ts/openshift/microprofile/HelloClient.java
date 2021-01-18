@@ -19,8 +19,14 @@ public interface HelloClient {
     @Path("/hello")
     @Produces(MediaType.TEXT_PLAIN)
     @Asynchronous
-    @Fallback(fallbackMethod = "fallback")
     CompletionStage<String> get();
+
+    @GET
+    @Path("/hello/notFound")
+    @Produces(MediaType.TEXT_PLAIN)
+    @Asynchronous
+    @Fallback(fallbackMethod = "fallback")
+    CompletionStage<String> getWithFallback();
 
     default CompletionStage<String> fallback() {
         return completedFuture("Fallback");
