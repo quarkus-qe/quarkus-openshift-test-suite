@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -14,6 +15,7 @@ import static org.awaitility.Awaitility.await;
 import static org.fusesource.jansi.Ansi.ansi;
 
 public final class OpenShiftUtil {
+    private static final long DEFAULT_READINESS_TIMEOUT_MIN = 5;
     private final OpenShiftClient oc;
     private final AwaitUtil await;
 
@@ -39,6 +41,10 @@ public final class OpenShiftUtil {
     }
 
     public void scale(String deploymentConfigName, int replicas) {
+        scale(deploymentConfigName, replicas, DEFAULT_READINESS_TIMEOUT_MIN, TimeUnit.MINUTES);
+    }
+
+    public void scale(String deploymentConfigName, int replicas, long timeout, TimeUnit unit) {
         System.out.println(ansi().a("scaling ").fgYellow().a(deploymentConfigName).reset()
                 .a(" to ").fgYellow().a(replicas).reset().a(" replica(s)"));
 
@@ -47,7 +53,7 @@ public final class OpenShiftUtil {
                 .withName(deploymentConfigName)
                 .scale(replicas);
 
-        awaitDeploymentReadiness(deploymentConfigName, replicas);
+        awaitDeploymentReadiness(deploymentConfigName, replicas, timeout, unit);
     }
 
     public void deployLatest(String deploymentConfigName, boolean waitForAllReplicas) {
@@ -57,20 +63,22 @@ public final class OpenShiftUtil {
                 .deployLatest(waitForAllReplicas);
     }
 
-    public void awaitDeploymentReadiness(String deploymentConfigName, int expectedReplicas) {
-        System.out.println(ansi().a("waiting for ").fgYellow().a(deploymentConfigName).reset()
-                .a(" to have exactly ").fgYellow().a(expectedReplicas).reset().a(" ready replica(s)"));
+    public void awaitDeploymentReadiness(String deploymentConfigName, int expectedReplicas, long timeout, TimeUnit unit) {
+        String waitingReadinessMsg = ansi().a("waiting for ").fgYellow().a(deploymentConfigName).reset()
+                .a(" to have exactly ").fgYellow().a(expectedReplicas).reset().a(" ready replica(s)").toString();
 
-        await().atMost(5, TimeUnit.MINUTES).until(() -> {
+        System.out.println(waitingReadinessMsg);
+
+        await().pollInterval(Duration.ofSeconds(1)).atMost(timeout, unit).until(() -> {
             // ideally, we'd look at deployment config's status.availableReplicas field,
             // but that's only available since OpenShift 3.5
             List<Pod> pods = listPodsForDeploymentConfig(deploymentConfigName);
             try {
                 return pods.size() == expectedReplicas && pods.stream().allMatch(ReadinessUtil::isPodReady);
             } catch (IllegalStateException e) {
+                return false;
                 // the 'Ready' condition can be missing sometimes, in which case Readiness.isPodReady throws an exception
                 // here, we'll swallow that exception in hope that the 'Ready' condition will appear later
-                return false;
             }
         });
     }

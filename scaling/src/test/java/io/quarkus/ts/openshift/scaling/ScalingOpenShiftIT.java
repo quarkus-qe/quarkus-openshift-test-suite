@@ -7,6 +7,7 @@ import io.restassured.response.ValidatableResponse;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -16,6 +17,7 @@ import static javax.ws.rs.core.Response.Status.OK;
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.awaitility.Awaitility.with;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @OpenShiftTest
@@ -24,6 +26,8 @@ public class ScalingOpenShiftIT {
     public static final String DC_NAME = "test-scaling";
     private static final int TIMEOUT_SEC = 60;
     private static final int DELAY_BETWEEN_REQUEST_MS = 100;
+    private static final int POLL_INTERVAL_MS = 1000;
+    private static final int READINESS_TIMEOUT_MIN = 3;
 
     @TestResource
     private OpenShiftUtil openShiftUtil;
@@ -87,14 +91,20 @@ public class ScalingOpenShiftIT {
     }
 
     private void givenResourcePath(String path) {
-        given()
-                .when().get("/scaling")
-                .then()
-                .statusCode(OK.getStatusCode());
+        with().pollInterval(Duration.ofMillis(POLL_INTERVAL_MS))
+                .await().atMost(TIMEOUT_SEC, TimeUnit.SECONDS)
+                .untilAsserted(() -> {
+                    given()
+                            .when().get("/scaling")
+                            .then()
+                            .log().body()
+                            .log().status()
+                            .statusCode(OK.getStatusCode());
+                });
     }
 
     private void whenScaleTo(int amount) {
-        openShiftUtil.scale(DC_NAME, amount);
+        openShiftUtil.scale(DC_NAME, amount, READINESS_TIMEOUT_MIN, TimeUnit.MINUTES);
     }
 
     private void thenCheckReplicasAmount(int expectedAmount) {
