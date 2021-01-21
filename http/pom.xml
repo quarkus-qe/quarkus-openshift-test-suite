@@ -58,10 +58,6 @@
             <artifactId>quarkus-grpc</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.quarkus</groupId>
-            <artifactId>quarkus-smallrye-health</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.quarkus.ts.openshift</groupId>
             <artifactId>app-metadata</artifactId>
         </dependency>

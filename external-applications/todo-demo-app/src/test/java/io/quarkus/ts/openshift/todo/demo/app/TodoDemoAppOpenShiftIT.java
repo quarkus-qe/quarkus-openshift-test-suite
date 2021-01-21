@@ -14,7 +14,7 @@ import static io.restassured.RestAssured.when;
 @OpenShiftTest
 @ManualApplicationDeployment
 @CustomAppMetadata(appName = "todo-demo-app", httpRoot = "/", knownEndpoint = "/")
-@AdditionalResources("classpath:openjdk-11-rhel7.yaml")
+@AdditionalResources("classpath:openjdk-11.yaml")
 @AdditionalResources("classpath:todo-demo-app.yaml")
 public class TodoDemoAppOpenShiftIT {
     @TestResource
