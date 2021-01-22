@@ -48,7 +48,7 @@ public class PriceConsumer implements Runnable {
             JMSConsumer consumer = context.createConsumer(context.createQueue("prices"));
             while (true) {
                 Message message = consumer.receive();
-                if (message == null) return;
+                if (message == null && (lastPrice != null || !lastPrice.isEmpty())) return;
                 lastPrice = message.getBody(String.class);
             }
         } catch (JMSException e) {

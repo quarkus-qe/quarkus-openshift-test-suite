@@ -28,7 +28,7 @@ public class PriceProducer implements Runnable {
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
     void onStart(@Observes StartupEvent ev) {
-        scheduler.scheduleWithFixedDelay(this, 0L, 5L, TimeUnit.SECONDS);
+        scheduler.scheduleWithFixedDelay(this, 0L, 500L, TimeUnit.MILLISECONDS);
     }
 
     void onStop(@Observes ShutdownEvent ev) {

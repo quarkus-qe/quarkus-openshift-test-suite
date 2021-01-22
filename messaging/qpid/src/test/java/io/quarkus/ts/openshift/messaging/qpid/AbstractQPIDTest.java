@@ -19,7 +19,7 @@ public abstract class AbstractQPIDTest {
     @Test
     @Order(1)
     public void testLastPrice() {
-        await().atMost(60, TimeUnit.SECONDS).untilAsserted(() -> {
+        await().atMost(3, TimeUnit.MINUTES).untilAsserted(() -> {
             String value =
                     when()
                             .get("/prices/last")
