@@ -459,6 +459,13 @@ Restrictions are defined using common annotations (`@RolesAllowed` etc.).
 
 A simple Keycloak realm with 1 client (protected application), 2 users and 2 roles is provided in `test-realm.json`.
 
+### `security/keycloak-oauth2`
+
+Verifies authorization using OAuth2 protocol. Keycloak is used for issuing and verifying tokens.
+Restrictions are defined using common annotations (`@RolesAllowed` etc.).
+
+A simple Keycloak realm with 1 client (protected application), 2 users and 2 roles is provided in `test-realm.json`.
+
 ### `security/https-1way`
 
 Verifies that accessing an HTTPS endpoint is posible.

@@ -78,3 +78,4 @@ Finally, the Keycloak test resource can be used to auto-configure the Quarkus ap
 
 - Using `KeycloakQuarkusTestResource.WithOidcConfig` to configure the OIDC Auth Url property.
 - Using `KeycloakQuarkusTestResource.WithOidcAndTokenIssuerConfig` to configure the OIDC Auth Url and the Token Issuer properties.
+- Using `KeycloakQuarkusTestResource.WithOAuth2Config` to configure the OAuth 2 Introspection Url.
