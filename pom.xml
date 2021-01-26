@@ -209,6 +209,13 @@
                             </goals>
                         </execution>
                     </executions>
+                    <configuration>
+                        <systemPropertyVariables>
+                            <quarkus.package.type>${quarkus.package.type}</quarkus.package.type>
+                            <quarkus.native.builder-image>${quarkus.native.builder-image}</quarkus.native.builder-image>
+                            <quarkus.s2i.base-jvm-image>${quarkus.s2i.base-jvm-image}</quarkus.s2i.base-jvm-image>
+                        </systemPropertyVariables>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>

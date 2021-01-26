@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  * of {@link io.quarkus.ts.openshift.app.metadata.AppMetadata} for the test. This must be used when deploying
  * an application that lives outside of the test suite and can't use the {@code app-metadata} Quarkus extension.
  *
- * @see ManualApplicationDeployment
+ * @see ManualDeploymentStrategy
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
