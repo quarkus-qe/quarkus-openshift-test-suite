@@ -1,12 +1,13 @@
 package io.quarkus.ts.openshift.common;
 
 import io.fabric8.knative.client.KnativeClient;
-import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.quarkus.ts.openshift.app.metadata.AppMetadata;
 import io.quarkus.ts.openshift.common.actions.OnOpenShiftFailureAction;
 import io.quarkus.ts.openshift.common.config.Config;
+import io.quarkus.ts.openshift.common.deploy.DeploymentStrategy;
+import io.quarkus.ts.openshift.common.deploy.OpenShiftDeploymentStrategyLoader;
 import io.quarkus.ts.openshift.common.injection.InjectionPoint;
 import io.quarkus.ts.openshift.common.injection.TestResource;
 import io.quarkus.ts.openshift.common.injection.WithName;
@@ -36,7 +37,6 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -44,12 +44,11 @@ import java.util.ServiceLoader;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 
 import static org.fusesource.jansi.Ansi.ansi;
 import static org.junit.platform.commons.util.AnnotationUtils.findAnnotatedFields;
 
-// TODO at this point, this class is close to becoming unreadable, and could use some refactoring. 
+// TODO at this point, this class is close to becoming unreadable, and could use some refactoring.
 // Raised https://github.com/quarkus-qe/quarkus-openshift-test-suite/issues/108 for the refactoring.
 final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallback, BeforeEachCallback,
         TestInstancePostProcessor, ParameterResolver,
@@ -69,10 +68,6 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
         return context.getStore(Namespace.create(getClass()));
     }
 
-    private Optional<ManualApplicationDeployment> getManualDeploymentAnnotation(ExtensionContext context) {
-        return context.getElement().map(it -> it.getAnnotation(ManualApplicationDeployment.class));
-    }
-
     private Optional<CustomAppMetadata> getCustomAppMetadataAnnotation(ExtensionContext context) {
         return context.getElement().map(it -> it.getAnnotation(CustomAppMetadata.class));
     }
@@ -81,10 +76,6 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
         return getStore(context)
                 .getOrComputeIfAbsent(OpenShiftClientResource.class.getName(), ignored -> OpenShiftClientResource.createDefault(), OpenShiftClientResource.class)
                 .client;
-    }
-
-    private Path getResourcesYaml() {
-        return Paths.get("target", "kubernetes", "openshift.yml");
     }
 
     private AppMetadata getAppMetadata(ExtensionContext context) {
@@ -115,7 +106,7 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
         OpenShiftClient oc = getOpenShiftClient(context);
         AwaitUtil await = getAwaitUtil(context);
         return getStore(context)
-                .getOrComputeIfAbsent(OpenShiftUtil.class.getName(), ignogred -> new OpenShiftUtil(oc, await), OpenShiftUtil.class);
+                .getOrComputeIfAbsent(OpenShiftUtil.class.getName(), ignored -> new OpenShiftUtil(oc, await), OpenShiftUtil.class);
     }
 
     private void initTestsStatus(ExtensionContext context) {
@@ -152,28 +143,7 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
         deployAdditionalResources(context);
 
         runPublicStaticVoidMethods(CustomizeApplicationDeployment.class, context);
-
-        if (!getManualDeploymentAnnotation(context).isPresent()) {
-            Path openshiftResources = getResourcesYaml();
-            if (!Files.exists(openshiftResources)) {
-                throw new OpenShiftTestException("Missing " + openshiftResources + ", did you add the quarkus-kubernetes or quarkus-openshift extension?");
-            }
-
-            ImageOverrides.apply(openshiftResources, getOpenShiftClient(context));
-
-            System.out.println("deploying application");
-            new Command("oc", "apply", "-f", openshiftResources.toString()).runAndWait();
-
-            awaitImageStreams(context, openshiftResources);
-
-            Optional<String> binary = findNativeBinary();
-            if (binary.isPresent()) {
-                new Command("oc", "start-build", getAppMetadata(context).appName, "--from-file=" + binary.get(), "--follow")
-                        .runAndWait();
-            } else {
-                new Command("oc", "start-build", getAppMetadata(context).appName, "--from-dir=target", "--follow").runAndWait();
-            }
-        }
+        getDeploymentStrategy(context).deploy();
 
         setUpRestAssured(context);
 
@@ -211,20 +181,6 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
                 }
             }
         }
-    }
-
-    private void awaitImageStreams(ExtensionContext context, Path openshiftResources) throws IOException {
-        OpenShiftClient oc = getOpenShiftClient(context);
-        AppMetadata metadata = getAppMetadata(context);
-        AwaitUtil awaitUtil = getAwaitUtil(context);
-
-        oc.load(Files.newInputStream(openshiftResources))
-                .get()
-                .stream()
-                .flatMap(it -> it instanceof ImageStream ? Stream.of(it) : Stream.empty())
-                .map(it -> it.getMetadata().getName())
-                .filter(it -> !it.equals(metadata.appName))
-                .forEach(awaitUtil::awaitImageStream);
     }
 
     private void setUpRestAssured(ExtensionContext context) throws Exception {
@@ -271,30 +227,8 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
 
         System.out.println("---------- OpenShiftTest tear down ----------");
 
-        boolean shouldUndeployApplication = true;
-        if (EphemeralNamespace.isEnabled()) {
-            // when using ephemeral namespaces, we don't undeploy the application because:
-            // - when an ephemeral namespace is dropped, everything is destroyed anyway
-            // - when retain on failure is enabled and failure occurs,
-            //   everything in the ephemeral namespace must be kept intact
-            shouldUndeployApplication = false;
-        }
-        if (RetainOnFailure.isEnabled() && testsFailed) {
-            shouldUndeployApplication = false;
-
-            if (EphemeralNamespace.isDisabled()) {
-                // when using ephemeral namespaces, a different message will be printed in dropEphemeralNamespaceIfNecessary
-                System.out.println(ansi().a("test ").fgYellow().a(context.getDisplayName()).reset()
-                        .a(" failed, not deleting any resources"));
-            }
-        }
-        if (getManualDeploymentAnnotation(context).isPresent()) {
-            shouldUndeployApplication = false;
-        }
-
-        if (shouldUndeployApplication) {
-            System.out.println("undeploying application");
-            new Command("oc", "delete", "-f", getResourcesYaml().toString(), "--ignore-not-found").runAndWait();
+        if (!(testsFailed && RetainOnFailure.isEnabled())) {
+            getDeploymentStrategy(context).undeploy();
         }
 
         // TODO before or after application undeployment?
@@ -469,7 +403,17 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
             System.out.println(ansi().a("Error running post failure action. Caused by: " + ex).reset());
         }
     }
-    
+
+    private DeploymentStrategy getDeploymentStrategy(ExtensionContext context) throws Exception {
+        DeploymentStrategy strategy = getStore(context)
+                .getOrComputeIfAbsent(DeploymentStrategy.class.getName(),
+                        ignored -> OpenShiftDeploymentStrategyLoader.load(context), DeploymentStrategy.class);
+
+        injectDependencies(strategy, context);
+
+        return strategy;
+    }
+
     private void injectDependencies(Object instance, ExtensionContext context) throws Exception {
         for (Field field : findAnnotatedFields(instance.getClass(), TestResource.class, ignored -> true)) {
             InjectionPoint injectionPoint = InjectionPoint.forField(field);
@@ -482,13 +426,5 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
 
     private void failureOccured(ExtensionContext context) {
         getTestsStatus(context).failed = true;
-    }
-
-    private Optional<String> findNativeBinary() throws Exception {
-        try (Stream<Path> binariesFound = Files
-                .find(Paths.get("target/"), Integer.MAX_VALUE,
-                        (path, basicFileAttributes) -> path.toFile().getName().matches(".*-runner"))) {
-            return binariesFound.map(path -> path.normalize().toString()).findFirst();
-        }
     }
 }

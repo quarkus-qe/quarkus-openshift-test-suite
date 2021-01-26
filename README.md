@@ -235,9 +235,14 @@ The Quarkus version used in the test suite is matched against a regular expressi
 This can be used to disable tests that are known to fail on certain Quarkus versions.
 In such case, the `reason` attribute of the annotation should point to corresponding issue (or pull request).
 
+### Deployment using Quarkus OpenShift extension
+
+If the `@OpenShiftTest` annotation is configured to use the strategy `UsingQuarkusPluginDeploymentStrategy` and the module contains the `quarkus-openshift` Quarkus extension, the test framework will use Quarkus to build and deploy the module into OpenShift.
+Note that the property `quarkus.kubernetes.deploy` must NOT be set in the module configuration in order to avoid to perform the deployment at build time.  
+
 ### Custom application deployment
 
-If the test class is annotated `@ManualApplicationDeployment`, the `target/kubernetes/openshift.yml` file is ignored and the test application is _not_ deployed automatically.
+If the `@OpenShiftTest` annotation is configured to use the strategy `ManualDeploymentStrategy`, the `target/kubernetes/openshift.yml` file is ignored and the test application is _not_ deployed automatically.
 Instead, you should use `@AdditionalResources`, `@CustomizeApplicationDeployment` and `@CustomizeApplicationUndeployment` to deploy the application manually.
 
 This can be used to write tests that excersise an external application.
@@ -320,7 +325,7 @@ The most interesting probably are:
   Currently, we support binary S2I builds, with the expectation that `quarkus-kubernetes` (or `quarkus-openshift`) is used.
   We also support completely custom application deployment, which provides most flexibility, but also requires most work.
   At the very least, we should provide some automation for S2I-less deployments with `-Dquarkus.container-image.build -Dquarkus.kubernetes.deploy`.
-  Supporting S2I source builds would be more complex (you need the application source stored in some Git repo, and when you're working on the test suite, you want your local changes, not something out there on GitHub) and is probably best left to `@ManualApplicationDeployment`.
+  Supporting S2I source builds would be more complex (you need the application source stored in some Git repo, and when you're working on the test suite, you want your local changes, not something out there on GitHub) and is probably best left to `ManualDeploymentStrategy` strategy.
 - To be able to customize URL path for route awaiting.
 - To be able to cleanup the project before running the test.
   Could be just a simple annotation `@CleanupProject` added on the test class.

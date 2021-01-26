@@ -1,4 +1,4 @@
-package io.quarkus.ts.openshift.common;
+package io.quarkus.ts.openshift.common.util;
 
 import io.fabric8.kubernetes.api.builder.TypedVisitor;
 import io.fabric8.kubernetes.api.model.ContainerBuilder;
@@ -19,10 +19,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-final class ImageOverrides {
+public final class ImageOverrides {
     static final String CONFIG_KEY = "ts.image-overrides";
 
-    static void apply(Path yaml, OpenShiftClient oc) throws IOException {
+    public static void apply(Path yaml, OpenShiftClient oc) throws IOException {
         String configFile = Config.get().getAsString(CONFIG_KEY, null);
         if (configFile == null) {
             return;

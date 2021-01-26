@@ -1,5 +1,7 @@
 package io.quarkus.ts.openshift.common;
 
+import io.quarkus.ts.openshift.common.deploy.DeploymentStrategy;
+import io.quarkus.ts.openshift.common.deploy.EmbeddedDeploymentStrategy;
 import org.junit.jupiter.api.extension.ExtendWith;
 
 import java.lang.annotation.ElementType;
@@ -37,4 +39,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ExtendWith(OpenShiftTestExtension.class)
 public @interface OpenShiftTest {
+    /**
+     * Specify the strategy to deploy the OpenShift resources. The available options are:
+     * - EmbeddedDeploymentStrategy (default): via the test framework.
+     * - UsingQuarkusPluginDeploymentStrategy: via the Quarkus plugin.
+     * - ManualDeploymentStrategy: will do nothing as the test case should manage the resources manually.
+     */
+    Class<? extends DeploymentStrategy> strategy() default EmbeddedDeploymentStrategy.class;
 }

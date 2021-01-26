@@ -3,6 +3,7 @@ package io.quarkus.ts.openshift.common;
 import io.fabric8.kubernetes.api.model.HasMetadata;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.quarkus.ts.openshift.common.util.AwaitUtil;
+import io.quarkus.ts.openshift.common.util.ImageOverrides;
 import org.junit.jupiter.api.extension.ExtensionContext.Store.CloseableResource;
 
 import java.io.IOException;

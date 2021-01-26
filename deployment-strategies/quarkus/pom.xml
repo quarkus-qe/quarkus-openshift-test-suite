@@ -16,12 +16,6 @@
 
     <name>Quarkus OpenShift TS: Deployment Strategies: Quarkus</name>
 
-    <properties>
-        <!-- this could also be set in application.properties, but this is much closer to what users actually do -->
-        <quarkus.kubernetes.deploy>true</quarkus.kubernetes.deploy>
-        <quarkus.kubernetes-client.trust-certs>true</quarkus.kubernetes-client.trust-certs>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>io.quarkus</groupId>
