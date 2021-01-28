@@ -10,32 +10,22 @@ import io.quarkus.ts.openshift.app.metadata.AppMetadata;
 import io.quarkus.ts.openshift.common.CustomizeApplicationDeployment;
 import io.quarkus.ts.openshift.common.injection.TestResource;
 import io.quarkus.ts.openshift.common.injection.WithName;
-import org.apache.http.impl.client.HttpClients;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.keycloak.authorization.client.AuthzClient;
-import org.keycloak.authorization.client.Configuration;
 
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.List;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
-
-public abstract class AbstractSecurityKeycloakOpenShiftIT {
+public abstract class AbstractSecurityKeycloakOpenShiftIT extends AbstractSecurityKeycloakOpenShiftTest {
 
     static String keycloakUrl;
-    static String keycloakRealmUrl;
 
     // TODO this is pretty ugly, but I'm tired and can't think of a better way at the moment
     @CustomizeApplicationDeployment
-    public static void configureKeycloakUrl(OpenShiftClient oc, AppMetadata appMetadata, @WithName("keycloak-plain") URL url) throws IOException {
-        keycloakUrl = url + "/auth";
-        keycloakRealmUrl = url + "/auth/realms/test-realm";
+    public static void configureKeycloakUrl(OpenShiftClient oc, AppMetadata appMetadata, @WithName("keycloak-plain") URL url)
+            throws IOException {
+        keycloakUrl = url + "/auth/realms/test-realm";
 
         List<HasMetadata> objs = oc.load(Files.newInputStream(Paths.get("target/kubernetes/openshift.yml"))).get();
         objs.stream()
@@ -45,8 +35,7 @@ public abstract class AbstractSecurityKeycloakOpenShiftIT {
                 .forEach(dc -> {
                     dc.getSpec().getTemplate().getSpec().getContainers().forEach(container -> {
                         container.getEnv().add(
-                                new EnvVar("QUARKUS_OIDC_AUTH_SERVER_URL", keycloakRealmUrl, null)
-                        );
+                                new EnvVar("QUARKUS_OIDC_AUTH_SERVER_URL", keycloakUrl, null));
                     });
                 });
 
@@ -56,105 +45,15 @@ public abstract class AbstractSecurityKeycloakOpenShiftIT {
     }
 
     @TestResource
-    private OpenShiftClient oc;
+    private URL applicationUrl;
 
-    private AuthzClient authzClient;
-
-    @BeforeEach
-    public void setup() {
-        authzClient = AuthzClient.create(new Configuration(
-                keycloakUrl,
-                "test-realm",
-                "test-application-client",
-                Collections.singletonMap("secret", "test-application-client-secret"),
-                HttpClients.createDefault()
-        ));
+    @Override
+    protected String getAuthServerUrl() {
+        return keycloakUrl;
     }
 
-    private String getToken(String userName, String password) {
-        return authzClient.obtainAccessToken(userName, password).getToken();
-    }
-
-    @Test
-    public void normalUser_userResource() {
-        given()
-        .when()
-                .auth().oauth2(getToken("test-normal-user", "test-normal-user"))
-                .get("/user")
-        .then()
-                .statusCode(200)
-                .body(equalTo("Hello, user test-normal-user"));
-    }
-
-    @Test
-    public void normalUser_userResource_issuer() {
-        given()
-        .when()
-                .auth().oauth2(getToken("test-normal-user", "test-normal-user"))
-                .get("/user/issuer")
-        .then()
-                .statusCode(200)
-                .body(equalTo("user token issued by " + keycloakRealmUrl));
-    }
-
-    @Test
-    public void normalUser_adminResource() {
-        given()
-        .when()
-                .auth().oauth2(getToken("test-normal-user", "test-normal-user"))
-                .get("/admin")
-        .then()
-                .statusCode(403);
-    }
-
-    @Test
-    public void adminUser_userResource() {
-        given()
-        .when()
-                .auth().oauth2(getToken("test-admin-user", "test-admin-user"))
-                .get("/user")
-        .then()
-                .statusCode(200)
-                .body(equalTo("Hello, user test-admin-user"));
-    }
-
-    @Test
-    public void adminUser_adminResource() {
-        given()
-        .when()
-                .auth().oauth2(getToken("test-admin-user", "test-admin-user"))
-                .get("/admin")
-        .then()
-                .statusCode(200)
-                .body(equalTo("Hello, admin test-admin-user"));
-    }
-
-    @Test
-    public void adminUser_adminResource_issuer() {
-        given()
-        .when()
-                .auth().oauth2(getToken("test-admin-user", "test-admin-user"))
-                .get("/admin/issuer")
-        .then()
-                .statusCode(200)
-                .body(equalTo("admin token issued by " + keycloakRealmUrl));
-    }
-
-    @Test
-    public void noUser_userResource() {
-        given()
-        .when()
-                .get("/user")
-        .then()
-                .statusCode(401);
-    }
-
-    @Test
-    public void noUser_adminResource() {
-        given()
-        .when()
-                .get("/admin")
-        .then()
-                .statusCode(401);
+    @Override
+    protected String getAppUrl() {
+        return applicationUrl.toString();
     }
 }

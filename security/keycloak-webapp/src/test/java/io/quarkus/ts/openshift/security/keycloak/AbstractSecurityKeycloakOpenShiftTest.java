@@ -15,7 +15,9 @@ import org.junit.jupiter.api.Test;
 
 import java.net.URI;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -106,6 +108,31 @@ public abstract class AbstractSecurityKeycloakOpenShiftTest {
 
         whenLoginAs("test-admin");
         thenPageReturns("admin token issued by " + getAuthServerUrl());
+    }
+
+    @Test
+    public void sessionExpiration_userResource() throws Exception {
+        whenGoTo("/user");
+        thenRedirectToLoginPage();
+        whenLoginAs("test-user");
+
+        // According to property `quarkus.oidc.token.lifespan-grace` and the property `ssoSessionMaxLifespan` in the keycloak configuration,
+        // we need to wait more than 5 seconds for the token expiration.
+        await().atMost(1, TimeUnit.MINUTES).pollInterval(1, TimeUnit.SECONDS).untilAsserted(() -> {
+            whenGoTo("/user");
+            thenRedirectToLoginPage();
+        });
+    }
+
+    @Test
+    public void sessionRevocation_userResource() throws Exception {
+        whenGoTo("/user");
+        thenRedirectToLoginPage();
+        whenLoginAs("test-user");
+        thenPageReturns("Hello, user test-user");
+        whenGoTo("/logout");
+        whenGoTo("/user");
+        thenRedirectToLoginPage();
     }
 
     private void whenLoginAs(String user) throws Exception {

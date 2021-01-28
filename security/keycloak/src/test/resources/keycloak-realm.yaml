@@ -8,6 +8,7 @@ data:
       "realm": "test-realm",
       "enabled": true,
       "sslRequired": "none",
+      "accessTokenLifespan": 5,
       "roles": {
         "realm": [
           {
