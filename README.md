@@ -35,7 +35,7 @@ When running against released Red Hat build of Quarkus make sure https://maven.r
 Example command for released Red Hat build of Quarkus:
 ```
 mvn -fae clean verify \
- -Dts.use-ephemeral-namespaces -Dts.authenticated-registry \
+ -Dts.authenticated-registry \
  -Dversion.quarkus=1.3.4.Final-redhat-00004 \
  -Dquarkus.platform.group-id=com.redhat.quarkus
 ```
@@ -44,11 +44,13 @@ Example command for not yet released version of Red Hat build of Quarkus:
 
 ```
 mvn -fae clean verify \
- -Dts.use-ephemeral-namespaces -Dts.authenticated-registry \
+ -Dts.authenticated-registry \
  -Dversion.quarkus=1.7.1.Final-redhat-00001 \
  -Dquarkus.platform.group-id=com.redhat.quarkus \
  -Dmaven.repo.local=/Users/rsvoboda/Downloads/rh-quarkus-1.7.1.GA-maven-repository/maven-repository
 ```
+
+If you want to run the tests using ephemeral namespaces, go to the [Running tests in ephemeral namespaces](#running-tests-in-ephemeral-namespaces) section for more information.
 
 ## Branching Strategy
 
@@ -206,8 +208,18 @@ This annotation is `@Repeatable`, so you can include it more than once.
 
 By default, the test framework expects that the user is logged into an OpenShift project, and that project is used for all tests.
 
-If you start the tests with `-Dts.use-ephemeral-namespaces`, the test framework will create an ephemeral namespace for each test.
-After the test is finished, the ephemeral namespace is automatically dropped.
+If you want to run the tests using ephemeral namespaces, you need to build and install the TS framework modules beforehand:
+
+```
+mvn clean install -pl '.,app-metadata/deployment,app-metadata/runtime,common'
+```
+
+Then, you can start the tests with the `-Dts.use-ephemeral-namespaces` property, the test framework will create an ephemeral namespace for each test.
+After the test is finished, the ephemeral namespace is automatically dropped:
+
+```
+mvn clean verify -Dts.use-ephemeral-namespaces
+```
 
 The ephemeral namespaces are named `ts-<unique suffix>`, where the unique suffix is 10 random `a-z` characters.
 
