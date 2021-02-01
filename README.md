@@ -481,6 +481,12 @@ A simple Keycloak realm with 1 client (protected application), 2 users and 2 rol
 Verifies authorization using OAuth2 protocol. Keycloak is used for issuing and verifying tokens.
 Restrictions are defined using common annotations (`@RolesAllowed` etc.).
 
+### `security/keycloak-multitenant`
+
+Verifies that we can use a multitenant configuration using JWT, web applications and code flow authorization in different tenants. 
+Authentication is OIDC, and Keycloak is used.
+Authorization is based on roles, which are configured in Keycloak.
+
 A simple Keycloak realm with 1 client (protected application), 2 users and 2 roles is provided in `test-realm.json`.
 
 ### `security/https-1way`
