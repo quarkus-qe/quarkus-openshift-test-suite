@@ -38,6 +38,11 @@ public class Command {
         return this;
     }
 
+    public Command outputToLines(List<String> lines) {
+        outputConsumer = linesOutput(lines);
+        return this;
+    }
+
     private static String descriptionOfProgram(String program) {
         if (program.contains(File.separator)) {
             return program.substring(program.lastIndexOf(File.separator) + 1);
@@ -82,6 +87,18 @@ public class Command {
                 String line;
                 while ((line = reader.readLine()) != null) {
                     System.out.println(ansi().fgCyan().a(description).reset().a("> ").a(line));
+                }
+            } catch (IOException ignored) {
+            }
+        };
+    }
+
+    private static final BiConsumer<String, InputStream> linesOutput(List<String> lines) {
+        return (description, is) -> {
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    lines.add(line);
                 }
             } catch (IOException ignored) {
             }
