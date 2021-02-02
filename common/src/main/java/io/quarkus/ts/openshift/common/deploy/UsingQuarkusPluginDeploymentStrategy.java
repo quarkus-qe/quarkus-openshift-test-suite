@@ -34,11 +34,13 @@ public class UsingQuarkusPluginDeploymentStrategy implements DeploymentStrategy 
     private static final String QUARKUS_CONTAINER_IMAGE_GROUP = "quarkus.container-image.group";
     private static final String QUARKUS_NATIVE_BUILDER_IMAGE = "quarkus.native.builder-image";
     private static final String QUARKUS_NATIVE_CONTAINER_RUNTIME = "quarkus.native.container-runtime";
+    private static final String QUARKUS_NATIVE_MEMORY_LIMIT = "quarkus.native.native-image-xmx";
     private static final String QUARKUS_PACKAGE_TYPE = "quarkus.package.type";
     private static final String OC_IGNORE_IF_NOT_FOUND = "--ignore-not-found=true";
 
     private static final String NATIVE = "native";
     private static final String DOCKER = "docker";
+    private static final String DEFAULT_NATIVE_MEMORY_LIMIT = "3g";
 
     @TestResource
     private OpenShiftClient openShiftClient;
@@ -80,6 +82,8 @@ public class UsingQuarkusPluginDeploymentStrategy implements DeploymentStrategy 
             args.add(withProperty(QUARKUS_PACKAGE_TYPE, NATIVE));
             args.add(withProperty(QUARKUS_NATIVE_CONTAINER_RUNTIME,
                     System.getProperty(QUARKUS_NATIVE_CONTAINER_RUNTIME, DOCKER)));
+            args.add(withProperty(QUARKUS_NATIVE_MEMORY_LIMIT,
+                    System.getProperty(QUARKUS_NATIVE_MEMORY_LIMIT, DEFAULT_NATIVE_MEMORY_LIMIT)));
 
             String nativeBuilderImage = System.getProperty(QUARKUS_NATIVE_BUILDER_IMAGE);
             if (nativeBuilderImage != null) {
