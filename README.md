@@ -27,6 +27,30 @@ Therefore, if you want to run the tests with a different Java S2I image, run `mv
 In addition to common prerequisites for Java projects (JDK, Maven) and OpenShift (`oc`), the following utilities must also be installed on the machine where the test suite is being executed:
 
 - `tar`
+- an OpenShift instance where is enabled the monitoring for user-defined projects (see [documentation](https://docs.openshift.com/container-platform/4.6/monitoring/enabling-monitoring-for-user-defined-projects.html))
+- the OpenShift user must have permission to create ServiceMonitor CRDs and access to the `openshift-user-workload-monitoring` namespace:
+
+For example, if the OpenShift user is called `qe`, then we should have this cluster role assigned to it:
+
+```
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: monitor-crd-edit
+rules:
+- apiGroups: ["monitoring.coreos.com", "apiextensions.k8s.io"]
+  resources: ["prometheusrules", "servicemonitors", "podmonitors", "customresourcedefinitions"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete"]
+EOF
+```
+
+And also, the same user `qe` should have access to the `openshift-user-workload-monitoring` namespace (this namespace is automatically created by the Prometheus operator when enabling the monitoring of user-defined projects):
+
+```
+oc adm policy add-role-to-user edit qe -n openshift-user-workload-monitoring
+```
+
+These requirements are necessary to verify the `micrometer/prometheus` tests. 
 
 ## Running against Red Hat build of Quarkus
 
@@ -525,6 +549,16 @@ It is possible to enable/disable the "hello" endpoint, which controls whether Fa
 All HTTP endpoints and internal processing is asynchronous, so Context Propagation is also required.
 JAX-RS endpoints and RestClient calls are automatically traced with OpenTracing, and some additional logging into the OpenTracing spans is also done.
 Jaeger is deployed in an "all-in-one" configuration, and the OpenShift test verifies the stored traces.
+
+### `micrometer/prometheus`
+
+Verifies that custom metrics are exposed in the embedded Prometheus instance provided by OpenShift.
+
+There is a PrimeNumberResource that checks whether an integer is prime or not. The application will expose the following custom metrics:
+- `prime_number_max_{uniqueId}`: max prime number that was found
+- `prime_number_test_{uniqueId}`: with information about the calculation of the prime number (count, max, sum)
+
+Where `{uniqueId}` is an unique identifier that is calculated at startup time to uniquely identify the metrics of the application.
 
 ### `messaging/artemis`
 
