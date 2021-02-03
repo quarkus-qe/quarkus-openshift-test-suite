@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import static io.quarkus.ts.openshift.http.HttpClientVersionResource.HTTP_VERSION;
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
+import static org.hamcrest.CoreMatchers.containsString;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -88,12 +89,72 @@ public abstract class AbstractHttpTest {
                 .onFailure().retry().atMost(RETRY);
 
         content.subscribe().with(body -> {
-            assertTrue(body.getString("content").equals("Hello, World!"));
+            assertEquals(body.getString("content"),"Hello, World!");
             done.countDown();
         });
 
         done.await(TIMEOUT_SEC, TimeUnit.SECONDS);
         assertTrue(done.getCount() == 0);
+    }
+
+    @Test
+    @DisplayName("Health endpoint moved to /q/")
+    public void healthEndpointRedirection() {
+        given().redirects().follow(false)
+        .expect().
+                statusCode(301).
+                header("Location", containsString( "/q/health")).
+                when().
+                get("/health");
+
+        given().redirects().follow(true).and().redirects().max(3)
+                .expect().statusCode(200).
+                when().get("/health");
+    }
+
+    @Test
+    @DisplayName("Metric endpoint moved to /q/")
+    public void metricEndpointRedirection() {
+        given().redirects().follow(false)
+                .expect().
+                statusCode(301).
+                header("Location", containsString( "/q/metrics")).
+                when().
+                get("/metrics");
+
+        given().redirects().follow(true).and().redirects().max(3)
+                .expect().statusCode(200).
+                when().get("/metrics");
+    }
+
+    @Test
+    @DisplayName("Swagger endpoint moved to /q/")
+    public void swaggerEndpointRedirection() {
+        given().redirects().follow(false)
+                .expect().
+                statusCode(301).
+                header("Location", containsString( "/q/swagger-ui")).
+                when().
+                get("/swagger-ui");
+
+        given().redirects().follow(true).and().redirects().max(3)
+                .expect().statusCode(200).
+                when().get("/swagger-ui");
+    }
+
+    @Test
+    @DisplayName("OpenAPI endpoint moved to /q/")
+    public void openApiEndpointRedirection() {
+        given().redirects().follow(false)
+                .expect().
+                statusCode(301).
+                header("Location", containsString( "/q/openapi")).
+                when().
+                get("/openapi");
+
+        given().redirects().follow(true).and().redirects().max(3)
+                .expect().statusCode(200).
+                when().get("/openapi");
     }
 
     @Test
