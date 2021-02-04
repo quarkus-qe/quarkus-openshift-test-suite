@@ -46,6 +46,7 @@
         <module>security/https-2way-authz</module>
         <module>microprofile</module>
         <module>micrometer/prometheus</module>
+        <module>micrometer/prometheus-kafka</module>
 
         <module>external-applications/todo-demo-app</module>
         <module>external-applications/quarkus-workshop-super-heroes</module>
