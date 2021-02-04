@@ -7,6 +7,7 @@ public class PrintStatusOnOpenShiftFailureActionImpl implements OnOpenShiftFailu
     @Override
     public void execute() throws Exception {
         new Command("oc", "status", "--suggest").runAndWait();
+        new Command("oc", "get", "events").runAndWait();
     }
 
 }
