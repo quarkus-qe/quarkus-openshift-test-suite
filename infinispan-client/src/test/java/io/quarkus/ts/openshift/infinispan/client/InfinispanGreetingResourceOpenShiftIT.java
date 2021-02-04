@@ -5,8 +5,8 @@ import io.quarkus.ts.openshift.common.AdditionalResources;
 import io.quarkus.ts.openshift.common.Command;
 import io.quarkus.ts.openshift.common.CustomizeApplicationDeployment;
 import io.quarkus.ts.openshift.common.CustomizeApplicationUndeployment;
-import io.quarkus.ts.openshift.common.ManualApplicationDeployment;
 import io.quarkus.ts.openshift.common.OpenShiftTest;
+import io.quarkus.ts.openshift.common.deploy.UsingQuarkusPluginDeploymentStrategy;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -22,8 +22,7 @@ import java.nio.file.Paths;
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.CoreMatchers.is;
 
-@OpenShiftTest
-@ManualApplicationDeployment
+@OpenShiftTest(strategy = UsingQuarkusPluginDeploymentStrategy.class)
 @AdditionalResources("classpath:clientcert_secret.yaml")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class InfinispanGreetingResourceOpenShiftIT {
@@ -32,8 +31,7 @@ public class InfinispanGreetingResourceOpenShiftIT {
     private static final String CLUSTER_CONFIG_PATH = "target/test-classes/infinispan_cluster_config.yaml";
     private static final String CLUSTER_CONFIGMAP_PATH = "target/test-classes/infinispan_cluster_configmap.yaml";
 
-    // Application deployment is performed by the Quarkus Kubernetes extension during application build,
-    // because we set quarkus.kubernetes.deploy=true (see the appplication.properties).
+    // Application deployment is performed by the Quarkus Kubernetes extension during test execution.
     // Creating an infinispan cluster, its secrets and setting the path to it for the application
     @CustomizeApplicationDeployment
     public static void deploy(OpenShiftClient oc) throws IOException, InterruptedException {
@@ -55,7 +53,6 @@ public class InfinispanGreetingResourceOpenShiftIT {
     public static void undeploy() throws IOException, InterruptedException {
         new Command("oc", "delete", "-f", CLUSTER_CONFIGMAP_PATH).runAndWait();
         new Command("oc", "delete", "-f", CLUSTER_CONFIG_PATH).runAndWait();
-        new Command("oc", "delete", "-f", "target/kubernetes/openshift.yml").runAndWait();
     }
 
     @Test

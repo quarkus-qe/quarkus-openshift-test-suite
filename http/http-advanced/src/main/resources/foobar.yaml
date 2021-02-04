@@ -1,0 +1,11 @@
+quarkus:
+  application:
+    name: test-http-advanced
+  http:
+    root-path: /api
+  kubernetes:
+    deployment-target: openshift
+  openshift:
+    expose: true
+  s2i:
+    base-jvm-image: registry.access.redhat.com/ubi8/openjdk-11:latest
