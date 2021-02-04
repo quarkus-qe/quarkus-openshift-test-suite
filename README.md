@@ -50,7 +50,7 @@ And also, the same user `qe` should have access to the `openshift-user-workload-
 oc adm policy add-role-to-user edit qe -n openshift-user-workload-monitoring
 ```
 
-These requirements are necessary to verify the `micrometer/prometheus` tests. 
+These requirements are necessary to verify the `micrometer/prometheus` and `micrometer/prometheus-kafka` tests. 
 
 ## Running against Red Hat build of Quarkus
 
@@ -559,6 +559,16 @@ There is a PrimeNumberResource that checks whether an integer is prime or not. T
 - `prime_number_test_{uniqueId}`: with information about the calculation of the prime number (count, max, sum)
 
 Where `{uniqueId}` is an unique identifier that is calculated at startup time to uniquely identify the metrics of the application.
+
+In order to run this module, the OpenShift user must have permission to create ServiceMonitor CRDs and access to the `openshift-user-workload-monitoring` namespace. See [Other Prerequisites](#other-prerequisites) section.
+
+### `micrometer/prometheus-kafka`
+
+Verifies that the kafka metrics are exposed in the embedded Prometheus instance provided by OpenShift.
+
+As part of this application, there is one Kafka consumer and one Kafka producer, therefore consumer and producer metrics are expected.
+
+In order to run this module, the OpenShift user must have permission to create ServiceMonitor CRDs and access to the `openshift-user-workload-monitoring` namespace. See [Other Prerequisites](#other-prerequisites) section.
 
 ### `messaging/artemis`
 

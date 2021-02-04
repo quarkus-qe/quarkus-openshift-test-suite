@@ -1,9 +1,11 @@
-package io.quarkus.ts.openshift.messaging.kafka;
+package io.quarkus.ts.openshift.micrometer;
 
 import io.quarkus.ts.openshift.common.AdditionalResources;
 import io.quarkus.ts.openshift.common.OpenShiftTest;
 
 @OpenShiftTest
 @AdditionalResources("classpath:deployments/kafka/strimzi.yaml")
-public class KafkaStreamOpenShiftIT extends AbstractKafkaTest{
+@AdditionalResources("classpath:service-monitor.yaml")
+public class KafkaAlertEventsOpenShiftIT extends AbstractAlertEventsOpenShiftIT {
+
 }

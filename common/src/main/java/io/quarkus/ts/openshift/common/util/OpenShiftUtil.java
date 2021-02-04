@@ -1,14 +1,19 @@
 package io.quarkus.ts.openshift.common.util;
 
 import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.client.dsl.ExecListener;
+import io.fabric8.kubernetes.client.dsl.ExecWatch;
 import io.fabric8.openshift.client.OpenShiftClient;
+import okhttp3.Response;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
@@ -126,5 +131,35 @@ public final class OpenShiftUtil {
 
     public void deleteYaml(InputStream yaml) {
         oc.load(yaml).delete();
+    }
+
+    public String execOnPod(String namespace, String podName, String containerId, String... input)
+            throws InterruptedException {
+
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        CountDownLatch execLatch = new CountDownLatch(1);
+
+        try (ExecWatch execWatch = oc.pods().inNamespace(namespace).withName(podName).inContainer(containerId)
+                .writingOutput(out)
+                .usingListener(new ExecListener() {
+                    @Override
+                    public void onOpen(Response response) {
+                        // do nothing
+                    }
+
+                    @Override
+                    public void onFailure(Throwable throwable, Response response) {
+                        execLatch.countDown();
+                    }
+
+                    @Override
+                    public void onClose(int i, String s) {
+                        execLatch.countDown();
+                    }
+                })
+                .exec(input)) {
+            execLatch.await(5, TimeUnit.MINUTES);
+            return out.toString();
+        }
     }
 }

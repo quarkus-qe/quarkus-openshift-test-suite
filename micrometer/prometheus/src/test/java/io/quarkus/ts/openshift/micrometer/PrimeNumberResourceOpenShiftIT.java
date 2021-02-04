@@ -1,15 +1,13 @@
 package io.quarkus.ts.openshift.micrometer;
 
 import io.quarkus.ts.openshift.common.AdditionalResources;
-import io.quarkus.ts.openshift.common.Command;
 import io.quarkus.ts.openshift.common.OpenShiftTest;
-import io.quarkus.ts.openshift.common.deploy.UsingQuarkusPluginDeploymentStrategy;
+import io.quarkus.ts.openshift.common.injection.TestResource;
+import io.quarkus.ts.openshift.common.util.OpenShiftUtil;
 import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static io.restassured.RestAssured.get;
@@ -22,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * - `prime_number_max_{uniqueId}`: max prime number that is found
  * - `prime_number_test_{uniqueId}`: with information about the calculation of the prime number
  */
-@OpenShiftTest(strategy = UsingQuarkusPluginDeploymentStrategy.class)
+@OpenShiftTest
 @AdditionalResources("classpath:service-monitor.yaml")
 public class PrimeNumberResourceOpenShiftIT {
 
@@ -32,7 +30,14 @@ public class PrimeNumberResourceOpenShiftIT {
     private static final String PRIME_NUMBER_TEST_MAX = "prime_number_test_%s_seconds_max";
     private static final String PRIME_NUMBER_TEST_SUM = "prime_number_test_%s_seconds_sum";
 
+    private static final String PROMETHEUS_NAMESPACE = "openshift-user-workload-monitoring";
+    private static final String PROMETHEUS_POD = "prometheus-user-workload-0";
+    private static final String PROMETHEUS_CONTAINER = "prometheus";
+
     private static final Integer ANY_VALUE = null;
+
+    @TestResource
+    private OpenShiftUtil openShiftUtil;
 
     private String uniqueId;
 
@@ -63,20 +68,14 @@ public class PrimeNumberResourceOpenShiftIT {
 
     private void thenMetricIsExposedInPrometheus(String name, Integer expected) throws Exception {
         await().ignoreExceptions().atMost(5, TimeUnit.MINUTES).untilAsserted(() -> {
-            List<String> lines = new LinkedList<>();
-            new Command("oc", "exec", "-n", "openshift-user-workload-monitoring",
-                    "pod/prometheus-user-workload-0", "curl",
-                    "http://localhost:9090/api/v1/query?query=" + primeNumberCustomMetricName(name))
-                            .outputToLines(lines)
-                            .runAndWait();
-            assertTrue(lines.stream().anyMatch(line -> line.contains("\"status\":\"success\"")), "Verify the status was ok");
-            assertTrue(
-                    lines.stream()
-                            .anyMatch(line -> line.contains("\"__name__\":\"" + primeNumberCustomMetricName(name) + "\"")),
+            String output = openShiftUtil.execOnPod(PROMETHEUS_NAMESPACE, PROMETHEUS_POD, PROMETHEUS_CONTAINER, "curl",
+                    "http://localhost:9090/api/v1/query?query=" + primeNumberCustomMetricName(name));
+
+            assertTrue(output.contains("\"status\":\"success\""), "Verify the status was ok");
+            assertTrue(output.contains("\"__name__\":\"" + primeNumberCustomMetricName(name) + "\""),
                     "Verify the metrics is found");
             if (expected != null) {
-                assertTrue(lines.stream().anyMatch(line -> line.contains("\"" + expected + "\"")),
-                        "Verify the metrics contains the correct number");
+                assertTrue(output.contains("\"" + expected + "\""), "Verify the metrics contains the correct number");
             }
 
         });

@@ -1,4 +1,4 @@
-package io.quarkus.ts.openshift.messaging.kafka;
+package io.quarkus.ts.openshift.micrometer;
 
 import io.quarkus.ts.openshift.common.AdditionalResources;
 import io.quarkus.ts.openshift.common.OnlyIfConfigured;
@@ -6,7 +6,8 @@ import io.quarkus.ts.openshift.common.OpenShiftTest;
 
 @OpenShiftTest
 @AdditionalResources("classpath:deployments/kafka/amq-streams.yaml")
-@AdditionalResources("classpath:deployments/kafka/apicurio.yaml")
+@AdditionalResources("classpath:service-monitor.yaml")
 @OnlyIfConfigured("ts.authenticated-registry")
-public class AmqStreamsOpenShiftIT extends AbstractKafkaTest{
+public class AmqStreamsAlertEventsOpenShiftIT extends AbstractAlertEventsOpenShiftIT {
+
 }
