@@ -11,6 +11,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -36,6 +38,7 @@ public class UsingQuarkusPluginDeploymentStrategy implements DeploymentStrategy 
     private static final String QUARKUS_NATIVE_CONTAINER_RUNTIME = "quarkus.native.container-runtime";
     private static final String QUARKUS_NATIVE_MEMORY_LIMIT = "quarkus.native.native-image-xmx";
     private static final String QUARKUS_PACKAGE_TYPE = "quarkus.package.type";
+    private static final String QUARKUS_OPENSHIFT_ENV_VARS = "quarkus.openshift.env.vars.";
     private static final String OC_IGNORE_IF_NOT_FOUND = "--ignore-not-found=true";
 
     private static final String NATIVE = "native";
@@ -46,7 +49,7 @@ public class UsingQuarkusPluginDeploymentStrategy implements DeploymentStrategy 
     private OpenShiftClient openShiftClient;
 
     @Override
-    public void deploy() throws Exception {
+    public void deploy(Map<String, String> envVars) throws Exception {
         String namespace = openShiftClient.getNamespace();
 
         List<String> args = new ArrayList<>(
@@ -57,6 +60,7 @@ public class UsingQuarkusPluginDeploymentStrategy implements DeploymentStrategy 
         args.add(withContainerImageGroup(namespace));
         withMavenRepositoryLocalIfSet(args);
         withNativeBuildArgumentsIfNative(args);
+        withEnvVars(args, envVars);
 
         new Command(args).runAndWait();
     }
@@ -109,6 +113,12 @@ public class UsingQuarkusPluginDeploymentStrategy implements DeploymentStrategy 
 
     private static final String withKubernetesClientTrustCerts() {
         return withProperty(QUARKUS_KUBERNETES_CLIENT_TRUST_CERTS, Boolean.TRUE.toString());
+    }
+
+    private void withEnvVars(List<String> args, Map<String, String> envVars) {
+        for (Entry<String, String> envVar : envVars.entrySet()) {
+            args.add(withProperty(QUARKUS_OPENSHIFT_ENV_VARS + envVar.getKey(), envVar.getValue()));
+        }
     }
 
     private static final String withProperty(String property, String value) {

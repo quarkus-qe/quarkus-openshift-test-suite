@@ -51,10 +51,10 @@ public abstract class AbstractSecurityKeycloakOpenShiftTest {
         String loc = webClient.loadWebResponse(new WebRequest(URI.create(getAppUrl() + "/user").toURL()))
                 .getResponseHeaderValue("location");
 
-        assertTrue(loc.startsWith(getAuthServerUrl() + "/protocol/openid-connect/auth"));
-        assertTrue(loc.contains("scope=openid"));
-        assertTrue(loc.contains("response_type=code"));
-        assertTrue(loc.contains("client_id=test-application-client"));
+        assertTrue(loc.startsWith(getAuthServerUrl()), "Unexpected location for " + getAuthServerUrl() + ". Got: " + loc);
+        assertTrue(loc.contains("scope=openid"), "Unexpected scope. Got: " + loc);
+        assertTrue(loc.contains("response_type=code"), "Unexpected response type. Got: " + loc);
+        assertTrue(loc.contains("client_id=test-application-client"), "Unexpected client id. Got: " + loc);
     }
 
     @Test

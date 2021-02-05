@@ -228,6 +228,42 @@ public class HelloOpenShiftIT {
 These resources are deployed _before_ the test application is deployed, and are also undeployed _after_ the test application is undeployed.
 This annotation is `@Repeatable`, so you can include it more than once.
 
+Also, additional resources with routes sometimes need to be injected into the Quarkus applications. For example, if we have the next `route.yaml` file with content: 
+
+```yaml
+apiVersion: v1
+kind: List
+items:
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    name: keycloak-plain
+  spec:
+    to:
+      name: keycloak-plain
+```
+
+Then, We can use the `@InjectRouteUrlIntoApp` annotation to inject the route URL into the Quarkus application as an environment variable:
+
+```java
+@OpenShiftTest
+@AdditionalResources("classpath:route.yaml")
+@InjectRouteUrlIntoApp(route = "keycloak-plain", envVar = "KEYCLOAK_HTTP_URL")
+public class HelloOpenShiftIT {
+    ...
+}
+```
+
+After deploying the route, the framework will deploy the module test application with the environment variable `KEYCLOAK_HTTP_URL` and the route URL.
+
+Note that environment variables are available to be used in properties files like:
+
+```properties
+quarkus.my.property=${KEYCLOAK_HTTP_URL:default_value}
+```
+
+Further information about usage of configuration in [here](https://quarkus.io/guides/config-reference#combine-property-env-var).
+
 ### Running tests in ephemeral namespaces
 
 By default, the test framework expects that the user is logged into an OpenShift project, and that project is used for all tests.

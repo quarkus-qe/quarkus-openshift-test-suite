@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -14,6 +15,7 @@ import io.quarkus.ts.openshift.common.Command;
 import io.quarkus.ts.openshift.common.OpenShiftTestException;
 import io.quarkus.ts.openshift.common.injection.TestResource;
 import io.quarkus.ts.openshift.common.util.AwaitUtil;
+import io.quarkus.ts.openshift.common.util.EnvVarsOverrides;
 import io.quarkus.ts.openshift.common.util.ImageOverrides;
 import io.quarkus.ts.openshift.common.util.NamespaceOverrides;
 
@@ -35,7 +37,7 @@ public class EmbeddedDeploymentStrategy implements DeploymentStrategy {
     private AwaitUtil awaitUtil;
 
     @Override
-    public void deploy() throws Exception {
+    public void deploy(Map<String, String> envVars) throws Exception {
         Path openshiftResources = getResourcesYaml();
         if (!Files.exists(openshiftResources)) {
             throw new OpenShiftTestException(
@@ -44,6 +46,7 @@ public class EmbeddedDeploymentStrategy implements DeploymentStrategy {
 
         NamespaceOverrides.apply(openshiftResources, openShiftClient);
         ImageOverrides.apply(openshiftResources, openShiftClient);
+        EnvVarsOverrides.apply(envVars, openshiftResources, openShiftClient);
 
         System.out.println("deploying application");
         new Command("oc", "apply", "-f", openshiftResources.toString()).runAndWait();

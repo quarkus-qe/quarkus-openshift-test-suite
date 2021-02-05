@@ -1,5 +1,7 @@
 package io.quarkus.ts.openshift.common.deploy;
 
+import java.util.Map;
+
 /**
  * If the test class is using the {@code ManualDeploymentStrategy} strategy, the test framework will delegate the deployment
  * to the test case.
@@ -9,7 +11,7 @@ package io.quarkus.ts.openshift.common.deploy;
 public class ManualDeploymentStrategy implements DeploymentStrategy {
 
     @Override
-    public void deploy() throws Exception {
+    public void deploy(Map<String, String> envVars) throws Exception {
         // Do nothing
     }
 
