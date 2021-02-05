@@ -41,6 +41,7 @@
         <module>security/keycloak-jwt</module>
         <module>security/keycloak-oauth2</module>
         <module>security/keycloak-multitenant</module>
+        <module>security/keycloak-oidc-client</module>
         <module>security/https-1way</module>
         <module>security/https-2way</module>
         <module>security/https-2way-authz</module>

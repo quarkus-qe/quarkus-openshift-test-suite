@@ -513,6 +513,14 @@ Authorization is based on roles, which are configured in Keycloak.
 
 A simple Keycloak realm with 1 client (protected application), 2 users and 2 roles is provided in `test-realm.json`.
 
+### `security/keycloak-oidc-client`
+
+Verifies authorization using `OIDC Client` extension as token generator. 
+Keycloak is used for issuing and verifying tokens.
+Restrictions are defined using common annotations (`@RolesAllowed` etc.).
+
+A simple Keycloak realm with 1 client (protected application), 2 users and 2 roles is provided in `test-realm.json`.
+
 ### `security/https-1way`
 
 Verifies that accessing an HTTPS endpoint is posible.
