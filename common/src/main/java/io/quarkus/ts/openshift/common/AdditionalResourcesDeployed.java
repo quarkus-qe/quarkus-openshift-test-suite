@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtensionContext.Store.CloseableResource;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,6 +18,7 @@ import java.util.List;
 import static org.fusesource.jansi.Ansi.ansi;
 
 final class AdditionalResourcesDeployed implements CloseableResource {
+
     private final String url;
     private final Path file;
     private final TestsStatus testsStatus;
@@ -31,18 +33,7 @@ final class AdditionalResourcesDeployed implements CloseableResource {
                                               OpenShiftClient oc, AwaitUtil awaitUtil) throws IOException, InterruptedException {
         String url = annotation.value();
 
-        InputStream resources;
-        if (url.startsWith("classpath:")) {
-            String classloaderResource = url.substring("classpath:".length());
-            resources = OpenShiftTestExtension.class.getClassLoader().getResourceAsStream(classloaderResource);
-            if (resources == null) {
-                throw new IOException("Not found: " + url);
-            }
-        } else {
-            resources = new URL(url).openStream();
-        }
-        Path tempFile = Files.createTempFile("additional-resources", ".yml");
-        Files.copy(resources, tempFile, StandardCopyOption.REPLACE_EXISTING);
+        Path tempFile = copyResourceIntoTempFile(url);
         ImageOverrides.apply(tempFile, oc);
 
         System.out.println(ansi().a("deploying ").fgYellow().a(url).reset());
@@ -52,6 +43,23 @@ final class AdditionalResourcesDeployed implements CloseableResource {
         awaitUtil.awaitReadiness(deployedResources);
 
         return new AdditionalResourcesDeployed(url, tempFile, testsStatus);
+    }
+
+    private static Path copyResourceIntoTempFile(String url) throws IOException, MalformedURLException {
+        try (InputStream resources = openResource(url)) {
+            Path tempFile = Files.createTempFile("additional-resources", ".yml");
+            Files.copy(resources, tempFile, StandardCopyOption.REPLACE_EXISTING);
+            return tempFile;
+        }
+    }
+
+    private static InputStream openResource(String url) throws IOException, MalformedURLException {
+        if (url.startsWith("classpath:")) {
+            String classloaderResource = url.substring("classpath:".length());
+            return OpenShiftTestExtension.class.getClassLoader().getResourceAsStream(classloaderResource);
+        }
+
+        return new URL(url).openStream();
     }
 
     @Override

@@ -39,6 +39,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceLoader;
 import java.util.logging.Level;
@@ -143,11 +145,29 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
         deployAdditionalResources(context);
 
         runPublicStaticVoidMethods(CustomizeApplicationDeployment.class, context);
-        getDeploymentStrategy(context).deploy();
+
+        Map<String, String> envVars = resolveEnvVars(context);
+        getDeploymentStrategy(context).deploy(envVars);
 
         setUpRestAssured(context);
 
         getAwaitUtil(context).awaitAppRoute();
+    }
+
+    private Map<String, String> resolveEnvVars(ExtensionContext context) throws OpenShiftTestException {
+        Map<String, String> envVars = new HashMap<>();
+        Optional<AnnotatedElement> element = context.getElement();
+        if (element.isPresent()) {
+            OpenShiftUtil openshift = getOpenShiftUtil(context);
+            AnnotatedElement annotatedElement = element.get();
+            InjectRouteUrlIntoApp[] annotations = annotatedElement.getAnnotationsByType(InjectRouteUrlIntoApp.class);
+            for (InjectRouteUrlIntoApp annotation : annotations) {
+                String value = openshift.getUrlFromRoute(annotation.route());
+                envVars.put(annotation.envVar(), value);
+            }
+        }
+
+        return envVars;
     }
 
     private void createEphemeralNamespaceIfNecessary(ExtensionContext context) throws IOException, InterruptedException {

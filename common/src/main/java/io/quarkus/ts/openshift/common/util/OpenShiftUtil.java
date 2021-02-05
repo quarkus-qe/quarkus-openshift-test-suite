@@ -5,6 +5,8 @@ import io.fabric8.kubernetes.client.dsl.ExecListener;
 import io.fabric8.kubernetes.client.dsl.ExecWatch;
 import io.fabric8.openshift.client.OpenShiftClient;
 import okhttp3.Response;
+import io.fabric8.openshift.api.model.Route;
+import io.quarkus.ts.openshift.common.OpenShiftTestException;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -111,6 +113,17 @@ public final class OpenShiftUtil {
         scale(deploymentConfigName, replicas);
 
         await.awaitAppRoute();
+    }
+
+    public String getUrlFromRoute(String routeName) throws OpenShiftTestException {
+        Route route = oc.routes().withName(routeName).get();
+        if (route == null) {
+            throw new OpenShiftTestException("Couldn't find route '" + routeName + " ' in namespace '" + getNamespace() + "'");
+        }
+
+        final String protocol = route.getSpec().getTls() == null ? "http" : "https";
+        final String path = route.getSpec().getPath() == null ? "" : route.getSpec().getPath();
+        return String.format("%s://%s%s", protocol, route.getSpec().getHost(), path);
     }
 
     public void applyYaml(File yaml) throws IOException {
