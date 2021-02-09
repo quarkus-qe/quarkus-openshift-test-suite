@@ -3,7 +3,6 @@ package io.quarkus.ts.openshift.security.keycloak;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.ts.openshift.common.resources.KeycloakQuarkusTestResource;
-
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @QuarkusTest

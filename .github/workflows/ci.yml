@@ -51,7 +51,7 @@ jobs:
           java-version: openjdk${{ matrix.java }}
       - name: Build with Maven
         run: |
-          mvn -fae -V -B clean install -DskipTests -DskipITs -pl 'app-metadata/deployment,app-metadata/runtime,common,http' -Dquarkus.profile=native -Dquarkus.native.container-runtime=docker
+          mvn -fae -V -B clean install -DskipTests -DskipITs -pl 'app-metadata/deployment,app-metadata/runtime,common,http/http-minimum' -Dquarkus.profile=native -Dquarkus.native.container-runtime=docker
   build-master:
     name: JVM build - Quarkus master
     runs-on: ubuntu-latest

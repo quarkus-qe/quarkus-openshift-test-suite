@@ -16,7 +16,8 @@
         <module>app-metadata/runtime</module>
         <module>common</module>
 
-        <module>http</module>
+        <module>http/http-minimum</module>
+        <module>http/http-advanced</module>
         <module>configmap/api-server</module>
         <module>configmap/file-system</module>
         <module>config-secret/api-server</module>
