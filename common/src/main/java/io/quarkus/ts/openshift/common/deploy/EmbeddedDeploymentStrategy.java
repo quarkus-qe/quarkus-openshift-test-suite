@@ -1,13 +1,5 @@
 package io.quarkus.ts.openshift.common.deploy;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import io.fabric8.openshift.api.model.ImageStream;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.quarkus.ts.openshift.app.metadata.AppMetadata;
@@ -18,6 +10,14 @@ import io.quarkus.ts.openshift.common.util.AwaitUtil;
 import io.quarkus.ts.openshift.common.util.EnvVarsOverrides;
 import io.quarkus.ts.openshift.common.util.ImageOverrides;
 import io.quarkus.ts.openshift.common.util.NamespaceOverrides;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * If the test class is using the {@code EmbeddedDeploymentStrategy} strategy, the test framework will push the resources into

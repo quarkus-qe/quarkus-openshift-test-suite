@@ -3,10 +3,10 @@ package io.quarkus.ts.openshift.common.util;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.client.dsl.ExecListener;
 import io.fabric8.kubernetes.client.dsl.ExecWatch;
-import io.fabric8.openshift.client.OpenShiftClient;
-import okhttp3.Response;
 import io.fabric8.openshift.api.model.Route;
+import io.fabric8.openshift.client.OpenShiftClient;
 import io.quarkus.ts.openshift.common.OpenShiftTestException;
+import okhttp3.Response;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
