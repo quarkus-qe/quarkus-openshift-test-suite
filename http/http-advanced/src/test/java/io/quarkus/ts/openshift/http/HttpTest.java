@@ -9,17 +9,10 @@ import org.eclipse.microprofile.config.ConfigProvider;
 @QuarkusTestResource(KeycloakQuarkusTestResource.WithOidcConfig.class)
 public class HttpTest extends AbstractHttpTest {
 
-    private static final String oidcAuthServerUrl = ConfigProvider.getConfig().getValue("quarkus.oidc.auth-server-url", String.class);
-
     private static final int appPort = ConfigProvider.getConfig().getValue("quarkus.http.test-ssl-port", Integer.class);
 
     @Override
     protected String getAppEndpoint() {
         return String.format("https://localhost:%d/api", appPort);
-    }
-
-    @Override
-    protected String getAuthServerUrl() {
-        return oidcAuthServerUrl;
     }
 }

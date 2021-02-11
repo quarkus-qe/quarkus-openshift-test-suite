@@ -1,17 +1,15 @@
-package io.quarkus.ts.openshift.http;
+package io.quarkus.ts.openshift.http.clients;
 
-import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 
-@Path("/")
 @RegisterRestClient
-public interface HttpVersionClientServiceAsync {
+public interface HttpVersionClientService {
 
     @GET
     @Path("/httpVersion")
-    Uni<Response> getClientHttpVersion();
+    Response getClientHttpVersion();
 }

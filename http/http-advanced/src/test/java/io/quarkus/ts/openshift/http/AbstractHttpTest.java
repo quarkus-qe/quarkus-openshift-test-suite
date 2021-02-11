@@ -1,6 +1,10 @@
 package io.quarkus.ts.openshift.http;
 
 import io.quarkus.ts.openshift.common.injection.TestResource;
+import io.quarkus.ts.openshift.http.clients.HealthClientService;
+import io.quarkus.ts.openshift.http.clients.HttpVersionClientService;
+import io.quarkus.ts.openshift.http.clients.HttpVersionClientServiceAsync;
+import io.quarkus.ts.openshift.http.clients.RestClientServiceBuilder;
 import io.smallrye.mutiny.Uni;
 import io.vertx.core.http.HttpVersion;
 import io.vertx.core.json.JsonObject;
@@ -11,26 +15,17 @@ import io.vertx.mutiny.ext.web.client.HttpResponse;
 import io.vertx.mutiny.ext.web.client.WebClient;
 import io.vertx.mutiny.ext.web.client.predicate.ResponsePredicate;
 import io.vertx.mutiny.ext.web.client.predicate.ResponsePredicateResult;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.http.impl.client.HttpClients;
-import org.eclipse.microprofile.rest.client.inject.RestClient;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.keycloak.authorization.client.AuthzClient;
-import org.keycloak.authorization.client.Configuration;
 
-import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 
-import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -38,41 +33,22 @@ import java.util.concurrent.TimeUnit;
 import static io.quarkus.ts.openshift.http.HttpClientVersionResource.HTTP_VERSION;
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class AbstractHttpTest {
 
     private static final int TIMEOUT_SEC = 3;
     private static final int RETRY = 3;
-
-    @Inject
-    @RestClient
-    private HttpVersionClientService httpVersionClientService;
-
-    @Inject
-    @RestClient
-    private HttpVersionClientServiceAsync httpVersionClientServiceAsync;
+    private static final String PASSWORD = "password";
+    private static final String KEY_STORE_PATH = "META-INF/resources/server.keystore";
 
     @TestResource
     private URL appEndpoint;
-
-    private AuthzClient authzClient;
-
-    protected abstract String getAuthServerUrl();
-
-    @BeforeEach
-    public void setup() {
-        authzClient = AuthzClient.create(new Configuration(
-                StringUtils.substringBefore(getAuthServerUrl(), "/realms"),
-                "test-realm",
-                "test-application-client",
-                Collections.singletonMap("secret", "test-application-client-secret"),
-                HttpClients.createDefault()
-        ));
-    }
 
     @Test
     @DisplayName("Http/1.1 Server test")
@@ -97,34 +73,34 @@ public abstract class AbstractHttpTest {
     @Test
     @DisplayName("Http/2 Server test")
     public void http2Server() throws InterruptedException, URISyntaxException {
-
-        URL res = getClass().getClassLoader().getResource("META-INF/resources/server.truststore");
-        File file = Paths.get(res.toURI()).toFile();
-        String truststore = file.getAbsolutePath();
-
         CountDownLatch done = new CountDownLatch(1);
-        WebClientOptions options = new WebClientOptions().setProtocolVersion(HttpVersion.HTTP_2).setSsl(true).setVerifyHost(false).setUseAlpn(true).setTrustStoreOptions(new JksOptions().setPassword("password").setPath(truststore));
-        Uni<JsonObject> content = WebClient.create(Vertx.vertx(), options).getAbs(getAppEndpoint() + "/hello")
+        Uni<JsonObject> content = WebClient.create(Vertx.vertx(), defaultVertxHttpClientOptions()).getAbs(getAppEndpoint() + "/hello")
                 .expect(ResponsePredicate.create(AbstractHttpTest::isHttp2x))
                 .expect(ResponsePredicate.status(Response.Status.OK.getStatusCode()))
-                .send().map(resp -> resp.bodyAsJsonObject())
+                .send().map(HttpResponse::bodyAsJsonObject)
                 .ifNoItem().after(Duration.ofSeconds(TIMEOUT_SEC)).fail()
                 .onFailure().retry().atMost(RETRY);
 
         content.subscribe().with(body -> {
-            assertEquals(body.getString("content"),"Hello, World!");
+            assertEquals(body.getString("content"), "Hello, World!");
             done.countDown();
         });
 
         done.await(TIMEOUT_SEC, TimeUnit.SECONDS);
-        assertTrue(done.getCount() == 0);
+        assertThat(done.getCount(), equalTo(0L));
     }
 
     @Test
     @DisplayName("Http/2 Client Sync test")
     @Disabled("blocked by: https://issues.redhat.com/browse/QUARKUS-658")
-    public void http2ClientSync() {
-        Response resp = httpVersionClientService.getClientHttpVersion();
+    public void http2ClientSync() throws Exception {
+        HttpVersionClientService versionHttpClient = new RestClientServiceBuilder<HttpVersionClientService>(getAppEndpoint())
+                .withHostVerified(true)
+                .withPassword(PASSWORD)
+                .withKeyStorePath(KEY_STORE_PATH)
+                .build(HttpVersionClientService.class);
+
+        Response resp = versionHttpClient.getClientHttpVersion();
         assertEquals(200, resp.getStatus());
         assertEquals(HttpVersion.HTTP_2.name(), resp.getHeaderString(HTTP_VERSION));
     }
@@ -132,8 +108,14 @@ public abstract class AbstractHttpTest {
     @Test
     @DisplayName("Http/2 Client Async test")
     @Disabled("blocked by: https://issues.redhat.com/browse/QUARKUS-658")
-    public void http2ClientAsync() {
-        Response resp = httpVersionClientServiceAsync
+    public void http2ClientAsync() throws Exception {
+        HttpVersionClientServiceAsync clientServiceAsync = new RestClientServiceBuilder<HttpVersionClientServiceAsync>(getAppEndpoint())
+                .withHostVerified(true)
+                .withPassword(PASSWORD)
+                .withKeyStorePath(KEY_STORE_PATH)
+                .build(HttpVersionClientServiceAsync.class);
+
+        Response resp = clientServiceAsync
                 .getClientHttpVersion()
                 .await()
                 .atMost(Duration.ofSeconds(10));
@@ -152,16 +134,45 @@ public abstract class AbstractHttpTest {
                 "/health/live", "/health"
         );
 
-        for(String endpoint: endpoints) {
+        for (String endpoint : endpoints) {
             given().redirects().follow(false)
                     .expect().
                     statusCode(301).
-                    header("Location", containsString( "/q" + endpoint)).
+                    header("Location", containsString("/q" + endpoint)).
                     when().
                     get(endpoint);
 
-            given().expect().statusCode(200).when().get(endpoint);
+            given().expect().statusCode(in(Arrays.asList(200, 204))).when().get(endpoint);
         }
+    }
+
+    @Test
+    @Disabled("blocked by: https://issues.redhat.com/browse/QUARKUS-781")
+    public void microprofileHttpClientRedirection() throws Exception {
+        HealthClientService healthHttpClient = new RestClientServiceBuilder<HealthClientService>(getAppEndpoint())
+                .withHostVerified(true)
+                .withPassword(PASSWORD)
+                .withKeyStorePath(KEY_STORE_PATH)
+                .build(HealthClientService.class);
+
+        assertThat(200, equalTo(healthHttpClient.health().getStatus()));
+    }
+
+    @Test
+    public void vertxHttpClientRedirection() throws InterruptedException, URISyntaxException {
+        CountDownLatch done = new CountDownLatch(1);
+        Uni<Integer> statusCode = WebClient.create(Vertx.vertx(), defaultVertxHttpClientOptions()).getAbs(getAppEndpoint() + "/health")
+                .send().map(HttpResponse::statusCode)
+                .ifNoItem().after(Duration.ofSeconds(TIMEOUT_SEC)).fail()
+                .onFailure().retry().atMost(RETRY);
+
+        statusCode.subscribe().with(httpStatusCode -> {
+            assertEquals(200, httpStatusCode);
+            done.countDown();
+        });
+
+        done.await(TIMEOUT_SEC, TimeUnit.SECONDS);
+        assertThat(done.getCount(), equalTo(0L));
     }
 
     protected String getAppEndpoint() {
@@ -172,4 +183,16 @@ public abstract class AbstractHttpTest {
         return (resp.version().compareTo(HttpVersion.HTTP_2) == 0) ? ResponsePredicateResult.success() : ResponsePredicateResult.failure("Expected HTTP/2");
     }
 
+    private WebClientOptions defaultVertxHttpClientOptions() throws URISyntaxException {
+        return new WebClientOptions().setProtocolVersion(HttpVersion.HTTP_2)
+                .setSsl(true)
+                .setVerifyHost(false)
+                .setUseAlpn(true)
+                .setTrustStoreOptions(new JksOptions().setPassword(PASSWORD).setPath(defaultTruststore()));
+    }
+
+    private String defaultTruststore() throws URISyntaxException {
+        URL res = getClass().getClassLoader().getResource(KEY_STORE_PATH);
+        return Paths.get(res.toURI()).toFile().getAbsolutePath();
+    }
 }
