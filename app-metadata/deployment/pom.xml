@@ -16,18 +16,6 @@
 
     <name>Quarkus OpenShift TS: App Metadata: Deployment</name>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>io.quarkus</groupId>
-                <artifactId>quarkus-bom</artifactId>
-                <version>${version.quarkus}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <dependency>
             <groupId>io.quarkus.ts.openshift</groupId>
@@ -58,7 +46,7 @@
                         <path>
                             <groupId>io.quarkus</groupId>
                             <artifactId>quarkus-extension-processor</artifactId>
-                            <version>${version.quarkus}</version>
+                            <version>${version.plugin.quarkus}</version>
                         </path>
                     </annotationProcessorPaths>
                 </configuration>
