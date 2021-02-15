@@ -25,6 +25,8 @@ public class UsingQuarkusPluginDeploymentStrategy implements DeploymentStrategy 
 
     private static final String MVN_COMMAND = "mvn";
     private static final String PACKAGE_GOAL = "package";
+    private static final String VERSION_PLATFORM_QUARKUS = "version.quarkus";
+    private static final String VERSION_PLUGIN_QUARKUS = "version.plugin.quarkus";
     private static final String QUARKUS_PLUGIN_DEPLOY = "-Dquarkus.kubernetes.deploy=true";
     private static final String MVN_REPOSITORY_LOCAL = "maven.repo.local";
     private static final String SKIP_TESTS = "-DskipTests=true";
@@ -58,6 +60,7 @@ public class UsingQuarkusPluginDeploymentStrategy implements DeploymentStrategy 
         args.add(withKubernetesClientNamespace(namespace));
         args.add(withKubernetesClientTrustCerts());
         args.add(withContainerImageGroup(namespace));
+        withQuarkusVersions(args);
         withMavenRepositoryLocalIfSet(args);
         withNativeBuildArgumentsIfNative(args);
         withEnvVars(args, envVars);
@@ -78,6 +81,18 @@ public class UsingQuarkusPluginDeploymentStrategy implements DeploymentStrategy 
                         (path, ignored) -> path.toFile().getName().matches(".*.yml"))) {
 
             return resources.collect(Collectors.toList());
+        }
+    }
+
+    private static final void withQuarkusVersions(List<String> args) {
+        String quarkusVersion = System.getProperty(VERSION_PLATFORM_QUARKUS);
+        if (quarkusVersion != null) {
+            args.add(withProperty(VERSION_PLATFORM_QUARKUS, quarkusVersion));
+        }
+
+        String quarkusPluginVersion = System.getProperty(VERSION_PLUGIN_QUARKUS);
+        if (quarkusPluginVersion != null) {
+            args.add(withProperty(VERSION_PLUGIN_QUARKUS, quarkusPluginVersion));
         }
     }
 
