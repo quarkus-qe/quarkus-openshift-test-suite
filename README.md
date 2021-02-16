@@ -487,8 +487,9 @@ The infinispan cluster needs 2 special secrets - tls-secret with TLS certificate
 TLS certificate is a substitution of `secrets/signing-key` in openshift-service-ca namespace, which "qe" user cannot use (doesn't have rights on it). 
 Clientcert secret is generated for "qe" from the tls-secret mentioned above.
 
-Infinispan client test scenarios are using the cache directly with @Inject and @RemoteCache. The first scenario is one infinispan cluster with 2 replicas and 
-one quarkus application. Through the JAX-RS endpoint we send data into the cache and retrieve it through another JAX-RS endpoint.
+Infinispan client test are using the cache directly with @Inject and @RemoteCache. Through the JAX-RS endpoint, we send data into the cache and retrieve it through another JAX-RS endpoint. 
+The next tests are checking a simple fail-over - first client (application) fail, then Infinispan cluster (cache) fail. Tests kill either the Quarkus pod or Infinispan cluster pod, then wait for redeployment, and check data.
+For the Quarkus application pod killing is used the same approach as in configmap tests.
 
 ### `security/basic`
 
