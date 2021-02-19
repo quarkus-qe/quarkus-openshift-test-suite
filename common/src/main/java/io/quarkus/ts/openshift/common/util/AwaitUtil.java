@@ -59,7 +59,7 @@ public final class AwaitUtil {
     public void awaitReadiness(List<HasMetadata> resources) {
         resources.stream()
                 .filter(Objects::nonNull)
-                .filter(it -> ReadinessUtil.isReadinessApplicable(it.getClass()))
+                .filter(ReadinessUtil.INSTANCE::isReadinessApplicable)
                 .forEach(it -> {
                     System.out.println(ansi().a("waiting for ").a(readableKind(it.getKind())).a(" ")
                             .fgYellow().a(it.getMetadata().getName()).reset().a(" to become ready"));
@@ -78,7 +78,7 @@ public final class AwaitUtil {
                             throw new OpenShiftTestException("Couldn't load " + readableKind(it.getKind()) + " '"
                                     + it.getMetadata().getName() + "' from API server");
                         }
-                        return ReadinessUtil.isReady(current);
+                        return ReadinessUtil.INSTANCE.isReady(current);
                     });
                 });
     }
