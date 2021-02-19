@@ -1,6 +1,7 @@
 package io.quarkus.ts.openshift.infinispan.client;
 
 import io.quarkus.ts.openshift.common.AdditionalResources;
+import io.quarkus.ts.openshift.common.OnlyIfConfigured;
 import io.quarkus.ts.openshift.common.OpenShiftTest;
 import io.quarkus.ts.openshift.common.OpenShiftTestException;
 import io.quarkus.ts.openshift.common.deploy.UsingQuarkusPluginDeploymentStrategy;
@@ -20,8 +21,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @OpenShiftTest(strategy = UsingQuarkusPluginDeploymentStrategy.class)
 @AdditionalResources("classpath:clientcert_secret.yaml")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@OnlyIfConfigured("ts.authenticated-registry")
 public class InfinispanCountersOpenShiftIT extends AbstractInfinispanResourceTest {
 
+    /**
+     * Simple check of connection to endpoints
+     *
+     * Expected values = 0
+     */
     @Test
     @Order(1)
     public void testConnectToEndpoints() {
@@ -31,6 +38,12 @@ public class InfinispanCountersOpenShiftIT extends AbstractInfinispanResourceTes
         assertEquals(firstEndpointCache, secondEndpointCache);
     }
 
+    /**
+     * Test increment counters by 1
+     *
+     * Client counters should be 1 for both endpoints
+     * Cache counter is shared and should be 2
+     */
     @Test
     @Order(2)
     public void testUpdateCacheOnEndpoints() {
@@ -41,12 +54,18 @@ public class InfinispanCountersOpenShiftIT extends AbstractInfinispanResourceTes
         assertEquals("Cache=2 Client=1", secondEndpointCounters);
     }
 
+    /**
+     * Client fail-over test. Testing the Quarkus application will connect back to the DataGrid server after restart.
+     *
+     * Cache counter should remain the same.
+     * Client counter is reset to 0
+     */
     @Test
     @Order(3)
     public void testCacheAfterClientsRestart() {
-        // always start from 0
         resetCacheCounter(appUrl + "/first-counter/reset-cache");
         resetClientCounter(appUrl + "/first-counter/reset-client");
+
         // fill the cache
         incrementCountersOnValue(appUrl + "/first-counter/increment-counters", 10);
 
@@ -60,6 +79,12 @@ public class InfinispanCountersOpenShiftIT extends AbstractInfinispanResourceTes
         assertEquals("0", clientCounter);
     }
 
+    /**
+     * Client fail-over test. Testing the request to the DataGrid server by the failed Quarkus application.
+     *
+     * Cache counter should remain the same.
+     * Client counter is reset to 0
+     */
     @Test
     @Order(4)
     public void testInvokeWithFailedNode() {
@@ -89,6 +114,18 @@ public class InfinispanCountersOpenShiftIT extends AbstractInfinispanResourceTes
         assertEquals("0", clientCounter);
     }
 
+    /**
+     * Infinispan fail-over test. Testing restart the infinispan cluster in DataGrid operator and wait the Quarkus
+     * application connects back. The restart is done by reducing the number of infinispan cluster replicas to 0 and it waits
+     * for the shutdown condition. Then the number of replicas is changed back to 1.
+     *
+     * We don't have cache backup in this test case, so the cache is deleted by the restart of infinispan cluster.
+     * The cache definition "mycache" remains, but the "counter" cache in it is deleted.
+     * Client counter should remain with the same value after the restart.
+     *
+     * @throws IOException
+     * @throws InterruptedException
+     */
     @Test
     @Order(5)
     public void testRestartInfinispanCluster() throws IOException, InterruptedException {
@@ -112,6 +149,17 @@ public class InfinispanCountersOpenShiftIT extends AbstractInfinispanResourceTes
         assertEquals("10", clientCounter);
     }
 
+    /**
+     * Infinispan fail-over test. Testing a restart of the infinispan cluster and increment/change the cache counter value
+     * after the restart. The cache is deleted by the restart of infinispan cluster. Because of this, we need to fill the cache
+     * again. It is done by 'cache.put("counter", 0)'. Then it could be incremented.
+     *
+     * Cache newly created after the restart and incremented by 1 so it should be only 1.
+     * Client counter should remain the same during the restart and after the counter incrementing should by increased by 1.
+     *
+     * @throws IOException
+     * @throws InterruptedException
+     */
     @Test
     @Order(6)
     public void testIncrementAfterRestartInfinispanCluster() throws IOException, InterruptedException {
@@ -140,6 +188,18 @@ public class InfinispanCountersOpenShiftIT extends AbstractInfinispanResourceTes
         assertEquals("Cache=1 Client=11", firstEndpointCounters);
     }
 
+    /**
+     * Infinispan fail-over test. Test invoke a request on the Infinispan server which is currently down.
+     * Because of our settings in the hotrod-client.properties file, the application is trying to connect only once and only 1s.
+     * By default, the app is trying to connect 60 s with 10 retries even when the next tests continue. It means that the counter
+     * could be unexpectedly increased in one of the next tests
+     *
+     * Cache should be empty (status code 204).
+     * Client counter should be increased even if the server is down.
+     *
+     * @throws IOException
+     * @throws InterruptedException
+     */
     @Test
     @Order(7)
     public void testInvokeOnFailedInfinispanCluster() throws IOException, InterruptedException {
@@ -171,6 +231,11 @@ public class InfinispanCountersOpenShiftIT extends AbstractInfinispanResourceTes
         assertEquals("11", clientCounter);
     }
 
+    /**
+     * Check the connection to the second client (second Quarkus application).
+     *
+     * @throws OpenShiftTestException
+     */
     @Test
     @Order(8)
     public void testConnectSecondClient() throws OpenShiftTestException {
@@ -180,9 +245,18 @@ public class InfinispanCountersOpenShiftIT extends AbstractInfinispanResourceTes
         assertEquals("0", secondClientCache);
     }
 
+    /**
+     * Testing the cache is shared between clients (apps). Every client has its own client counter.
+     *
+     * Clients counters should be increased only if the increase is called by their client.
+     * Cache counter is shared and should contain the sum of both client counters.
+     *
+     * @throws OpenShiftTestException
+     */
     @Test
     @Order(9)
     public void testMultipleClientIncrement() throws OpenShiftTestException {
+        // reset the first and client
         resetCacheCounter(appUrl + "/first-counter/reset-cache");
         resetClientCounter(appUrl + "/first-counter/reset-client");
         resetClientCounter(openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/reset-client");
@@ -201,18 +275,29 @@ public class InfinispanCountersOpenShiftIT extends AbstractInfinispanResourceTes
 
         assertEquals("10", firstClientAppCounter);
         assertEquals("10", secondClientAppCounter);
-        assertEquals("20", firstClientCacheCounter);
-        assertEquals("20", secondClientCacheCounter);
+
+        // sum of both client counters
+        String cacheValue = String.valueOf(Integer.valueOf(firstClientAppCounter) + Integer.valueOf(secondClientAppCounter));
+        assertEquals(cacheValue, firstClientCacheCounter);
+        assertEquals(cacheValue, secondClientCacheCounter);
     }
 
+    /**
+     * Multiple client Infinispan fail-over test. Testing restart the infinispan cluster and increment/change counters values
+     * of both client applications after the restart.
+     *
+     * Cache newly created after the restart and incremented by 1 by each client so it should by on value 2.
+     * Client counters should remain the same during the restart and after the counters incrementing both are increased by 1.
+     *
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws OpenShiftTestException
+     */
     @Test
     @Order(10)
     public void testMultipleClientDataAfterRestartInfinispanCluster() throws IOException, InterruptedException, OpenShiftTestException {
-        // reset the first client
         resetCacheCounter(appUrl + "/first-counter/reset-cache");
         resetClientCounter(appUrl + "/first-counter/reset-client");
-
-        // reset the second client
         resetClientCounter(openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/reset-client");
 
         // update the cache in both clients
