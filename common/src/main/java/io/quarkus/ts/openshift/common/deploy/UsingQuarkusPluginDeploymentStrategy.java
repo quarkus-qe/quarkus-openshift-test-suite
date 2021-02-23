@@ -41,6 +41,8 @@ public class UsingQuarkusPluginDeploymentStrategy implements DeploymentStrategy 
     private static final String QUARKUS_NATIVE_MEMORY_LIMIT = "quarkus.native.native-image-xmx";
     private static final String QUARKUS_PACKAGE_TYPE = "quarkus.package.type";
     private static final String QUARKUS_OPENSHIFT_ENV_VARS = "quarkus.openshift.env.vars.";
+    private static final String QUARKUS_PLATFORM_GROUP_ID = "quarkus.platform.group-id";
+    private static final String QUARKUS_PLATFORM_ARTIFACT_ID = "quarkus.platform.artifact-id";
     private static final String OC_IGNORE_IF_NOT_FOUND = "--ignore-not-found=true";
 
     private static final String NATIVE = "native";
@@ -61,6 +63,7 @@ public class UsingQuarkusPluginDeploymentStrategy implements DeploymentStrategy 
         args.add(withKubernetesClientTrustCerts());
         args.add(withContainerImageGroup(namespace));
         withQuarkusVersions(args);
+        withQuarkusBom(args);
         withMavenRepositoryLocalIfSet(args);
         withNativeBuildArgumentsIfNative(args);
         withEnvVars(args, envVars);
@@ -115,6 +118,18 @@ public class UsingQuarkusPluginDeploymentStrategy implements DeploymentStrategy 
         String mvnRepositoryPath = System.getProperty(MVN_REPOSITORY_LOCAL);
         if (mvnRepositoryPath != null) {
             args.add(withProperty(MVN_REPOSITORY_LOCAL, mvnRepositoryPath));
+        }
+    }
+
+    private void withQuarkusBom(List<String> args) {
+        String groupId = System.getProperty(QUARKUS_PLATFORM_GROUP_ID);
+        if (groupId != null) {
+            args.add(withProperty(QUARKUS_PLATFORM_GROUP_ID, groupId));
+        }
+
+        String artifactId = System.getProperty(QUARKUS_PLATFORM_ARTIFACT_ID);
+        if (artifactId != null) {
+            args.add(withProperty(QUARKUS_PLATFORM_ARTIFACT_ID, artifactId));
         }
     }
 
