@@ -15,7 +15,7 @@ public class HttpClientVersionResource {
     @Route(methods = HttpMethod.GET, path = "/httpVersion")
     public void clientHttpVersion(RoutingContext rc) {
         String httpClientVersion = rc.request().version().name();
-         rc.response().headers().add(HTTP_VERSION, httpClientVersion);
-         rc.response().setStatusCode(Response.Status.OK.getStatusCode()).end();
+        rc.response().headers().add(HTTP_VERSION, httpClientVersion);
+        rc.response().setStatusCode(Response.Status.OK.getStatusCode()).end();
     }
 }

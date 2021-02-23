@@ -8,7 +8,7 @@ import io.quarkus.example.HelloRequest;
 import javax.inject.Singleton;
 
 @Singleton
-public class GrpcService extends GreeterGrpc.GreeterImplBase{
+public class GrpcService extends GreeterGrpc.GreeterImplBase {
 
     @Override
     public void sayHello(HelloRequest request, StreamObserver<HelloReply> responseObserver) {

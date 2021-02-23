@@ -22,7 +22,7 @@ import java.util.List;
 @AdditionalResources("classpath:deployments/keycloak/version-73.yaml")
 @AdditionalResources("classpath:keycloak-realm.yaml")
 @AdditionalResources("classpath:deployments/keycloak/deployment.yaml")
-public class HttpOpenShiftIT extends AbstractHttpTest{
+public class HttpOpenShiftIT extends AbstractHttpTest {
     static String keycloakUrl;
 
     @CustomizeApplicationDeployment
@@ -34,21 +34,12 @@ public class HttpOpenShiftIT extends AbstractHttpTest{
                 .filter(it -> it instanceof DeploymentConfig)
                 .filter(it -> it.getMetadata().getName().equals(appMetadata.appName))
                 .map(DeploymentConfig.class::cast)
-                .forEach(dc -> {
-                    dc.getSpec().getTemplate().getSpec().getContainers().forEach(container -> {
-                        container.getEnv().add(
-                                new EnvVar("QUARKUS_OIDC_AUTH_SERVER_URL", keycloakUrl, null)
-                        );
-                    });
-                });
+                .forEach(dc -> dc.getSpec().getTemplate().getSpec().getContainers().forEach(container -> container.getEnv().add(
+                        new EnvVar("QUARKUS_OIDC_AUTH_SERVER_URL", keycloakUrl, null)
+                )));
 
         KubernetesList list = new KubernetesList();
         list.setItems(objs);
         Serialization.yamlMapper().writeValue(Files.newOutputStream(Paths.get("target/kubernetes/openshift.yml")), list);
-    }
-
-    @Override
-    protected String getAuthServerUrl() {
-        return keycloakUrl;
     }
 }
