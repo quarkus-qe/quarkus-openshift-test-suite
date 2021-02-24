@@ -23,12 +23,18 @@ items:
       git:
         uri: https://github.com/quarkusio/quarkus-workshops.git
       type: Git
+      configMaps:
+      - configMap:
+          name: settings-mvn
+        destinationDir: "configuration"
     strategy:
       type: Source
       sourceStrategy:
         env:
         - name: ARTIFACT_COPY_ARGS
           value: -p -r lib/ *-runner.jar
+        - name: MAVEN_ARGS
+          value: -s /opt/app-root/src/configuration/settings.xml -Dquarkus-plugin.version=${version.plugin.quarkus} -Dquarkus.platform.version=${version.quarkus} -Dquarkus.platform.group-id=${quarkus.platform.group-id} -Dquarkus.platform.artifact-id=${quarkus.platform.artifact-id}
         from:
           kind: ImageStreamTag
           name: openjdk-11:latest

@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: settings-mvn
+data:
+  settings.xml: |
+    <?xml version="1.0" encoding="UTF-8"?>
+    <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+        <profiles>
+            <profile>
+                <id>redhat</id>
+                <repositories>
+                    <repository>
+                        <id>redhat</id>
+                        <name>Repository for Redhat dependencies</name>
+                        <url>https://maven.repository.redhat.com/ga/</url>
+                    </repository>
+                </repositories>
+                <pluginRepositories>
+                    <pluginRepository>
+                        <id>redhat</id>
+                        <name>Repository for Redhat dependencies</name>
+                        <url>https://maven.repository.redhat.com/ga/</url>
+                    </pluginRepository>
+                </pluginRepositories>
+            </profile>
+            <profile>
+                <id>artifactory</id>
+                <repositories>
+                    <repository>
+                        <id>quarkus-maven-repo-zip</id>
+                        <url>http://10.0.136.110:8040/artifactory/quarkus-maven-repo-zip</url>
+                        <snapshots>
+                            <enabled>false</enabled>
+                        </snapshots>
+                    </repository>
+                </repositories>
+                <pluginRepositories>
+                    <pluginRepository>
+                        <id>quarkus-maven-repo-zip</id>
+                        <url>http://10.0.136.110:8040/artifactory/quarkus-maven-repo-zip</url>
+                        <snapshots>
+                            <enabled>false</enabled>
+                        </snapshots>
+                    </pluginRepository>
+                </pluginRepositories>
+            </profile>
+        </profiles>
+        <activeProfiles>
+            <activeProfile>artifactory</activeProfile>
+            <activeProfile>redhat</activeProfile>
+        </activeProfiles>
+    </settings>
+
