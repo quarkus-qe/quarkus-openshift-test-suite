@@ -136,6 +136,7 @@ public abstract class AbstractHttpTest {
 
         for (String endpoint : endpoints) {
             given().redirects().follow(false)
+                    .log().uri()
                     .expect().
                     statusCode(301).
                     header("Location", containsString("/q" + endpoint)).
