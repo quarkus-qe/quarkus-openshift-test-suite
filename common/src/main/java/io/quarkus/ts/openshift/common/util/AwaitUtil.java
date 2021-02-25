@@ -59,7 +59,7 @@ public final class AwaitUtil {
     public void awaitReadiness(List<HasMetadata> resources) {
         resources.stream()
                 .filter(Objects::nonNull)
-                .filter(ReadinessUtil::isReadinessApplicable)
+                .filter(it -> ReadinessUtil.isReadinessApplicable(it.getClass()))
                 .forEach(it -> {
                     System.out.println(ansi().a("waiting for ").a(readableKind(it.getKind())).a(" ")
                             .fgYellow().a(it.getMetadata().getName()).reset().a(" to become ready"));
