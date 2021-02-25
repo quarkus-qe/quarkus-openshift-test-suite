@@ -5,6 +5,7 @@ import io.fabric8.kubernetes.client.Handlers;
 import io.fabric8.kubernetes.client.ResourceHandler;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.quarkus.ts.openshift.app.metadata.AppMetadata;
+import io.quarkus.ts.openshift.common.DefaultTimeout;
 import io.quarkus.ts.openshift.common.OpenShiftTestException;
 
 import java.util.Arrays;
@@ -28,7 +29,7 @@ public final class AwaitUtil {
 
     public void awaitImageStream(String imageStream) {
         System.out.println(ansi().a("waiting for image stream ").fgYellow().a(imageStream).reset().a(" to populate"));
-        await().atMost(5, TimeUnit.MINUTES).until(imageStreamHasTags(oc, imageStream));
+        await().atMost(DefaultTimeout.getMinutes(), TimeUnit.MINUTES).until(imageStreamHasTags(oc, imageStream));
     }
 
     private static Callable<Boolean> imageStreamHasTags(OpenShiftClient oc, String imageStream) {
@@ -45,7 +46,7 @@ public final class AwaitUtil {
 
         System.out.println(ansi().a("waiting for route ").fgYellow().a(metadata.appName).reset()
                 .a(" to start responding at ").fgYellow().a(metadata.knownEndpoint).reset());
-        await().ignoreExceptions().atMost(5, TimeUnit.MINUTES).untilAsserted(() -> {
+        await().ignoreExceptions().atMost(DefaultTimeout.getMinutes(), TimeUnit.MINUTES).untilAsserted(() -> {
             given()
                     // known endpoint is already httpRoot-adjusted
                     .basePath("/")
@@ -64,7 +65,7 @@ public final class AwaitUtil {
                     System.out.println(ansi().a("waiting for ").a(readableKind(it.getKind())).a(" ")
                             .fgYellow().a(it.getMetadata().getName()).reset().a(" to become ready"));
                     await().pollInterval(1, TimeUnit.SECONDS)
-                           .atMost(5, TimeUnit.MINUTES)
+                           .atMost(DefaultTimeout.getMinutes(), TimeUnit.MINUTES)
                            .until(() -> {
                         HasMetadata current = oc.resource(it).fromServer().get();
                         if (current == null) {
