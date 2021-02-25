@@ -388,6 +388,64 @@ When a test fails, the test suite will copy the pod logs in order to troubleshoo
 
 Go to the [Security](security/README.md) guide for further details about how to configure the OpenShift suite with security enabled.
 
+### Default timeout
+
+When the test framework needs to await something, such as deployment readiness, it uses a default timeout of 10 minutes.
+If you want to change that value, you can use `-Dts.default-timeout` to override the default value.
+The unit is minutes, so e.g. `-Dts.default-timeout=5` means default timeout of 5 minutes.
+
+### Custom Maven Repository for S2I
+
+OpenShift provides an S2I (Source-to-Image) process to build applications directly using the source code. By default, OpenShift will build the application's source code using the RedHat maven repository `https://maven.repository.redhat.com/ga/`. However, our applications might require some dependencies from other remote Maven repositories. In order to allow us to add another remote Maven repository, you can use `-Dts.s2i.maven.remote.repository=http://host:port/repo/name`.
+
+Then, we need to instruct our OpenShiftTest to load the Maven settings using:
+
+```java
+@OpenShiftTest
+@AdditionalResources("classpath:deployments/maven/s2i-maven-settings.yaml")
+@AdditionalResources("classpath:myApp.yaml")
+public class MyAppIT {
+   // ...
+}
+```
+
+The above code snippet will load the Maven settings and the `myApp.yaml` must contain the S2I build including the configMap `settings-mvn` and the `MAVEN_ARGS` to overwrite the `settigs.xml` file:
+
+```
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: myApp
+spec:
+  output:
+    to:
+      kind: ImageStreamTag
+      name: myapp:latest
+  source:
+    git:
+      uri: https://github.com/repo/name.git
+    type: Git
+    configMaps:
+    - configMap:
+        name: settings-mvn
+      destinationDir: "configuration"
+  strategy:
+    type: Source
+    sourceStrategy:
+      env:
+      - name: ARTIFACT_COPY_ARGS
+        value: -p -r lib/ *-runner.jar
+      - name: MAVEN_ARGS
+        value: -s /opt/app-root/src/configuration/settings.xml
+      from:
+        kind: ImageStreamTag
+        name: openjdk-11:latest
+  triggers:
+  - type: ConfigChange
+  - type: ImageChange
+    imageChange: {}
+```
+
 ### TODO
 
 There's a lot of possible improvements that haven't been implemented yet.
