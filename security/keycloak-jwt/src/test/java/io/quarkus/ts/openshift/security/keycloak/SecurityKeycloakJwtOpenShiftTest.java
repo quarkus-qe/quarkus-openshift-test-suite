@@ -6,8 +6,8 @@ import io.quarkus.ts.openshift.common.resources.KeycloakQuarkusTestResource;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @QuarkusTest
-@QuarkusTestResource(KeycloakQuarkusTestResource.WithOidcConfig.class)
-public class SecurityKeycloakOpenShiftTest extends AbstractSecurityKeycloakOpenShiftTest {
+@QuarkusTestResource(KeycloakQuarkusTestResource.WithOidcAndTokenIssuerConfig.class)
+public class SecurityKeycloakJwtOpenShiftTest extends AbstractSecurityKeycloakOpenShiftTest {
 
     @ConfigProperty(name = "quarkus.oidc.auth-server-url")
     String oidcAuthServerUrl;
