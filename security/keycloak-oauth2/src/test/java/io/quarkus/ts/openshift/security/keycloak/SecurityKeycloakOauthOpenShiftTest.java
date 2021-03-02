@@ -6,11 +6,11 @@ import io.quarkus.ts.openshift.common.resources.KeycloakQuarkusTestResource;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @QuarkusTest
-@QuarkusTestResource(KeycloakQuarkusTestResource.WithOidcAndTokenIssuerConfig.class)
-public class SecurityKeycloakOpenShiftTest extends AbstractSecurityKeycloakOpenShiftTest {
+@QuarkusTestResource(KeycloakQuarkusTestResource.WithOAuth2Config.class)
+public class SecurityKeycloakOauthOpenShiftTest extends AbstractSecurityKeycloakOpenShiftTest {
 
-    @ConfigProperty(name = "quarkus.oidc.auth-server-url")
-    String oidcAuthServerUrl;
+    @ConfigProperty(name = "quarkus.oauth2.introspection-url")
+    String oauth2IntrospectionUrl;
 
     @ConfigProperty(name = "quarkus.http.test-port")
     Integer appPort;
@@ -21,7 +21,7 @@ public class SecurityKeycloakOpenShiftTest extends AbstractSecurityKeycloakOpenS
     }
 
     @Override
-    protected String getAuthServerUrl() {
-        return oidcAuthServerUrl;
+    protected String getOAuth2IntrospectionUrl() {
+        return oauth2IntrospectionUrl;
     }
 }

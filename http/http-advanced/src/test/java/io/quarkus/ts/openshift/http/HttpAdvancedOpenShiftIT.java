@@ -22,7 +22,7 @@ import java.util.List;
 @AdditionalResources("classpath:deployments/keycloak/version-73.yaml")
 @AdditionalResources("classpath:keycloak-realm.yaml")
 @AdditionalResources("classpath:deployments/keycloak/deployment.yaml")
-public class HttpOpenShiftIT extends AbstractHttpTest {
+public class HttpAdvancedOpenShiftIT extends AbstractHttpTest {
     static String keycloakUrl;
 
     @CustomizeApplicationDeployment
