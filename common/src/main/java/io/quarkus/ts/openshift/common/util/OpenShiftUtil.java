@@ -81,7 +81,7 @@ public final class OpenShiftUtil {
             // but that's only available since OpenShift 3.5
             List<Pod> pods = listPodsForDeploymentConfig(deploymentConfigName);
             try {
-                return pods.size() == expectedReplicas && pods.stream().allMatch(ReadinessUtil::isPodReady);
+                return pods.size() == expectedReplicas && pods.stream().allMatch(ReadinessUtil::isReady);
             } catch (IllegalStateException e) {
                 return false;
                 // the 'Ready' condition can be missing sometimes, in which case Readiness.isPodReady throws an exception
@@ -95,7 +95,7 @@ public final class OpenShiftUtil {
 
         int number = 0;
         for (Pod pod : pods) {
-            if (ReadinessUtil.isPodReady(pod)) {
+            if (ReadinessUtil.isReady(pod)) {
                 number++;
             }
         }
