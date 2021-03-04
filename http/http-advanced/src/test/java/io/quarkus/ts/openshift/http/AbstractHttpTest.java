@@ -74,7 +74,7 @@ public abstract class AbstractHttpTest {
     @DisplayName("Http/2 Server test")
     public void http2Server() throws InterruptedException, URISyntaxException {
         CountDownLatch done = new CountDownLatch(1);
-        Uni<JsonObject> content = WebClient.create(Vertx.vertx(), defaultVertxHttpClientOptions()).getAbs(getAppEndpoint() + "/hello")
+        Uni<JsonObject> content = WebClient.create(Vertx.vertx(), defaultVertxHttpClientOptions()).getAbs(getAppEndpoint() + "hello")
                 .expect(ResponsePredicate.create(AbstractHttpTest::isHttp2x))
                 .expect(ResponsePredicate.status(Response.Status.OK.getStatusCode()))
                 .send().map(HttpResponse::bodyAsJsonObject)
@@ -161,7 +161,7 @@ public abstract class AbstractHttpTest {
     @Test
     public void vertxHttpClientRedirection() throws InterruptedException, URISyntaxException {
         CountDownLatch done = new CountDownLatch(1);
-        Uni<Integer> statusCode = WebClient.create(Vertx.vertx(), defaultVertxHttpClientOptions()).getAbs(getAppEndpoint() + "/health")
+        Uni<Integer> statusCode = WebClient.create(Vertx.vertx(), defaultVertxHttpClientOptions()).getAbs(getAppEndpoint() + "health")
                 .send().map(HttpResponse::statusCode)
                 .ifNoItem().after(Duration.ofSeconds(TIMEOUT_SEC)).fail()
                 .onFailure().retry().atMost(RETRY);
