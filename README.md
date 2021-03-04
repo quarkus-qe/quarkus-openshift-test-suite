@@ -452,6 +452,7 @@ There are actually multiple Maven modules in the `sql-db` directory:
 - `mysql`: same for MysQL
 - `mariadb`: same for MariaDB
 - `mssql`: same for MSSQL
+- `multiple-pus`: An application with two persistence units defined in `application.properties`.
 
 All the tests deploy a SQL database directly into OpenShift, alongside the application.
 This might not be recommended for production, but is good enough for test.
