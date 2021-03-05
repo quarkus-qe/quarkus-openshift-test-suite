@@ -3,6 +3,7 @@ package io.quarkus.ts.openshift.common.deploy;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.quarkus.ts.openshift.common.Command;
 import io.quarkus.ts.openshift.common.injection.TestResource;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -13,6 +14,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -36,13 +38,13 @@ public class UsingQuarkusPluginDeploymentStrategy implements DeploymentStrategy 
     private static final String QUARKUS_KUBERNETES_CLIENT_NAMESPACE = "quarkus.kubernetes-client.namespace";
     private static final String QUARKUS_KUBERNETES_CLIENT_TRUST_CERTS = "quarkus.kubernetes-client.trust-certs";
     private static final String QUARKUS_CONTAINER_IMAGE_GROUP = "quarkus.container-image.group";
-    private static final String QUARKUS_NATIVE_BUILDER_IMAGE = "quarkus.native.builder-image";
     private static final String QUARKUS_NATIVE_CONTAINER_RUNTIME = "quarkus.native.container-runtime";
     private static final String QUARKUS_NATIVE_MEMORY_LIMIT = "quarkus.native.native-image-xmx";
     private static final String QUARKUS_PACKAGE_TYPE = "quarkus.package.type";
     private static final String QUARKUS_OPENSHIFT_ENV_VARS = "quarkus.openshift.env.vars.";
-    private static final String QUARKUS_PLATFORM_GROUP_ID = "quarkus.platform.group-id";
-    private static final String QUARKUS_PLATFORM_ARTIFACT_ID = "quarkus.platform.artifact-id";
+
+    private static final String QUARKUS_PROPERTY_PREFIX = "quarkus.";
+
     private static final String OC_IGNORE_IF_NOT_FOUND = "--ignore-not-found=true";
 
     private static final String NATIVE = "native";
@@ -63,7 +65,7 @@ public class UsingQuarkusPluginDeploymentStrategy implements DeploymentStrategy 
         args.add(withKubernetesClientTrustCerts());
         args.add(withContainerImageGroup(namespace));
         withQuarkusVersions(args);
-        withQuarkusBom(args);
+        withQuarkusProperties(args);
         withMavenRepositoryLocalIfSet(args);
         withNativeBuildArgumentsIfNative(args);
         withEnvVars(args, envVars);
@@ -106,11 +108,6 @@ public class UsingQuarkusPluginDeploymentStrategy implements DeploymentStrategy 
                     System.getProperty(QUARKUS_NATIVE_CONTAINER_RUNTIME, DOCKER)));
             args.add(withProperty(QUARKUS_NATIVE_MEMORY_LIMIT,
                     System.getProperty(QUARKUS_NATIVE_MEMORY_LIMIT, DEFAULT_NATIVE_MEMORY_LIMIT)));
-
-            String nativeBuilderImage = System.getProperty(QUARKUS_NATIVE_BUILDER_IMAGE);
-            if (nativeBuilderImage != null) {
-                args.add(withProperty(QUARKUS_NATIVE_BUILDER_IMAGE, nativeBuilderImage));
-            }
         }
     }
 
@@ -121,16 +118,14 @@ public class UsingQuarkusPluginDeploymentStrategy implements DeploymentStrategy 
         }
     }
 
-    private void withQuarkusBom(List<String> args) {
-        String groupId = System.getProperty(QUARKUS_PLATFORM_GROUP_ID);
-        if (groupId != null) {
-            args.add(withProperty(QUARKUS_PLATFORM_GROUP_ID, groupId));
-        }
-
-        String artifactId = System.getProperty(QUARKUS_PLATFORM_ARTIFACT_ID);
-        if (artifactId != null) {
-            args.add(withProperty(QUARKUS_PLATFORM_ARTIFACT_ID, artifactId));
-        }
+    private void withQuarkusProperties(List<String> args) {
+        System.getProperties().entrySet().stream()
+                .filter(isQuarkusProperty().and(propertyValueIsNotEmpty()))
+                .forEach(property -> {
+                    String key = (String) property.getKey();
+                    String value = (String) property.getValue();
+                    args.add(withProperty(key, value));
+                });
     }
 
     private static final String withContainerImageGroup(String namespace) {
@@ -145,7 +140,7 @@ public class UsingQuarkusPluginDeploymentStrategy implements DeploymentStrategy 
         return withProperty(QUARKUS_KUBERNETES_CLIENT_TRUST_CERTS, Boolean.TRUE.toString());
     }
 
-    private void withEnvVars(List<String> args, Map<String, String> envVars) {
+    private static final void withEnvVars(List<String> args, Map<String, String> envVars) {
         for (Entry<String, String> envVar : envVars.entrySet()) {
             args.add(withProperty(QUARKUS_OPENSHIFT_ENV_VARS + envVar.getKey(), envVar.getValue()));
         }
@@ -153,6 +148,14 @@ public class UsingQuarkusPluginDeploymentStrategy implements DeploymentStrategy 
 
     private static final String withProperty(String property, String value) {
         return String.format("-D%s=%s", property, value);
+    }
+
+    private static final Predicate<Entry<Object, Object>> propertyValueIsNotEmpty() {
+        return property -> StringUtils.isNotEmpty((String) property.getValue());
+    }
+
+    private static final Predicate<Entry<Object, Object>> isQuarkusProperty() {
+        return property -> StringUtils.startsWith((String) property.getKey(), QUARKUS_PROPERTY_PREFIX);
     }
 
 }
