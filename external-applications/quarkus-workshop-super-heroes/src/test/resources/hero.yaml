@@ -32,7 +32,7 @@ items:
       sourceStrategy:
         env:
         - name: ARTIFACT_COPY_ARGS
-          value: -p -r lib/ *-runner.jar
+          value: -p -r quarkus-app/*
         - name: MAVEN_ARGS
           value: -s /opt/app-root/src/configuration/settings.xml -Dquarkus-plugin.version=${version.plugin.quarkus} -Dquarkus.platform.version=${version.quarkus} -Dquarkus.platform.group-id=${quarkus.platform.group-id} -Dquarkus.platform.artifact-id=${quarkus.platform.artifact-id} -DskipTests=true
         from:
@@ -61,7 +61,7 @@ items:
           image: quarkus-workshop-hero:latest
           env:
           - name: ARTIFACT_COPY_ARGS
-            value: -p -r lib/ *-runner.jar
+            value: -p -r lib/ *
           - name: QUARKUS_DATASOURCE_JDBC_URL
             value: jdbc:postgresql://heroes-database:5432/heroes-database
           - name: QUARKUS_HTTP_PORT

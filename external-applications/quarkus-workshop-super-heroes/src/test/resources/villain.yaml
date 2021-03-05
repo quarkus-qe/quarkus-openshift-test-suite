@@ -32,7 +32,7 @@ items:
         sourceStrategy:
           env:
             - name: ARTIFACT_COPY_ARGS
-              value: -p -r lib/ *-runner.jar
+              value: -p -r quarkus-app/*
             - name: MAVEN_ARGS
               value: -s /opt/app-root/src/configuration/settings.xml -Dquarkus.version=${version.plugin.quarkus} -DskipTests=true
           from:
@@ -61,7 +61,7 @@ items:
               image: quarkus-workshop-villain:latest
               env:
                 - name: ARTIFACT_COPY_ARGS
-                  value: -p -r lib/ *-runner.jar
+                  value: -p -r lib/*
                 - name: QUARKUS_DATASOURCE_JDBC_URL
                   value: jdbc:postgresql://villains-database:5432/villains-database
                 - name: QUARKUS_HTTP_PORT
