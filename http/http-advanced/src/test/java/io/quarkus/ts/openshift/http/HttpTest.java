@@ -13,6 +13,6 @@ public class HttpTest extends AbstractHttpTest {
 
     @Override
     protected String getAppEndpoint() {
-        return String.format("https://localhost:%d/api", appPort);
+        return String.format("https://localhost:%d/api/", appPort);
     }
 }
