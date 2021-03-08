@@ -104,7 +104,7 @@ public class ScalingOpenShiftIT {
     }
 
     private void whenScaleTo(int amount) {
-        openShiftUtil.scale(DC_NAME, amount, READINESS_TIMEOUT_MIN, TimeUnit.MINUTES);
+        openShiftUtil.scale(DC_NAME, amount, READINESS_TIMEOUT_MIN);
     }
 
     private void thenCheckReplicasAmount(int expectedAmount) {

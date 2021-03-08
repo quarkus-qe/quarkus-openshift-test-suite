@@ -5,6 +5,7 @@ import io.fabric8.kubernetes.client.dsl.ExecListener;
 import io.fabric8.kubernetes.client.dsl.ExecWatch;
 import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.client.OpenShiftClient;
+import io.quarkus.ts.openshift.common.DefaultTimeout;
 import io.quarkus.ts.openshift.common.OpenShiftTestException;
 import okhttp3.Response;
 
@@ -22,7 +23,6 @@ import static org.awaitility.Awaitility.await;
 import static org.fusesource.jansi.Ansi.ansi;
 
 public final class OpenShiftUtil {
-    private static final long DEFAULT_READINESS_TIMEOUT_MIN = 5;
     private final OpenShiftClient oc;
     private final AwaitUtil await;
 
@@ -48,10 +48,10 @@ public final class OpenShiftUtil {
     }
 
     public void scale(String deploymentConfigName, int replicas) {
-        scale(deploymentConfigName, replicas, DEFAULT_READINESS_TIMEOUT_MIN, TimeUnit.MINUTES);
+        scale(deploymentConfigName, replicas, DefaultTimeout.getMinutes());
     }
 
-    public void scale(String deploymentConfigName, int replicas, long timeout, TimeUnit unit) {
+    public void scale(String deploymentConfigName, int replicas, long timeout) {
         System.out.println(ansi().a("scaling ").fgYellow().a(deploymentConfigName).reset()
                 .a(" to ").fgYellow().a(replicas).reset().a(" replica(s)"));
 
@@ -60,7 +60,7 @@ public final class OpenShiftUtil {
                 .withName(deploymentConfigName)
                 .scale(replicas);
 
-        awaitDeploymentReadiness(deploymentConfigName, replicas, timeout, unit);
+        awaitDeploymentReadiness(deploymentConfigName, replicas, timeout);
     }
 
     public void deployLatest(String deploymentConfigName, boolean waitForAllReplicas) {
@@ -70,13 +70,13 @@ public final class OpenShiftUtil {
                 .deployLatest(waitForAllReplicas);
     }
 
-    public void awaitDeploymentReadiness(String deploymentConfigName, int expectedReplicas, long timeout, TimeUnit unit) {
+    public void awaitDeploymentReadiness(String deploymentConfigName, int expectedReplicas, long timeout) {
         String waitingReadinessMsg = ansi().a("waiting for ").fgYellow().a(deploymentConfigName).reset()
                 .a(" to have exactly ").fgYellow().a(expectedReplicas).reset().a(" ready replica(s)").toString();
 
         System.out.println(waitingReadinessMsg);
 
-        await().pollInterval(Duration.ofSeconds(1)).atMost(timeout, unit).until(() -> {
+        await().pollInterval(Duration.ofSeconds(1)).atMost(timeout, TimeUnit.MINUTES).until(() -> {
             // ideally, we'd look at deployment config's status.availableReplicas field,
             // but that's only available since OpenShift 3.5
             List<Pod> pods = listPodsForDeploymentConfig(deploymentConfigName);
