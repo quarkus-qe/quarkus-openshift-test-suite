@@ -79,7 +79,7 @@
         <version.maven-compiler-plugin>3.8.1</version.maven-compiler-plugin>
         <version.maven-jar-plugin>3.2.0</version.maven-jar-plugin>
         <version.maven-surefire-plugin>2.22.2</version.maven-surefire-plugin>
-        <version.quarkus>1.11.5.Final</version.quarkus>
+        <version.quarkus>1.12.0.Final</version.quarkus>
         <version.plugin.quarkus>${version.quarkus}</version.plugin.quarkus>
         <version.testcontainers>1.15.2</version.testcontainers>
     </properties>
@@ -297,7 +297,7 @@
             <properties>
                 <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
                 <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
-                <version.qpid-jms>0.22.0</version.qpid-jms>
+                <version.qpid-jms>0.23.0</version.qpid-jms>
                 <version.quarkus>999-SNAPSHOT</version.quarkus>
             </properties>
             <dependencyManagement>
@@ -322,7 +322,9 @@
 
             <properties>
                 <quarkus.package.type>native</quarkus.package.type>
-                <quarkus.native.builder-image>quay.io/quarkus/ubi-quarkus-mandrel:20.3-java11</quarkus.native.builder-image>
+                <!-- TODO: Can't use `ubi-quarkus-mandrel` image due to https://github.com/graalvm/mandrel/issues/218 -->
+                <!-- <quarkus.native.builder-image>quay.io/quarkus/ubi-quarkus-mandrel:20.1.0.1.Final-java11</quarkus.native.builder-image> -->
+                <quarkus.native.builder-image>quay.io/quarkus/ubi-quarkus-native-image:21.0-java11</quarkus.native.builder-image>
                 <quarkus.s2i.base-jvm-image>quay.io/quarkus/ubi-quarkus-native-binary-s2i:1.0</quarkus.s2i.base-jvm-image>
                 <quarkus.native.native-image-xmx>3g</quarkus.native.native-image-xmx>
             </properties>

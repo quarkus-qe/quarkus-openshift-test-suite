@@ -58,7 +58,7 @@ public class EmbeddedDeploymentStrategy implements DeploymentStrategy {
             new Command("oc", "start-build", appMetadata.appName, "--from-file=" + binary.get(), "--follow")
                     .runAndWait();
         } else {
-            new Command("oc", "start-build", appMetadata.appName, "--from-dir=target", "--follow").runAndWait();
+            new Command("oc", "start-build", appMetadata.appName, "--from-dir=target/quarkus-app", "--follow").runAndWait();
         }
     }
 

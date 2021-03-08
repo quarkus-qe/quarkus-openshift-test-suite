@@ -34,7 +34,7 @@ items:
         - name: ARTIFACT_COPY_ARGS
           value: -p -r lib/ *-runner.jar
         - name: MAVEN_ARGS
-          value: -s /configuration/settings.xml -Dquarkus-plugin.version=${version.plugin.quarkus} -Dquarkus.platform.version=${version.quarkus} -Dquarkus.platform.group-id=${quarkus.platform.group-id} -Dquarkus.platform.artifact-id=${quarkus.platform.artifact-id} -DskipTests=true
+          value: -s /configuration/settings.xml -Dquarkus.package.type=uber-jar -Dquarkus-plugin.version=${version.plugin.quarkus} -Dquarkus.platform.version=${version.quarkus} -Dquarkus.platform.group-id=${quarkus.platform.group-id} -Dquarkus.platform.artifact-id=${quarkus.platform.artifact-id} -DskipTests=true
         from:
           kind: ImageStreamTag
           name: openjdk-11:latest
@@ -60,8 +60,6 @@ items:
         - name: quarkus-workshop-hero
           image: quarkus-workshop-hero:latest
           env:
-          - name: ARTIFACT_COPY_ARGS
-            value: -p -r lib/ *-runner.jar
           - name: QUARKUS_DATASOURCE_JDBC_URL
             value: jdbc:postgresql://heroes-database:5432/heroes-database
           - name: QUARKUS_HTTP_PORT
