@@ -127,11 +127,10 @@ public abstract class AbstractHttpTest {
     @Test
     @DisplayName("Non-application endpoint move to /q/")
     public void nonAppRedirections() {
-        //TODO QUARKUS-752: swagger-ui (quarkus.swagger-ui.always-include) is not supported by Native mode.
         List<String> endpoints = Arrays.asList(
                 "/openapi", "/metrics/base", "/metrics/application",
                 "/metrics/vendor", "/metrics", "/health/group", "/health/well", "/health/ready",
-                "/health/live", "/health"
+                "/health/live", "/health", "/swagger-ui"
         );
 
         for (String endpoint : endpoints) {
