@@ -15,6 +15,7 @@ import io.vertx.mutiny.ext.web.client.HttpResponse;
 import io.vertx.mutiny.ext.web.client.WebClient;
 import io.vertx.mutiny.ext.web.client.predicate.ResponsePredicate;
 import io.vertx.mutiny.ext.web.client.predicate.ResponsePredicateResult;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -176,7 +177,7 @@ public abstract class AbstractHttpTest {
     }
 
     protected String getAppEndpoint() {
-        return appEndpoint.toString();
+        return StringUtils.appendIfMissing(appEndpoint.toString(), "/");
     }
 
     private static ResponsePredicateResult isHttp2x(HttpResponse<Void> resp) {
