@@ -428,7 +428,7 @@ spec:
     configMaps:
     - configMap:
         name: settings-mvn
-      destinationDir: "configuration"
+      destinationDir: "/configuration"
   strategy:
     type: Source
     sourceStrategy:
@@ -436,7 +436,7 @@ spec:
       - name: ARTIFACT_COPY_ARGS
         value: -p -r lib/ *-runner.jar
       - name: MAVEN_ARGS
-        value: -s /opt/app-root/src/configuration/settings.xml
+        value: -s /configuration/settings.xml
       from:
         kind: ImageStreamTag
         name: openjdk-11:latest
