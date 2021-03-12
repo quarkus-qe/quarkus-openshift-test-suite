@@ -5,5 +5,5 @@ import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
 @QuarkusTestResource(ArtemisTestResource.class)
-public class ArtemisTest extends AbstractArtemisTest {
+public class ArtemisJtaTest extends AbstractArtemisTest {
 }

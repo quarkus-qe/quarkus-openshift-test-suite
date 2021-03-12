@@ -7,7 +7,7 @@ import org.eclipse.microprofile.config.ConfigProvider;
 
 @QuarkusTest
 @QuarkusTestResource(KeycloakQuarkusTestResource.WithOidcConfig.class)
-public class HttpTest extends AbstractHttpTest {
+public class HttpAdvancedTest extends AbstractHttpTest {
 
     private static final int appPort = ConfigProvider.getConfig().getValue("quarkus.http.test-ssl-port", Integer.class);
 
