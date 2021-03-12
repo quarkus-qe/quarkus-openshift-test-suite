@@ -32,7 +32,7 @@ items:
         sourceStrategy:
           env:
             - name: ARTIFACT_COPY_ARGS
-              value: -p -r lib/ *-runner.jar
+              value: -p -r *-runner.jar
             - name: MAVEN_ARGS
               value: -s /configuration/settings.xml -Dquarkus.package.type=uber-jar -Dquarkus.version=${version.plugin.quarkus} -DskipTests=true
           from:
