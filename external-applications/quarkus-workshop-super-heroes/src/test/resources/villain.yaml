@@ -32,9 +32,9 @@ items:
         sourceStrategy:
           env:
             - name: ARTIFACT_COPY_ARGS
-              value: -p -r lib/ *-runner.jar
+              value: -p -r *-runner.jar
             - name: MAVEN_ARGS
-              value: -s /configuration/settings.xml -Dquarkus.version=${version.plugin.quarkus} -DskipTests=true
+              value: -s /configuration/settings.xml -Dquarkus.package.type=uber-jar -Dquarkus.version=${version.plugin.quarkus} -DskipTests=true
           from:
             kind: ImageStreamTag
             name: openjdk-11:latest
@@ -60,8 +60,6 @@ items:
             - name: quarkus-workshop-villain
               image: quarkus-workshop-villain:latest
               env:
-                - name: ARTIFACT_COPY_ARGS
-                  value: -p -r lib/ *-runner.jar
                 - name: QUARKUS_DATASOURCE_JDBC_URL
                   value: jdbc:postgresql://villains-database:5432/villains-database
                 - name: QUARKUS_HTTP_PORT
