@@ -70,7 +70,7 @@
         <version.quarkiverse.apicurio.registry.client>0.0.1</version.quarkiverse.apicurio.registry.client>
         <version.strimzi>0.20.1</version.strimzi>
         <version.apache-httpclient-fluent>4.5.12</version.apache-httpclient-fluent> <!-- same as Apache HTTP Client managed by Quarkus BOM -->
-        <version.fusesource-jansi>2.3.1</version.fusesource-jansi>
+        <version.fusesource-jansi>2.3.2</version.fusesource-jansi>
         <version.impsort-maven-plugin>1.6.0</version.impsort-maven-plugin>
         <version.jandex-maven-plugin>1.0.8</version.jandex-maven-plugin>
         <version.jjwt>0.11.2</version.jjwt>
