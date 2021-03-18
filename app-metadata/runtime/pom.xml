@@ -28,6 +28,7 @@
             <plugin>
                 <groupId>io.quarkus</groupId>
                 <artifactId>quarkus-bootstrap-maven-plugin</artifactId>
+                <version>${version.plugin.quarkus}</version>
                 <executions>
                     <execution>
                         <goals>
