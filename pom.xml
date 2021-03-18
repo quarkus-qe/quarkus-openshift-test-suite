@@ -34,6 +34,7 @@
         <module>sql-db/mysql</module>
         <module>sql-db/mariadb</module>
         <module>sql-db/mssql</module>
+        <module>sql-db/multiple-pus</module>
         <module>security/basic</module>
         <module>security/jwt</module>
         <module>security/keycloak</module>
