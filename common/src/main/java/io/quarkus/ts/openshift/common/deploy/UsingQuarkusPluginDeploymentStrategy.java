@@ -25,6 +25,7 @@ import java.util.stream.Stream;
  */
 public class UsingQuarkusPluginDeploymentStrategy implements DeploymentStrategy {
 
+    private static final String BUILD_STRATEGY = "quarkus.openshift.build-strategy";
     private static final String MVN_COMMAND = "mvn";
     private static final String PACKAGE_GOAL = "package";
     private static final String VERSION_PLATFORM_QUARKUS = "version.quarkus";
@@ -64,6 +65,7 @@ public class UsingQuarkusPluginDeploymentStrategy implements DeploymentStrategy 
         args.add(withKubernetesClientNamespace(namespace));
         args.add(withKubernetesClientTrustCerts());
         args.add(withContainerImageGroup(namespace));
+        withBuildStrategy(args);
         withQuarkusVersions(args);
         withQuarkusProperties(args);
         withMavenRepositoryLocalIfSet(args);
@@ -111,6 +113,10 @@ public class UsingQuarkusPluginDeploymentStrategy implements DeploymentStrategy 
         }
     }
 
+    protected void withBuildStrategy(List<String> args) {
+
+    }
+
     private void withMavenRepositoryLocalIfSet(List<String> args) {
         String mvnRepositoryPath = System.getProperty(MVN_REPOSITORY_LOCAL);
         if (mvnRepositoryPath != null) {
@@ -156,6 +162,15 @@ public class UsingQuarkusPluginDeploymentStrategy implements DeploymentStrategy 
 
     private static final Predicate<Entry<Object, Object>> isQuarkusProperty() {
         return property -> StringUtils.startsWith((String) property.getKey(), QUARKUS_PROPERTY_PREFIX);
+    }
+    
+    public static class UsingDockerStrategy extends UsingQuarkusPluginDeploymentStrategy {
+
+        @Override
+        protected void withBuildStrategy(List<String> args) {
+            args.add(withProperty(BUILD_STRATEGY, "docker"));
+        }
+
     }
 
 }
