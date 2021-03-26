@@ -4,6 +4,7 @@ import io.quarkus.ts.openshift.common.AdditionalResources;
 import io.quarkus.ts.openshift.common.CustomAppMetadata;
 import io.quarkus.ts.openshift.common.OnlyIfConfigured;
 import io.quarkus.ts.openshift.common.OpenShiftTest;
+import io.quarkus.ts.openshift.common.ParallelAdditionalResourcesEnabled;
 import io.quarkus.ts.openshift.common.deploy.ManualDeploymentStrategy;
 import io.quarkus.ts.openshift.common.injection.TestResource;
 import org.junit.jupiter.api.MethodOrderer;
@@ -33,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @AdditionalResources("classpath:hero.yaml")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @OnlyIfConfigured("ts.authenticated-registry")
+@ParallelAdditionalResourcesEnabled
 public class HeroesOpenShiftIT {
 
     @TestResource
