@@ -15,8 +15,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 
-import static org.fusesource.jansi.Ansi.ansi;
-
 final class AdditionalResourcesDeployed implements CloseableResource {
 
     private final String url;
@@ -36,7 +34,10 @@ final class AdditionalResourcesDeployed implements CloseableResource {
         Path tempFile = copyResourceIntoTempFile(url);
         ImageOverrides.apply(tempFile, oc);
 
-        System.out.println(ansi().a("deploying ").fgYellow().a(url).reset());
+        // TODO: Workaround for issue: https://github.com/quarkusio/quarkus/issues/15953
+        // System.out.println(ansi().a("deploying ").fgYellow().a(url).reset());
+        System.out.println("deploying " + url);
+
         new Command("oc", "apply", "-f", tempFile.toString()).runAndWait();
 
         List<HasMetadata> deployedResources = oc.load(Files.newInputStream(tempFile)).get();
@@ -68,7 +69,9 @@ final class AdditionalResourcesDeployed implements CloseableResource {
             return;
         }
 
-        System.out.println(ansi().a("undeploying ").fgYellow().a(url).reset());
+        // TODO: Workaround for issue: https://github.com/quarkusio/quarkus/issues/15953
+        // System.out.println(ansi().a("undeploying ").fgYellow().a(url).reset());
+        System.out.println("undeploying " + url);
         new Command("oc", "delete", "-f", file.toString(), "--ignore-not-found").runAndWait();
         Files.delete(file);
     }

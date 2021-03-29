@@ -47,7 +47,6 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import static org.fusesource.jansi.Ansi.ansi;
 import static org.junit.platform.commons.util.AnnotationUtils.findAnnotatedFields;
 
 // TODO at this point, this class is close to becoming unreadable, and could use some refactoring.
@@ -175,7 +174,9 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
             EphemeralNamespace namespace = EphemeralNamespace.newWithRandomName();
             getStore(context).put(EphemeralNamespace.class.getName(), namespace);
 
-            System.out.println(ansi().a("using ephemeral namespace ").fgYellow().a(namespace.name).reset());
+            // TODO: Workaround for issue: https://github.com/quarkusio/quarkus/issues/15953
+            // System.out.println(ansi().a("using ephemeral namespace ").fgYellow().a(namespace.name).reset());
+            System.out.println("using ephemeral namespace " + namespace.name);
             new Command("oc", "new-project", namespace.name).runAndWait();
         }
     }
@@ -208,7 +209,9 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
         AppMetadata metadata = getAppMetadata(context);
 
         if (metadata.deploymentTarget.isEmpty() || !metadata.deploymentTarget.contains("knative")) {
-            System.out.println(ansi().a("using ").fgYellow().a("OpenShiftClient").reset().a(" to get the route"));
+            // TODO: Workaround for issue: https://github.com/quarkusio/quarkus/issues/15953
+            // System.out.println(ansi().a("using ").fgYellow().a("OpenShiftClient").reset().a(" to get the route"));
+            System.out.println("using OpenShiftClient to get the route");
 
             Route route = oc.routes().withName(metadata.appName).get();
             if (route == null) {
@@ -221,7 +224,9 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
                 RestAssured.baseURI = "http://" + route.getSpec().getHost();
             }
         } else {
-            System.out.println(ansi().a("using ").fgYellow().a("KnativeClient").reset().a(" to get the route"));
+            // TODO: Workaround for issue: https://github.com/quarkusio/quarkus/issues/15953
+            // System.out.println(ansi().a("using ").fgYellow().a("KnativeClient").reset().a(" to get the route"));
+            System.out.println("using KnativeClient to get the route");
 
             KnativeClient kn = oc.adapt(KnativeClient.class);
             io.fabric8.knative.serving.v1.Route knRoute = kn.routes().withName(metadata.appName).get();
@@ -239,8 +244,9 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
 
         if (testsFailed) {
             System.out.println("---------- OpenShiftTest failure ----------");
-            System.out.println(ansi().a("test ").fgYellow().a(context.getDisplayName()).reset()
-                    .a(" failed, showing current namespace status"));
+            // TODO: Workaround for issue: https://github.com/quarkusio/quarkus/issues/15953
+            // System.out.println(ansi().a("test ").fgYellow().a(context.getDisplayName()).reset().a(" failed, showing current namespace status"));
+            System.out.println("test " + context.getDisplayName() + " failed, showing current namespace status");
 
             onFailureActions.forEach(action -> this.runOnFailureAction(context, action));
         }
@@ -264,11 +270,16 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
         TestsStatus status = getTestsStatus(context);
         if (ephemeralNamespace != null) {
             if (RetainOnFailure.isEnabled() && status.failed) {
-                System.out.println(ansi().a("test ").fgYellow().a(context.getDisplayName()).reset()
-                        .a(" failed, keeping ephemeral namespace ").fgYellow().a(ephemeralNamespace.name).reset()
-                        .a(" intact"));
+                // TODO: Workaround for issue: https://github.com/quarkusio/quarkus/issues/15953
+                // System.out.println(ansi().a("test ").fgYellow().a(context.getDisplayName()).reset()
+                //       .a(" failed, keeping ephemeral namespace ").fgYellow().a(ephemeralNamespace.name).reset()
+                //       .a(" intact"));
+                System.out.println("test " + context.getDisplayName() + " failed, keeping ephemeral namespace "
+                        + ephemeralNamespace.name + " intact");
             } else {
-                System.out.println(ansi().a("dropping ephemeral namespace ").fgYellow().a(ephemeralNamespace.name).reset());
+                // TODO: Workaround for issue: https://github.com/quarkusio/quarkus/issues/15953
+                // System.out.println(ansi().a("dropping ephemeral namespace ").fgYellow().a(ephemeralNamespace.name).reset());
+                System.out.println("dropping ephemeral namespace " + ephemeralNamespace.name);
                 new Command("oc", "delete", "project", ephemeralNamespace.name).runAndWait();
             }
         }
@@ -306,9 +317,12 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
 
     @Override
     public void beforeEach(ExtensionContext context) {
-        System.out.println(ansi().a("---------- running test ")
-                .fgYellow().a(context.getParent().map(ctx -> ctx.getDisplayName() + ".").orElse(""))
-                .a(context.getDisplayName()).reset().a(" ----------"));
+        // TODO: Workaround for issue: https://github.com/quarkusio/quarkus/issues/15953
+        // System.out.println(ansi().a("---------- running test ")
+        //        .fgYellow().a(context.getParent().map(ctx -> ctx.getDisplayName() + ".").orElse(""))
+        //        .a(context.getDisplayName()).reset().a(" ----------"));
+        System.out.println("---------- running test " + context.getParent().map(ctx -> ctx.getDisplayName() + ".").orElse("")
+                + context.getDisplayName() + " ----------");
     }
 
     // ---
@@ -420,7 +434,9 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
             injectDependencies(action, context);
             action.execute();
         } catch (Exception ex) {
-            System.out.println(ansi().a("Error running post failure action. Caused by: " + ex).reset());
+            // TODO: Workaround for issue: https://github.com/quarkusio/quarkus/issues/15953
+            // System.out.println(ansi().a("Error running post failure action. Caused by: " + ex).reset());
+            System.out.println("Error running post failure action. Caused by: " + ex);
         }
     }
 

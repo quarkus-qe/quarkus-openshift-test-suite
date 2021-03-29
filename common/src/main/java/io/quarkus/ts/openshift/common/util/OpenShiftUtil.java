@@ -20,7 +20,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static org.awaitility.Awaitility.await;
-import static org.fusesource.jansi.Ansi.ansi;
 
 public final class OpenShiftUtil {
     private final OpenShiftClient oc;
@@ -52,8 +51,10 @@ public final class OpenShiftUtil {
     }
 
     public void scale(String deploymentConfigName, int replicas, long timeout) {
-        System.out.println(ansi().a("scaling ").fgYellow().a(deploymentConfigName).reset()
-                .a(" to ").fgYellow().a(replicas).reset().a(" replica(s)"));
+        // TODO: Workaround for issue: https://github.com/quarkusio/quarkus/issues/15953
+        // System.out.println(ansi().a("scaling ").fgYellow().a(deploymentConfigName).reset()
+        //        .a(" to ").fgYellow().a(replicas).reset().a(" replica(s)"));
+        System.out.println("scaling " + deploymentConfigName + " to " + replicas + " replica(s)");
 
         oc.deploymentConfigs()
                 .inNamespace(oc.getNamespace())
@@ -71,8 +72,11 @@ public final class OpenShiftUtil {
     }
 
     public void awaitDeploymentReadiness(String deploymentConfigName, int expectedReplicas, long timeout) {
-        String waitingReadinessMsg = ansi().a("waiting for ").fgYellow().a(deploymentConfigName).reset()
-                .a(" to have exactly ").fgYellow().a(expectedReplicas).reset().a(" ready replica(s)").toString();
+        // TODO: Workaround for issue: https://github.com/quarkusio/quarkus/issues/15953
+        // String waitingReadinessMsg = ansi().a("waiting for ").fgYellow().a(deploymentConfigName).reset()
+        //        .a(" to have exactly ").fgYellow().a(expectedReplicas).reset().a(" ready replica(s)").toString();
+        String waitingReadinessMsg = "waiting for " + deploymentConfigName + " to have exactly " + expectedReplicas
+                + " ready replica(s)";
 
         System.out.println(waitingReadinessMsg);
 
@@ -103,7 +107,9 @@ public final class OpenShiftUtil {
     }
 
     public void rolloutChanges(String deploymentConfigName) {
-        System.out.println(ansi().a("rolling out ").fgYellow().a(deploymentConfigName).reset());
+        // TODO: Workaround for issue: https://github.com/quarkusio/quarkus/issues/15953
+        // System.out.println(ansi().a("rolling out ").fgYellow().a(deploymentConfigName).reset());
+        System.out.println("rolling out " + deploymentConfigName);
 
         int replicas = countReadyReplicas(deploymentConfigName);
 

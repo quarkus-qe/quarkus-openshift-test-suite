@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 import static io.restassured.RestAssured.given;
 import static org.awaitility.Awaitility.await;
-import static org.fusesource.jansi.Ansi.ansi;
 
 public final class AwaitUtil {
     private final OpenShiftClient oc;
@@ -28,7 +27,9 @@ public final class AwaitUtil {
     }
 
     public void awaitImageStream(String imageStream) {
-        System.out.println(ansi().a("waiting for image stream ").fgYellow().a(imageStream).reset().a(" to populate"));
+        // TODO: Workaround for issue: https://github.com/quarkusio/quarkus/issues/15953
+        // System.out.println(ansi().a("waiting for image stream ").fgYellow().a(imageStream).reset().a(" to populate"));
+        System.out.println("waiting for image stream " + imageStream + " to populate");
         await().atMost(DefaultTimeout.getMinutes(), TimeUnit.MINUTES).until(imageStreamHasTags(oc, imageStream));
     }
 
@@ -44,8 +45,10 @@ public final class AwaitUtil {
                 oc.apps().deployments().withName(metadata.appName).get()
         ));
 
-        System.out.println(ansi().a("waiting for route ").fgYellow().a(metadata.appName).reset()
-                .a(" to start responding at ").fgYellow().a(metadata.knownEndpoint).reset());
+        // TODO: Workaround for issue: https://github.com/quarkusio/quarkus/issues/15953
+        // System.out.println(ansi().a("waiting for route ").fgYellow().a(metadata.appName).reset()
+        //        .a(" to start responding at ").fgYellow().a(metadata.knownEndpoint).reset());
+        System.out.println("waiting for route " + metadata.appName + " to start responding at " + metadata.knownEndpoint);
         await().ignoreExceptions().atMost(DefaultTimeout.getMinutes(), TimeUnit.MINUTES).untilAsserted(() -> {
             given()
                     // known endpoint is already httpRoot-adjusted
@@ -62,8 +65,11 @@ public final class AwaitUtil {
                 .filter(Objects::nonNull)
                 .filter(it -> ReadinessUtil.isReadinessApplicable(it.getClass()))
                 .forEach(it -> {
-                    System.out.println(ansi().a("waiting for ").a(readableKind(it.getKind())).a(" ")
-                            .fgYellow().a(it.getMetadata().getName()).reset().a(" to become ready"));
+                    // TODO: Workaround for issue: https://github.com/quarkusio/quarkus/issues/15953
+                    // System.out.println(ansi().a("waiting for ").a(readableKind(it.getKind())).a(" ")
+                    //         .fgYellow().a(it.getMetadata().getName()).reset().a(" to become ready"));
+                    System.out.println("waiting for " + readableKind(it.getKind()) + " " + it.getMetadata().getName()
+                            + " to become ready");
                     await().pollInterval(1, TimeUnit.SECONDS)
                            .atMost(DefaultTimeout.getMinutes(), TimeUnit.MINUTES)
                            .until(() -> {

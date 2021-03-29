@@ -11,8 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-import static org.fusesource.jansi.Ansi.ansi;
-
 public class Command {
     private final String description;
     private final List<String> command;
@@ -46,7 +44,9 @@ public class Command {
     }
 
     public void runAndWait() throws IOException, InterruptedException {
-        System.out.println(ansi().a("running ").fgYellow().a(String.join(" ", command)).reset());
+        // TODO: Workaround for issue: https://github.com/quarkusio/quarkus/issues/15953
+        // System.out.println(ansi().a("running ").fgYellow().a(String.join(" ", command)).reset());
+        System.out.println("running " + String.join(" ", command));
         Process process = new ProcessBuilder()
                 .redirectErrorStream(true)
                 .command(command)
@@ -81,7 +81,9 @@ public class Command {
             try (BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
                 String line;
                 while ((line = reader.readLine()) != null) {
-                    System.out.println(ansi().fgCyan().a(description).reset().a("> ").a(line));
+                    // TODO: Workaround for issue: https://github.com/quarkusio/quarkus/issues/15953
+                    // System.out.println(ansi().fgCyan().a(description).reset().a("> ").a(line));
+                    System.out.println(description + "> " + line);
                 }
             } catch (IOException ignored) {
             }
