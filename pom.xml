@@ -65,6 +65,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
+        <quarkus.grpc.clients.hello.port>9000</quarkus.grpc.clients.hello.port>
         <quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
         <version.apicurio.registry.utils.serde>1.3.2.Final</version.apicurio.registry.utils.serde>
@@ -201,6 +202,7 @@
                     <configuration>
                         <systemProperties>
                             <java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+                            <quarkus.grpc.clients.hello.port>${quarkus.grpc.clients.hello.port}</quarkus.grpc.clients.hello.port>
                         </systemProperties>
                     </configuration>
                 </plugin>
@@ -219,6 +221,7 @@
                     <configuration>
                         <systemPropertyVariables>
                             <quarkus.package.type>${quarkus.package.type}</quarkus.package.type>
+                            <quarkus.grpc.clients.hello.port>${quarkus.grpc.clients.hello.port}</quarkus.grpc.clients.hello.port>
                             <quarkus.native.builder-image>${quarkus.native.builder-image}</quarkus.native.builder-image>
                             <quarkus.s2i.base-jvm-image>${quarkus.s2i.base-jvm-image}</quarkus.s2i.base-jvm-image>
                         </systemPropertyVariables>
@@ -299,6 +302,7 @@
                 <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
                 <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
                 <version.qpid-jms>0.24.0</version.qpid-jms>
+                <quarkus.grpc.clients.hello.port>9001</quarkus.grpc.clients.hello.port>
                 <version.quarkus>999-SNAPSHOT</version.quarkus>
             </properties>
             <dependencyManagement>
