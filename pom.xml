@@ -80,7 +80,7 @@
         <version.maven-compiler-plugin>3.8.1</version.maven-compiler-plugin>
         <version.maven-jar-plugin>3.2.0</version.maven-jar-plugin>
         <version.maven-surefire-plugin>2.22.2</version.maven-surefire-plugin>
-        <version.quarkus>1.12.2.Final</version.quarkus>
+        <version.quarkus>1.13.1.Final</version.quarkus>
         <version.plugin.quarkus>${version.quarkus}</version.plugin.quarkus>
         <version.testcontainers>1.15.2</version.testcontainers>
     </properties>
