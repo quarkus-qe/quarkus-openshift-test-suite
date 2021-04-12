@@ -264,6 +264,8 @@ quarkus.my.property=${KEYCLOAK_HTTP_URL:default_value}
 
 Further information about usage of configuration in [here](https://quarkus.io/guides/config-reference#combine-property-env-var).
 
+**Note:** In case that you have several unrelated additional resources as Redis and postgres together in the same application, you can deploy those resources in parallel by adding `@ParallelAdditionalResourcesEnabled` annotation. Note that this label applies to all additional resources of this scenario.  
+
 ### Running tests in ephemeral namespaces
 
 By default, the test framework expects that the user is logged into an OpenShift project, and that project is used for all tests.
