@@ -37,6 +37,7 @@
         <module>sql-db/multiple-pus</module>
         <module>security/basic</module>
         <module>security/jwt</module>
+        <module>security/jwt-cookie</module>
         <module>security/keycloak</module>
         <module>security/keycloak-authz</module>
         <module>security/keycloak-webapp</module>
