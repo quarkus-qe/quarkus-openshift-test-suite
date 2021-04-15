@@ -565,6 +565,10 @@ Authentication is MicroProfile JWT, and tokens are issued manually in the test.
 Authorization is based on roles, which are embedded in the token.
 Restrictions are defined using common annotations (`@RolesAllowed` etc.).
 
+### `security/jwt-cookie`
+
+Same example as in `security/jwt` but setting the token into a Cookie instead of via HTTP headers.
+
 ### `security/keycloak`
 
 Verifies token-based authn and role-based authz.
