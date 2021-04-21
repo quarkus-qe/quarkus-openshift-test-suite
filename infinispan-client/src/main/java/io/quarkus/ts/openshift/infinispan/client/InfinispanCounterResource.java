@@ -29,7 +29,7 @@ public class InfinispanCounterResource {
     @Path("/get-client")
     @GET
     @Produces(MediaType.TEXT_PLAIN)
-    public int getClientCounter() {
+    public Integer getClientCounter() {
         return counter.get();
     }
 
@@ -37,9 +37,10 @@ public class InfinispanCounterResource {
     @PUT
     @Produces(MediaType.TEXT_PLAIN)
     public String incCounters() {
-        int invocationNumber = counter.incrementAndGet();
-        cache.put("counter", cache.get("counter") + 1);
-        return "Cache=" + cache.get("counter") + " Client=" + invocationNumber;
+        int invocationClientNumber = counter.incrementAndGet();
+        int invocationCacheNumber = cache.get("counter") + 1;
+        cache.put("counter", invocationCacheNumber);
+        return "Cache=" + invocationCacheNumber + " Client=" + invocationClientNumber;
     }
 
     @Path("/reset-cache")

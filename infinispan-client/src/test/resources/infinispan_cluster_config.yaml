@@ -8,7 +8,9 @@ spec:
   service:
     type: Cache
   container:
-    memory: 1Gi
+    extraJvmOpts: "-XX:NativeMemoryTracking=summary"
+    cpu: "2000m"
+    memory: 2Gi
   security:
     endpointSecretName: connect-secret
     endpointEncryption:
