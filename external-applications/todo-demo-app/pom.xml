@@ -35,6 +35,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <systemPropertyVariables>
+                        <!-- Building external apps in OpenShift can be quite slow when downloading Maven dependencies -->
+                        <ts.default-timeout>20</ts.default-timeout>
+                    </systemPropertyVariables>
+                </configuration>
             </plugin>
         </plugins>
     </build>
