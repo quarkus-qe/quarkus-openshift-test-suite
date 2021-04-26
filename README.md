@@ -501,6 +501,10 @@ The Secret is exposed by mounting it into the container file system.
 Checks that the application can read configuration from a Secret.
 The Secret is obtained directly from the Kubernetes API server.
 
+### `lifecycle-application`
+
+Verifies lifecycle application features like `@QuarkusMain` and `@CommandLineArguments`.
+
 ### `sql-db`
 
 Verifies that the application can connect to a SQL database and persist data using Hibernate ORM with Panache.
