@@ -22,7 +22,7 @@ jobs:
         with:
           java-version: openjdk${{ matrix.java }}
       - name: Build with Maven
-        run: mvn -fae -V -B clean test -Dinclude.serverless -Dinclude.datagrid
+        run: mvn -fae -V -B -s .github/mvn-settings.xml clean test -Dinclude.serverless -Dinclude.datagrid
       - name: Zip Artifacts
         run: |
           zip -R artifacts-jvm${{ matrix.java }}.zip 'surefire-reports/*'
@@ -51,7 +51,7 @@ jobs:
           java-version: openjdk${{ matrix.java }}
       - name: Build with Maven
         run: |
-          mvn -fae -V -B clean install -DskipTests -DskipITs -pl 'app-metadata/deployment,app-metadata/runtime,common,http/http-minimum' -Dquarkus.profile=native -Dquarkus.native.container-runtime=docker
+          mvn -fae -V -B clean install -s .github/mvn-settings.xml -DskipTests -DskipITs -pl 'app-metadata/deployment,app-metadata/runtime,common,http/http-minimum' -Dquarkus.profile=native -Dquarkus.native.container-runtime=docker
   build-main:
     name: JVM build - Quarkus main
     runs-on: ubuntu-latest
@@ -74,7 +74,7 @@ jobs:
       - name: Build Quarkus main
         run: git clone https://github.com/quarkusio/quarkus.git && cd quarkus && mvn -B -s .github/mvn-settings.xml clean install -DskipTests -DskipITs -DskipDocs
       - name: Build with Maven
-        run: mvn -fae -V -B clean test -Dquarkus-core-only -Dinclude.serverless -Dinclude.datagrid
+        run: mvn -fae -V -B clean test -s .github/mvn-settings.xml -Dquarkus-core-only -Dinclude.serverless -Dinclude.datagrid
       - name: Zip Artifacts
         run: |
           zip -R artifacts-jvm${{ matrix.java }}.zip 'surefire-reports/*'
