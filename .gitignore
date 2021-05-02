@@ -28,6 +28,7 @@ nb-configuration.xml
 *.rej
 
 # Maven
+impsort-maven-cache.properties 
 target/
 pom.xml.tag
 pom.xml.releaseBackup
