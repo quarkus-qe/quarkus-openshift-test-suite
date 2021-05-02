@@ -22,7 +22,7 @@ jobs:
         with:
           java-version: openjdk${{ matrix.java }}
       - name: Build with Maven
-        run: mvn -fae -V -B -s .github/mvn-settings.xml clean test -Dinclude.serverless -Dinclude.datagrid
+        run: mvn -fae -V -B -s .github/mvn-settings.xml clean test -Dinclude.serverless -Dinclude.datagrid -Dvalidate-format
       - name: Zip Artifacts
         run: |
           zip -R artifacts-jvm${{ matrix.java }}.zip 'surefire-reports/*'

@@ -83,9 +83,15 @@
         <version.maven-compiler-plugin>3.8.1</version.maven-compiler-plugin>
         <version.maven-jar-plugin>3.2.0</version.maven-jar-plugin>
         <version.maven-surefire-plugin>2.22.2</version.maven-surefire-plugin>
-        <version.quarkus>1.13.3.Final</version.quarkus>
+        <version.quarkus>1.13.2.Final</version.quarkus>
         <version.plugin.quarkus>${version.quarkus}</version.plugin.quarkus>
         <version.testcontainers>1.15.3</version.testcontainers>
+        <version.formatter-maven-plugin>2.15.0</version.formatter-maven-plugin>
+        <version.impsort-maven-plugin>1.6.0</version.impsort-maven-plugin>
+        <version.xml-format-maven-plugin>3.1.2</version.xml-format-maven-plugin>
+        <src.format.goal>format</src.format.goal>
+        <src.sort.goal>sort</src.sort.goal>
+        <xml.format.goal>xml-format</xml.format.goal>
     </properties>
 
     <dependencyManagement>
@@ -173,6 +179,71 @@
     </dependencyManagement>
 
     <build>
+        <plugins>
+            <plugin>
+                <groupId>net.revelc.code.formatter</groupId>
+                <artifactId>formatter-maven-plugin</artifactId>
+                <version>${version.formatter-maven-plugin}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>${src.format.goal}</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <dependencies>
+                    <dependency>
+                        <artifactId>quarkus-ide-config</artifactId>
+                        <groupId>io.quarkus</groupId>
+                        <version>${version.quarkus}</version>
+                    </dependency>
+                </dependencies>
+                <configuration>
+                    <configFile>eclipse-format.xml</configFile>
+                    <lineEnding>LF</lineEnding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>net.revelc.code</groupId>
+                <artifactId>impsort-maven-plugin</artifactId>
+                <version>${version.impsort-maven-plugin}</version>
+                <configuration>
+                    <!-- store outside of target to speed up formatting when mvn clean is used -->
+                    <cachedir>.cache</cachedir>
+                    <groups>java.,javax.,org.,com.</groups>
+                    <staticGroups>*</staticGroups>
+                    <removeUnused>true</removeUnused>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>${src.sort.goal}</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>au.com.acegi</groupId>
+                <artifactId>xml-format-maven-plugin</artifactId>
+                <version>${version.xml-format-maven-plugin}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>${xml.format.goal}</goal>
+                        </goals>
+                        <configuration>
+                            <indentSize>4</indentSize>
+                            <excludes>
+                                <!-- Exclude files from target folder -->
+                                <exclude>**/target/**/*.xml</exclude>
+                                <!-- Exclude Quarkus main repository -->
+                                <exclude>**/quarkus/**/*.xml</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
         <pluginManagement>
             <plugins>
                 <plugin>
@@ -263,33 +334,26 @@
         <profile>
             <id>format</id>
             <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <src.format.goal>format</src.format.goal>
+                <src.sort.goal>sort</src.sort.goal>
+                <xml.format.goal>xml-format</xml.format.goal>
+            </properties>
+        </profile>
+        <profile>
+            <id>validate-format</id>
+            <activation>
                 <property>
-                    <name>!no-format</name>
+                    <name>validate-format</name>
                 </property>
             </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>net.revelc.code</groupId>
-                        <artifactId>impsort-maven-plugin</artifactId>
-                        <version>${version.impsort-maven-plugin}</version>
-                        <configuration>
-                            <groups>*,javax.,java.</groups>
-                            <staticGroups>*</staticGroups>
-                            <staticAfter>true</staticAfter>
-                            <removeUnused>true</removeUnused>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>sort-imports</id>
-                                <goals>
-                                    <goal>sort</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
+            <properties>
+                <src.format.goal>validate</src.format.goal>
+                <src.sort.goal>check</src.sort.goal>
+                <xml.format.goal>xml-check</xml.format.goal>
+            </properties>
         </profile>
         <profile>
             <id>quarkus-core-only</id>
