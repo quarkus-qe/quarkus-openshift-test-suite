@@ -1,8 +1,5 @@
 package io.quarkus.ts.openshift.http.clients;
 
-import org.apache.commons.lang3.StringUtils;
-import org.eclipse.microprofile.rest.client.RestClientBuilder;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,6 +8,9 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
+
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
 public class RestClientServiceBuilder<T> {
 

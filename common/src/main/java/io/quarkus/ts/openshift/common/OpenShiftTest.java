@@ -1,13 +1,14 @@
 package io.quarkus.ts.openshift.common;
 
-import io.quarkus.ts.openshift.common.deploy.DeploymentStrategy;
-import io.quarkus.ts.openshift.common.deploy.EmbeddedDeploymentStrategy;
-import org.junit.jupiter.api.extension.ExtendWith;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import org.junit.jupiter.api.extension.ExtendWith;
+
+import io.quarkus.ts.openshift.common.deploy.DeploymentStrategy;
+import io.quarkus.ts.openshift.common.deploy.EmbeddedDeploymentStrategy;
 
 /**
  * Marks the test class as OpenShift test.

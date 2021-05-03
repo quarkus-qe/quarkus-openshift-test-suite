@@ -1,22 +1,23 @@
 package io.quarkus.ts.openshift.infinispan.client;
 
-import io.quarkus.ts.openshift.common.AdditionalResources;
-import io.quarkus.ts.openshift.common.OnlyIfConfigured;
-import io.quarkus.ts.openshift.common.OpenShiftTest;
-import io.quarkus.ts.openshift.common.OpenShiftTestException;
-import io.quarkus.ts.openshift.common.deploy.UsingQuarkusPluginDeploymentStrategy;
+import static io.restassured.RestAssured.when;
+import static org.awaitility.Awaitility.await;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
-import static io.restassured.RestAssured.when;
-import static org.awaitility.Awaitility.await;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import io.quarkus.ts.openshift.common.AdditionalResources;
+import io.quarkus.ts.openshift.common.OnlyIfConfigured;
+import io.quarkus.ts.openshift.common.OpenShiftTest;
+import io.quarkus.ts.openshift.common.OpenShiftTestException;
+import io.quarkus.ts.openshift.common.deploy.UsingQuarkusPluginDeploymentStrategy;
 
 @OpenShiftTest(strategy = UsingQuarkusPluginDeploymentStrategy.class)
 @AdditionalResources("classpath:clientcert_secret.yaml")
@@ -141,7 +142,7 @@ public class InfinispanCountersOpenShiftIT extends AbstractInfinispanResourceTes
         await().atMost(5, TimeUnit.MINUTES).untilAsserted(() -> {
             when()
                     .get(appUrl + "/first-counter/get-cache")
-            .then()
+                    .then()
                     .statusCode(204);
         });
 
@@ -191,7 +192,8 @@ public class InfinispanCountersOpenShiftIT extends AbstractInfinispanResourceTes
     /**
      * Infinispan fail-over test. Test invoke a request on the Infinispan server which is currently down.
      * Because of our settings in the hotrod-client.properties file, the application is trying to connect only once and only 1s.
-     * By default, the app is trying to connect 60 s with 10 retries even when the next tests continue. It means that the counter
+     * By default, the app is trying to connect 60 s with 10 retries even when the next tests continue. It means that the
+     * counter
      * could be unexpectedly increased in one of the next tests
      *
      * Cache should be empty (status code 204).
@@ -241,7 +243,8 @@ public class InfinispanCountersOpenShiftIT extends AbstractInfinispanResourceTes
     public void testConnectSecondClient() throws OpenShiftTestException {
         resetCacheCounter(appUrl + "/first-counter/reset-cache");
 
-        String secondClientCache = getCounterValue(openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/get-cache");
+        String secondClientCache = getCounterValue(
+                openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/get-cache");
         assertEquals("0", secondClientCache);
     }
 
@@ -263,15 +266,18 @@ public class InfinispanCountersOpenShiftIT extends AbstractInfinispanResourceTes
 
         // fill the cache in first and second client
         incrementCountersOnValue(appUrl + "/first-counter/increment-counters", 10);
-        incrementCountersOnValue(openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/increment-counters", 10);
+        incrementCountersOnValue(
+                openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/increment-counters", 10);
 
         // save the cache counters in first and second client
         String firstClientCacheCounter = getCounterValue(appUrl + "/first-counter/get-cache");
-        String secondClientCacheCounter = getCounterValue(openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/get-cache");
+        String secondClientCacheCounter = getCounterValue(
+                openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/get-cache");
 
         // save the client counters in first and second client
         String firstClientAppCounter = getCounterValue(appUrl + "/first-counter/get-client");
-        String secondClientAppCounter = getCounterValue(openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/get-client");
+        String secondClientAppCounter = getCounterValue(
+                openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/get-client");
 
         assertEquals("10", firstClientAppCounter);
         assertEquals("10", secondClientAppCounter);
@@ -295,14 +301,16 @@ public class InfinispanCountersOpenShiftIT extends AbstractInfinispanResourceTes
      */
     @Test
     @Order(10)
-    public void testMultipleClientDataAfterRestartInfinispanCluster() throws IOException, InterruptedException, OpenShiftTestException {
+    public void testMultipleClientDataAfterRestartInfinispanCluster()
+            throws IOException, InterruptedException, OpenShiftTestException {
         resetCacheCounter(appUrl + "/first-counter/reset-cache");
         resetClientCounter(appUrl + "/first-counter/reset-client");
         resetClientCounter(openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/reset-client");
 
         // update the cache in both clients
         String firstClientCounters = fillTheCache(appUrl + "/first-counter/increment-counters");
-        String secondClientCounters = fillTheCache(openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/increment-counters");
+        String secondClientCounters = fillTheCache(
+                openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/increment-counters");
 
         assertEquals("Cache=1 Client=1", firstClientCounters);
         assertEquals("Cache=2 Client=1", secondClientCounters);
@@ -315,7 +323,8 @@ public class InfinispanCountersOpenShiftIT extends AbstractInfinispanResourceTes
 
         // increment counters by the first and second client
         firstClientCounters = fillTheCache(appUrl + "/first-counter/increment-counters");
-        secondClientCounters = fillTheCache(openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/increment-counters");
+        secondClientCounters = fillTheCache(
+                openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/increment-counters");
 
         assertEquals("Cache=1 Client=2", firstClientCounters);
         assertEquals("Cache=2 Client=2", secondClientCounters);

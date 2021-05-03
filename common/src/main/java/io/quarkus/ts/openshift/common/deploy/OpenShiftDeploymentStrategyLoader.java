@@ -1,7 +1,8 @@
 package io.quarkus.ts.openshift.common.deploy;
 
-import io.quarkus.ts.openshift.common.OpenShiftTest;
 import org.junit.jupiter.api.extension.ExtensionContext;
+
+import io.quarkus.ts.openshift.common.OpenShiftTest;
 
 public final class OpenShiftDeploymentStrategyLoader {
 

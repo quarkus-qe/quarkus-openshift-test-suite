@@ -1,11 +1,11 @@
 package io.quarkus.ts.openshift.security.keycloak;
 
-import io.quarkus.security.identity.SecurityIdentity;
-
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+
+import io.quarkus.security.identity.SecurityIdentity;
 
 @Path("/secured")
 public class SecuredResource {

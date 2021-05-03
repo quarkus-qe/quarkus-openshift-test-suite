@@ -1,8 +1,8 @@
 package io.quarkus.ts.openshift.common;
 
-import io.quarkus.ts.openshift.common.config.Config;
-
 import java.util.concurrent.ThreadLocalRandom;
+
+import io.quarkus.ts.openshift.common.config.Config;
 
 final class EphemeralNamespace {
     static final String CONFIG_KEY = "ts.use-ephemeral-namespaces";

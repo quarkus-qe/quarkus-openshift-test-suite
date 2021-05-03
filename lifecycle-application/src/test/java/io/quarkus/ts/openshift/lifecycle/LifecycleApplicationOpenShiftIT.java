@@ -1,11 +1,9 @@
 package io.quarkus.ts.openshift.lifecycle;
 
-import io.fabric8.kubernetes.api.model.PodList;
-import io.fabric8.openshift.client.OpenShiftClient;
-import io.quarkus.ts.openshift.common.OpenShiftTest;
-import io.quarkus.ts.openshift.common.injection.TestResource;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Test;
+import static io.restassured.RestAssured.when;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.BufferedReader;
 import java.io.StringReader;
@@ -14,10 +12,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static io.restassured.RestAssured.when;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Test;
+
+import io.fabric8.kubernetes.api.model.PodList;
+import io.fabric8.openshift.client.OpenShiftClient;
+import io.quarkus.ts.openshift.common.OpenShiftTest;
+import io.quarkus.ts.openshift.common.injection.TestResource;
 
 @OpenShiftTest
 public class LifecycleApplicationOpenShiftIT {

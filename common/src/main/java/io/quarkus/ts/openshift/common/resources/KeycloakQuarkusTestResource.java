@@ -1,15 +1,16 @@
 package io.quarkus.ts.openshift.common.resources;
 
-import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
-import org.testcontainers.containers.BindMode;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
-
 import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+
+import org.testcontainers.containers.BindMode;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
+
+import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 
 public class KeycloakQuarkusTestResource implements QuarkusTestResourceLifecycleManager {
 

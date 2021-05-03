@@ -1,34 +1,7 @@
 package io.quarkus.ts.openshift.common;
 
-import io.fabric8.knative.client.KnativeClient;
-import io.fabric8.openshift.api.model.Route;
-import io.fabric8.openshift.client.OpenShiftClient;
-import io.quarkus.ts.openshift.app.metadata.AppMetadata;
-import io.quarkus.ts.openshift.common.actions.OnOpenShiftFailureAction;
-import io.quarkus.ts.openshift.common.config.Config;
-import io.quarkus.ts.openshift.common.deploy.DeploymentStrategy;
-import io.quarkus.ts.openshift.common.deploy.OpenShiftDeploymentStrategyLoader;
-import io.quarkus.ts.openshift.common.injection.InjectionPoint;
-import io.quarkus.ts.openshift.common.injection.TestResource;
-import io.quarkus.ts.openshift.common.injection.WithName;
-import io.quarkus.ts.openshift.common.util.AwaitUtil;
-import io.quarkus.ts.openshift.common.util.OpenShiftUtil;
-import io.restassured.RestAssured;
-import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.fusesource.jansi.Ansi;
-import org.junit.jupiter.api.extension.AfterAllCallback;
-import org.junit.jupiter.api.extension.BeforeAllCallback;
-import org.junit.jupiter.api.extension.BeforeEachCallback;
-import org.junit.jupiter.api.extension.ExtensionContext;
-import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
-import org.junit.jupiter.api.extension.ExtensionContext.Store;
-import org.junit.jupiter.api.extension.LifecycleMethodExecutionExceptionHandler;
-import org.junit.jupiter.api.extension.ParameterContext;
-import org.junit.jupiter.api.extension.ParameterResolutionException;
-import org.junit.jupiter.api.extension.ParameterResolver;
-import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
-import org.junit.jupiter.api.extension.TestInstancePostProcessor;
+import static org.fusesource.jansi.Ansi.ansi;
+import static org.junit.platform.commons.util.AnnotationUtils.findAnnotatedFields;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,8 +28,36 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
-import static org.fusesource.jansi.Ansi.ansi;
-import static org.junit.platform.commons.util.AnnotationUtils.findAnnotatedFields;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+import org.fusesource.jansi.Ansi;
+import org.junit.jupiter.api.extension.AfterAllCallback;
+import org.junit.jupiter.api.extension.BeforeAllCallback;
+import org.junit.jupiter.api.extension.BeforeEachCallback;
+import org.junit.jupiter.api.extension.ExtensionContext;
+import org.junit.jupiter.api.extension.ExtensionContext.Namespace;
+import org.junit.jupiter.api.extension.ExtensionContext.Store;
+import org.junit.jupiter.api.extension.LifecycleMethodExecutionExceptionHandler;
+import org.junit.jupiter.api.extension.ParameterContext;
+import org.junit.jupiter.api.extension.ParameterResolutionException;
+import org.junit.jupiter.api.extension.ParameterResolver;
+import org.junit.jupiter.api.extension.TestExecutionExceptionHandler;
+import org.junit.jupiter.api.extension.TestInstancePostProcessor;
+
+import io.fabric8.knative.client.KnativeClient;
+import io.fabric8.openshift.api.model.Route;
+import io.fabric8.openshift.client.OpenShiftClient;
+import io.quarkus.ts.openshift.app.metadata.AppMetadata;
+import io.quarkus.ts.openshift.common.actions.OnOpenShiftFailureAction;
+import io.quarkus.ts.openshift.common.config.Config;
+import io.quarkus.ts.openshift.common.deploy.DeploymentStrategy;
+import io.quarkus.ts.openshift.common.deploy.OpenShiftDeploymentStrategyLoader;
+import io.quarkus.ts.openshift.common.injection.InjectionPoint;
+import io.quarkus.ts.openshift.common.injection.TestResource;
+import io.quarkus.ts.openshift.common.injection.WithName;
+import io.quarkus.ts.openshift.common.util.AwaitUtil;
+import io.quarkus.ts.openshift.common.util.OpenShiftUtil;
+import io.restassured.RestAssured;
 
 // TODO at this point, this class is close to becoming unreadable, and could use some refactoring.
 // Raised https://github.com/quarkus-qe/quarkus-openshift-test-suite/issues/108 for the refactoring.
@@ -84,8 +85,8 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
 
     private OpenShiftClient getOpenShiftClient(ExtensionContext context) {
         return getStore(context)
-                .getOrComputeIfAbsent(OpenShiftClientResource.class.getName(), ignored -> OpenShiftClientResource.createDefault(), OpenShiftClientResource.class)
-                .client;
+                .getOrComputeIfAbsent(OpenShiftClientResource.class.getName(),
+                        ignored -> OpenShiftClientResource.createDefault(), OpenShiftClientResource.class).client;
     }
 
     private AppMetadata getAppMetadata(ExtensionContext context) {
@@ -96,8 +97,7 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
                             customAppMetadata.get().appName(),
                             customAppMetadata.get().httpRoot(),
                             customAppMetadata.get().knownEndpoint(),
-                            customAppMetadata.get().deploymentTarget()
-                    ), AppMetadata.class);
+                            customAppMetadata.get().deploymentTarget()), AppMetadata.class);
         }
 
         Path file = Paths.get("target", "app-metadata.properties");
@@ -116,7 +116,8 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
         OpenShiftClient oc = getOpenShiftClient(context);
         AwaitUtil await = getAwaitUtil(context);
         return getStore(context)
-                .getOrComputeIfAbsent(OpenShiftUtil.class.getName(), ignored -> new OpenShiftUtil(oc, await), OpenShiftUtil.class);
+                .getOrComputeIfAbsent(OpenShiftUtil.class.getName(), ignored -> new OpenShiftUtil(oc, await),
+                        OpenShiftUtil.class);
     }
 
     private void initTestsStatus(ExtensionContext context) {
@@ -195,7 +196,8 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
             AdditionalResources[] annotations = annotatedElement.getAnnotationsByType(AdditionalResources.class);
             boolean isParallelDeployment = isParallelDeploymentEnabled(annotatedElement);
             for (AdditionalResources additionalResources : annotations) {
-                Supplier<Pair<String, Boolean>> deployStatus = applyDeployment(context, testsStatus, oc, awaitUtil, additionalResources);
+                Supplier<Pair<String, Boolean>> deployStatus = applyDeployment(context, testsStatus, oc, awaitUtil,
+                        additionalResources);
                 if (isParallelDeployment) {
                     additionalResourceStatus.add(CompletableFuture.supplyAsync(() -> deployStatus.get()));
                 } else {
@@ -204,19 +206,22 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
             }
         }
         CompletableFuture[] additionalResources = additionalResourceStatus.toArray(new CompletableFuture[0]);
-        return CompletableFuture.allOf(additionalResources).thenAccept(next -> printResults(actionName, additionalResourceStatus));
+        return CompletableFuture.allOf(additionalResources)
+                .thenAccept(next -> printResults(actionName, additionalResourceStatus));
     }
 
-    private boolean isParallelDeploymentEnabled(AnnotatedElement annotatedElement){
+    private boolean isParallelDeploymentEnabled(AnnotatedElement annotatedElement) {
         return annotatedElement.getAnnotationsByType(ParallelAdditionalResourcesEnabled.class).length > 0;
     }
 
-    private Supplier<Pair<String, Boolean>> applyDeployment(ExtensionContext context, TestsStatus testsStatus, OpenShiftClient oc, AwaitUtil awaitUtil, AdditionalResources additionalResources) {
+    private Supplier<Pair<String, Boolean>> applyDeployment(ExtensionContext context, TestsStatus testsStatus,
+            OpenShiftClient oc, AwaitUtil awaitUtil, AdditionalResources additionalResources) {
         return () -> {
             String resourceUrl = additionalResources.value();
             Pair<String, Boolean> status = MutablePair.of(resourceUrl, true);
             try {
-                AdditionalResourcesDeployed deployed = AdditionalResourcesDeployed.deploy(additionalResources, testsStatus, oc, awaitUtil);
+                AdditionalResourcesDeployed deployed = AdditionalResourcesDeployed.deploy(additionalResources, testsStatus, oc,
+                        awaitUtil);
                 if (EphemeralNamespace.isDisabled()) {
                     // when using ephemeral namespaces, we don't delete additional resources because:
                     // - when an ephemeral namespace is dropped, everything is destroyed anyway
@@ -256,7 +261,8 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
 
             Route route = oc.routes().withName(metadata.appName).get();
             if (route == null) {
-                throw new OpenShiftTestException("Missing route " + metadata.appName + ", did you set quarkus.openshift.expose=true?");
+                throw new OpenShiftTestException(
+                        "Missing route " + metadata.appName + ", did you set quarkus.openshift.expose=true?");
             }
             if (route.getSpec().getTls() != null) {
                 RestAssured.useRelaxedHTTPSValidation();
@@ -304,7 +310,8 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
     }
 
     private void dropEphemeralNamespaceIfNecessary(ExtensionContext context) throws IOException, InterruptedException {
-        EphemeralNamespace ephemeralNamespace = getStore(context).get(EphemeralNamespace.class.getName(), EphemeralNamespace.class);
+        EphemeralNamespace ephemeralNamespace = getStore(context).get(EphemeralNamespace.class.getName(),
+                EphemeralNamespace.class);
         TestsStatus status = getTestsStatus(context);
         if (ephemeralNamespace != null) {
             if (RetainOnFailure.isEnabled() && status.failed) {
@@ -407,7 +414,7 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
             AppMetadata metadata = getAppMetadata(context);
             String routeName = metadata.appName;
             address = getBaseAddress(getOpenShiftClient(context).routes().withName(routeName).get());
-            if (metadata.httpRoot != null && metadata.httpRoot.length() > 1) {  // skip httpRoot "/" case
+            if (metadata.httpRoot != null && metadata.httpRoot.length() > 1) { // skip httpRoot "/" case
                 address = address + metadata.httpRoot;
             }
         }

@@ -1,7 +1,7 @@
 package io.quarkus.ts.openshift.messaging.qpid;
 
-import io.quarkus.runtime.ShutdownEvent;
-import io.quarkus.runtime.StartupEvent;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
@@ -13,8 +13,8 @@ import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import io.quarkus.runtime.ShutdownEvent;
+import io.quarkus.runtime.StartupEvent;
 
 /**
  * A bean consuming prices from the JMS queue.
@@ -48,7 +48,8 @@ public class PriceConsumer implements Runnable {
             JMSConsumer consumer = context.createConsumer(context.createQueue("prices"));
             while (true) {
                 Message message = consumer.receive();
-                if (message == null && (lastPrice != null || !lastPrice.isEmpty())) return;
+                if (message == null && (lastPrice != null || !lastPrice.isEmpty()))
+                    return;
                 lastPrice = message.getBody(String.class);
             }
         } catch (JMSException e) {

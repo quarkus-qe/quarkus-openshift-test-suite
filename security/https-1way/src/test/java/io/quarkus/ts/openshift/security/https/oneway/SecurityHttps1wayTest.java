@@ -1,7 +1,14 @@
 package io.quarkus.ts.openshift.security.https.oneway;
 
-import io.quarkus.test.common.http.TestHTTPResource;
-import io.quarkus.test.junit.QuarkusTest;
+import static io.quarkus.ts.openshift.common.util.HttpsAssertions.assertTlsHandshakeError;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.io.File;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
+import javax.net.ssl.SSLContext;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Request;
@@ -11,14 +18,8 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
 import org.junit.jupiter.api.Test;
 
-import javax.net.ssl.SSLContext;
-
-import java.io.File;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-
-import static io.quarkus.ts.openshift.common.util.HttpsAssertions.assertTlsHandshakeError;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import io.quarkus.test.common.http.TestHTTPResource;
+import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
 public class SecurityHttps1wayTest {

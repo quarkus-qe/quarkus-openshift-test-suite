@@ -1,11 +1,12 @@
 package io.quarkus.ts.openshift.messaging.kafka;
 
-import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
-import io.strimzi.StrimziKafkaContainer;
-import org.jboss.logging.Logger;
-
 import java.util.HashMap;
 import java.util.Map;
+
+import org.jboss.logging.Logger;
+
+import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
+import io.strimzi.StrimziKafkaContainer;
 
 public class StrimziKafkaResource implements QuarkusTestResourceLifecycleManager {
 

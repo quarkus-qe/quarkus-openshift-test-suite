@@ -1,6 +1,7 @@
 package io.quarkus.ts.openshift.lifecycle;
 
-import io.quarkus.runtime.annotations.CommandLineArguments;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -8,8 +9,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import io.quarkus.runtime.annotations.CommandLineArguments;
 
 @Path("/args")
 public class ArgsResource {

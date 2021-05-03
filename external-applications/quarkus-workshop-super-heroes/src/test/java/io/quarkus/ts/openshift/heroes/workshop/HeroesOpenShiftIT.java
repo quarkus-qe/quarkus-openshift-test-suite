@@ -1,19 +1,5 @@
 package io.quarkus.ts.openshift.heroes.workshop;
 
-import io.quarkus.ts.openshift.common.AdditionalResources;
-import io.quarkus.ts.openshift.common.CustomAppMetadata;
-import io.quarkus.ts.openshift.common.OnlyIfConfigured;
-import io.quarkus.ts.openshift.common.OpenShiftTest;
-import io.quarkus.ts.openshift.common.ParallelAdditionalResourcesEnabled;
-import io.quarkus.ts.openshift.common.deploy.ManualDeploymentStrategy;
-import io.quarkus.ts.openshift.common.injection.TestResource;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-
-import java.net.URL;
-
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static javax.ws.rs.core.HttpHeaders.ACCEPT;
@@ -25,6 +11,21 @@ import static javax.ws.rs.core.Response.Status.OK;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.net.URL;
+
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
+import io.quarkus.ts.openshift.common.AdditionalResources;
+import io.quarkus.ts.openshift.common.CustomAppMetadata;
+import io.quarkus.ts.openshift.common.OnlyIfConfigured;
+import io.quarkus.ts.openshift.common.OpenShiftTest;
+import io.quarkus.ts.openshift.common.ParallelAdditionalResourcesEnabled;
+import io.quarkus.ts.openshift.common.deploy.ManualDeploymentStrategy;
+import io.quarkus.ts.openshift.common.injection.TestResource;
 
 @OpenShiftTest(strategy = ManualDeploymentStrategy.class)
 @CustomAppMetadata(appName = "quarkus-workshop-hero", httpRoot = "/", knownEndpoint = "/")
@@ -56,46 +57,46 @@ public class HeroesOpenShiftIT {
     @Test
     public void testHello() {
         when()
-            .get(url + "/api/heroes/hello")
-        .then()
-            .statusCode(OK.getStatusCode())
-            .body(is("hello"));
+                .get(url + "/api/heroes/hello")
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body(is("hello"));
     }
 
     @Test
     public void testOpenApi() {
         given()
-            .header(ACCEPT, APPLICATION_JSON)
-            .when().get(url + "/openapi")
-            .then()
-            .statusCode(OK.getStatusCode());
+                .header(ACCEPT, APPLICATION_JSON)
+                .when().get(url + "/openapi")
+                .then()
+                .statusCode(OK.getStatusCode());
     }
 
     @Test
     public void testLiveness() {
         given()
-            .header(ACCEPT, APPLICATION_JSON)
-            .when().get(url + "/health/live")
-            .then()
-            .statusCode(OK.getStatusCode());
+                .header(ACCEPT, APPLICATION_JSON)
+                .when().get(url + "/health/live")
+                .then()
+                .statusCode(OK.getStatusCode());
     }
 
     @Test
     public void testReadiness() {
         given()
-            .header(ACCEPT, APPLICATION_JSON)
-            .when().get(url + "/health/ready")
-            .then()
-            .statusCode(OK.getStatusCode());
+                .header(ACCEPT, APPLICATION_JSON)
+                .when().get(url + "/health/ready")
+                .then()
+                .statusCode(OK.getStatusCode());
     }
 
     @Test
     public void testMetrics() {
         given()
-            .header(ACCEPT, APPLICATION_JSON)
-            .when().get(url + "/metrics/application")
-            .then()
-            .statusCode(OK.getStatusCode());
+                .header(ACCEPT, APPLICATION_JSON)
+                .when().get(url + "/metrics/application")
+                .then()
+                .statusCode(OK.getStatusCode());
     }
 
     @Test
@@ -109,32 +110,31 @@ public class HeroesOpenShiftIT {
         hero.powers = DEFAULT_POWERS;
 
         String location = given()
-            .body(hero)
-            .header(CONTENT_TYPE, APPLICATION_JSON)
-            .header(ACCEPT, APPLICATION_JSON)
-            .when()
-            .post(url + "/api/heroes")
-            .then()
-            .statusCode(CREATED.getStatusCode())
-            .extract().header("Location");
+                .body(hero)
+                .header(CONTENT_TYPE, APPLICATION_JSON)
+                .header(ACCEPT, APPLICATION_JSON)
+                .when()
+                .post(url + "/api/heroes")
+                .then()
+                .statusCode(CREATED.getStatusCode())
+                .extract().header("Location");
         assertTrue(location.contains("/api/heroes"));
-
 
         String[] segments = location.split("/");
         heroId = segments[segments.length - 1];
         assertNotNull(heroId);
 
         given()
-            .pathParam("id", heroId)
-            .when().get("/api/heroes/{id}")
-            .then()
-            .statusCode(OK.getStatusCode())
-            .header(CONTENT_TYPE, APPLICATION_JSON)
-            .body("name", is(DEFAULT_NAME))
-            .body("otherName", is(DEFAULT_OTHER_NAME))
-            .body("level", is(DEFAULT_LEVEL*3))
-            .body("picture", is(DEFAULT_PICTURE))
-            .body("powers", is(DEFAULT_POWERS));
+                .pathParam("id", heroId)
+                .when().get("/api/heroes/{id}")
+                .then()
+                .statusCode(OK.getStatusCode())
+                .header(CONTENT_TYPE, APPLICATION_JSON)
+                .body("name", is(DEFAULT_NAME))
+                .body("otherName", is(DEFAULT_OTHER_NAME))
+                .body("level", is(DEFAULT_LEVEL * 3))
+                .body("picture", is(DEFAULT_PICTURE))
+                .body("powers", is(DEFAULT_POWERS));
     }
 
     @Test
@@ -149,42 +149,42 @@ public class HeroesOpenShiftIT {
         hero.powers = UPDATED_POWERS;
 
         given()
-            .body(hero)
-            .header(CONTENT_TYPE, APPLICATION_JSON)
-            .header(ACCEPT, APPLICATION_JSON)
-            .when()
-            .put("/api/heroes")
-            .then()
-            .statusCode(OK.getStatusCode())
-            .header(CONTENT_TYPE, APPLICATION_JSON)
-            .body("name", is(UPDATED_NAME))
-            .body("otherName", is(UPDATED_OTHER_NAME))
-            .body("level", is(UPDATED_LEVEL))
-            .body("picture", is(UPDATED_PICTURE))
-            .body("powers", is(UPDATED_POWERS));
+                .body(hero)
+                .header(CONTENT_TYPE, APPLICATION_JSON)
+                .header(ACCEPT, APPLICATION_JSON)
+                .when()
+                .put("/api/heroes")
+                .then()
+                .statusCode(OK.getStatusCode())
+                .header(CONTENT_TYPE, APPLICATION_JSON)
+                .body("name", is(UPDATED_NAME))
+                .body("otherName", is(UPDATED_OTHER_NAME))
+                .body("level", is(UPDATED_LEVEL))
+                .body("picture", is(UPDATED_PICTURE))
+                .body("powers", is(UPDATED_POWERS));
     }
 
     @Test
     @Order(3)
     public void testDeleteHero() {
         given()
-            .pathParam("id", heroId)
-            .when().delete("/api/heroes/{id}")
-            .then()
-            .statusCode(NO_CONTENT.getStatusCode());
+                .pathParam("id", heroId)
+                .when().delete("/api/heroes/{id}")
+                .then()
+                .statusCode(NO_CONTENT.getStatusCode());
     }
 
     @Test
     @Order(4)
     public void testCalledOperationMetrics() {
         given()
-            .header(ACCEPT, APPLICATION_JSON)
-            .when().get(url + "/metrics/application")
-            .then()
-            .statusCode(OK.getStatusCode())
-            .body("'io.quarkus.workshop.superheroes.hero.HeroResource.countCreateHero'", is(1))
-            .body("'io.quarkus.workshop.superheroes.hero.HeroResource.countUpdateHero'", is(1))
-            .body("'io.quarkus.workshop.superheroes.hero.HeroResource.countDeleteHero'", is(1));
+                .header(ACCEPT, APPLICATION_JSON)
+                .when().get(url + "/metrics/application")
+                .then()
+                .statusCode(OK.getStatusCode())
+                .body("'io.quarkus.workshop.superheroes.hero.HeroResource.countCreateHero'", is(1))
+                .body("'io.quarkus.workshop.superheroes.hero.HeroResource.countUpdateHero'", is(1))
+                .body("'io.quarkus.workshop.superheroes.hero.HeroResource.countDeleteHero'", is(1));
     }
 
     static class Hero {

@@ -1,9 +1,10 @@
 package io.quarkus.ts.openshift.http;
 
+import org.eclipse.microprofile.config.ConfigProvider;
+
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.ts.openshift.common.resources.KeycloakQuarkusTestResource;
-import org.eclipse.microprofile.config.ConfigProvider;
 
 @QuarkusTest
 @QuarkusTestResource(KeycloakQuarkusTestResource.WithOidcConfig.class)

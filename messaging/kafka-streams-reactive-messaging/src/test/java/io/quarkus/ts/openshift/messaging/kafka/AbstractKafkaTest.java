@@ -1,17 +1,6 @@
 package io.quarkus.ts.openshift.messaging.kafka;
 
-import io.quarkus.ts.openshift.common.injection.TestResource;
-import io.quarkus.ts.openshift.messaging.kafka.aggregator.model.LoginAggregation;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.sse.SseEventSource;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URL;
 import java.util.List;
@@ -19,7 +8,19 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.sse.SseEventSource;
+
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
+import io.quarkus.ts.openshift.common.injection.TestResource;
+import io.quarkus.ts.openshift.messaging.kafka.aggregator.model.LoginAggregation;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public abstract class AbstractKafkaTest {
@@ -44,7 +45,7 @@ public abstract class AbstractKafkaTest {
     }
 
     protected void givenAnApplicationEndpoint(String endpoint) {
-       this.endpoint = endpoint;
+        this.endpoint = endpoint;
     }
 
     protected void whenRequestSomeEvents(int amount) throws InterruptedException {
@@ -62,7 +63,7 @@ public abstract class AbstractKafkaTest {
         source.close();
     }
 
-    protected void thenVerifyAllEventsArrived(){
+    protected void thenVerifyAllEventsArrived() {
         assertTrue(completed, "Not all expected kafka events has been consumed.");
     }
 

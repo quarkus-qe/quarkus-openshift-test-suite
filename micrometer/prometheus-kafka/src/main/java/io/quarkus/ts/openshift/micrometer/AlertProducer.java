@@ -1,11 +1,12 @@
 package io.quarkus.ts.openshift.micrometer;
 
-import io.smallrye.mutiny.Multi;
-import org.eclipse.microprofile.reactive.messaging.Outgoing;
+import java.time.Duration;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import java.time.Duration;
+import org.eclipse.microprofile.reactive.messaging.Outgoing;
+
+import io.smallrye.mutiny.Multi;
 
 @ApplicationScoped
 public class AlertProducer {

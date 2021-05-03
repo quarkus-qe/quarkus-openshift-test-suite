@@ -1,17 +1,17 @@
 package io.quarkus.ts.openshift.todo.demo.app;
 
+import static io.restassured.RestAssured.when;
+
+import java.net.URL;
+
+import org.apache.http.HttpStatus;
+import org.junit.jupiter.api.Test;
+
 import io.quarkus.ts.openshift.common.AdditionalResources;
 import io.quarkus.ts.openshift.common.CustomAppMetadata;
 import io.quarkus.ts.openshift.common.OpenShiftTest;
 import io.quarkus.ts.openshift.common.deploy.ManualDeploymentStrategy;
 import io.quarkus.ts.openshift.common.injection.TestResource;
-
-import org.apache.http.HttpStatus;
-import org.junit.jupiter.api.Test;
-
-import java.net.URL;
-
-import static io.restassured.RestAssured.when;
 
 @OpenShiftTest(strategy = ManualDeploymentStrategy.class)
 @CustomAppMetadata(appName = "quickstart-using-s2i", httpRoot = "/", knownEndpoint = "/")
@@ -25,7 +25,7 @@ public class QuickstartUsingS2iOpenShiftIT {
     public void verify() {
         when()
                 .get(url)
-        .then()
+                .then()
                 .statusCode(HttpStatus.SC_OK);
     }
 }

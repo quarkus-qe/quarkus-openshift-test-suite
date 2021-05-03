@@ -1,15 +1,15 @@
 package io.quarkus.ts.openshift.common.util;
 
-import org.junit.jupiter.api.function.Executable;
+import static org.junit.jupiter.api.Assertions.fail;
+
+import java.net.SocketException;
+import java.security.NoSuchAlgorithmException;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
 
-import java.net.SocketException;
-import java.security.NoSuchAlgorithmException;
-
-import static org.junit.jupiter.api.Assertions.fail;
+import org.junit.jupiter.api.function.Executable;
 
 public class HttpsAssertions {
     private HttpsAssertions() {

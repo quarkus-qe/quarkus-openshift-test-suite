@@ -1,9 +1,13 @@
 package io.quarkus.ts.openshift.messaging.kafka.aggregator.streams;
 
-import io.quarkus.kafka.client.serialization.JsonbSerde;
-import io.quarkus.ts.openshift.messaging.kafka.aggregator.model.LoginAggregation;
-import io.quarkus.ts.openshift.messaging.kafka.aggregator.model.LoginAttempt;
-import io.smallrye.reactive.messaging.annotations.Broadcast;
+import static javax.ws.rs.core.Response.Status.FORBIDDEN;
+import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
+
+import java.time.Duration;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Produces;
+
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -16,13 +20,10 @@ import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.eclipse.microprofile.reactive.messaging.Outgoing;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
-
-import java.time.Duration;
-
-import static javax.ws.rs.core.Response.Status.FORBIDDEN;
-import static javax.ws.rs.core.Response.Status.UNAUTHORIZED;
+import io.quarkus.kafka.client.serialization.JsonbSerde;
+import io.quarkus.ts.openshift.messaging.kafka.aggregator.model.LoginAggregation;
+import io.quarkus.ts.openshift.messaging.kafka.aggregator.model.LoginAttempt;
+import io.smallrye.reactive.messaging.annotations.Broadcast;
 
 @ApplicationScoped
 public class WindowedLoginDeniedStream {
@@ -54,7 +55,7 @@ public class WindowedLoginDeniedStream {
                                 .withValueSerde(loginAggregationSerde))
                 .toStream()
                 .filter((k, v) -> (v.getCode() == UNAUTHORIZED.getStatusCode() || v.getCode() == FORBIDDEN.getStatusCode()))
-                .filter((k,v) -> v.getCount() > threshold)
+                .filter((k, v) -> v.getCount() > threshold)
                 .to(LOGIN_DENIED_AGGREGATED_TOPIC);
 
         return builder.build();

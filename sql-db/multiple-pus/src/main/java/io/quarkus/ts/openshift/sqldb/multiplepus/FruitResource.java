@@ -1,8 +1,9 @@
 package io.quarkus.ts.openshift.sqldb.multiplepus;
 
-import io.quarkus.hibernate.orm.PersistenceUnit;
-import io.quarkus.panache.common.Sort;
-import io.quarkus.ts.openshift.sqldb.multiplepus.model.fruit.Fruit;
+import static javax.ws.rs.core.Response.Status.CREATED;
+import static javax.ws.rs.core.Response.Status.NO_CONTENT;
+
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
@@ -21,10 +22,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import java.util.List;
-
-import static javax.ws.rs.core.Response.Status.CREATED;
-import static javax.ws.rs.core.Response.Status.NO_CONTENT;
+import io.quarkus.hibernate.orm.PersistenceUnit;
+import io.quarkus.panache.common.Sort;
+import io.quarkus.ts.openshift.sqldb.multiplepus.model.fruit.Fruit;
 
 @Path("fruit")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -39,7 +39,7 @@ public class FruitResource {
     public List<Fruit> getAll() {
         return Fruit.listAll(Sort.by("name"));
     }
-    
+
     @GET
     @Path("/{id}")
     public Fruit get(@PathParam("id") Long id) {

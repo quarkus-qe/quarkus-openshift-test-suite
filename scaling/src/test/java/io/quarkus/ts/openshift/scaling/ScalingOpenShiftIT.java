@@ -1,17 +1,5 @@
 package io.quarkus.ts.openshift.scaling;
 
-import io.quarkus.ts.openshift.common.OpenShiftTest;
-import io.quarkus.ts.openshift.common.injection.TestResource;
-import io.quarkus.ts.openshift.common.util.OpenShiftUtil;
-import io.restassured.response.ValidatableResponse;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
-
-import java.time.Duration;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
 import static io.restassured.RestAssured.given;
 import static javax.ws.rs.core.Response.Status.OK;
 import static javax.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
@@ -19,6 +7,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 import static org.awaitility.Awaitility.with;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.time.Duration;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.ts.openshift.common.OpenShiftTest;
+import io.quarkus.ts.openshift.common.injection.TestResource;
+import io.quarkus.ts.openshift.common.util.OpenShiftUtil;
+import io.restassured.response.ValidatableResponse;
 
 @OpenShiftTest
 public class ScalingOpenShiftIT {
@@ -53,7 +54,6 @@ public class ScalingOpenShiftIT {
         whenMakeRequestTo("/scaling", REPLICAS);
     }
 
-
     /**
      * Workflow:
      * * Scale to two replicas and verify that both of the replicas are responding.
@@ -74,7 +74,6 @@ public class ScalingOpenShiftIT {
         thenCheckReplicasAmount(1);
         whenMakeRequestTo("/scaling", REPLICAS);
     }
-
 
     /**
      * Workflow:
@@ -121,7 +120,7 @@ public class ScalingOpenShiftIT {
                 });
     }
 
-    private ValidatableResponse makeHttpScalingRequest(String path, int expectedHttpStatus){
+    private ValidatableResponse makeHttpScalingRequest(String path, int expectedHttpStatus) {
         return given()
                 .when().get(path)
                 .then()

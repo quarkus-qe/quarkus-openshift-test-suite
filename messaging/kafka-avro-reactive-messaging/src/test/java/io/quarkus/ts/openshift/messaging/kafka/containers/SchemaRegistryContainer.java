@@ -1,15 +1,16 @@
 package io.quarkus.ts.openshift.messaging.kafka.containers;
 
-import io.strimzi.StrimziKafkaContainer;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.containers.Network;
+
+import io.strimzi.StrimziKafkaContainer;
 
 public class SchemaRegistryContainer extends GenericContainer<SchemaRegistryContainer> {
 
     private final int port;
 
     public SchemaRegistryContainer(final String image, final String version, final int port) {
-        super(image + ":"+ version);
+        super(image + ":" + version);
         this.port = port;
         withExposedPorts(port);
     }
@@ -18,7 +19,7 @@ public class SchemaRegistryContainer extends GenericContainer<SchemaRegistryCont
         return withStrimziKafka(kafka.getNetwork(), kafka.getNetworkAliases().get(0) + ":" + kPort);
     }
 
-    protected SchemaRegistryContainer withStrimziKafka(Network network,String bootstrapServers) {
+    protected SchemaRegistryContainer withStrimziKafka(Network network, String bootstrapServers) {
         withNetwork(network);
         withEnv("QUARKUS_PROFILE", "strimzi");
         withEnv("APPLICATION_ID", "registry_id");

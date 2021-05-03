@@ -11,4 +11,3 @@ public class Hello {
         return content;
     }
 }
-

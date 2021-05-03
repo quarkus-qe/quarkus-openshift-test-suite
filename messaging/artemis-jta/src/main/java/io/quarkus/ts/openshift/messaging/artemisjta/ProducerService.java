@@ -1,7 +1,5 @@
 package io.quarkus.ts.openshift.messaging.artemisjta;
 
-import org.jboss.logging.Logger;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.jms.ConnectionFactory;
@@ -9,6 +7,8 @@ import javax.jms.JMSContext;
 import javax.jms.JMSProducer;
 import javax.jms.Session;
 import javax.transaction.Transactional;
+
+import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public class ProducerService {

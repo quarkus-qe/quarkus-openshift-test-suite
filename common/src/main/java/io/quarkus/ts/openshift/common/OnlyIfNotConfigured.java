@@ -1,11 +1,11 @@
 package io.quarkus.ts.openshift.common;
 
-import org.junit.jupiter.api.extension.ExtendWith;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import org.junit.jupiter.api.extension.ExtendWith;
 
 /**
  * The {@code @OnlyIfNotConfigured} annotation can be used to selectively enable or disable certain tests

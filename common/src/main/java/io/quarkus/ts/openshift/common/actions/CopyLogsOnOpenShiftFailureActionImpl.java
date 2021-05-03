@@ -1,12 +1,12 @@
 package io.quarkus.ts.openshift.common.actions;
 
+import java.io.File;
+
 import io.fabric8.kubernetes.api.model.Pod;
 import io.quarkus.ts.openshift.common.Command;
 import io.quarkus.ts.openshift.common.config.Config;
 import io.quarkus.ts.openshift.common.injection.TestResource;
 import io.quarkus.ts.openshift.common.util.OpenShiftUtil;
-
-import java.io.File;
 
 public class CopyLogsOnOpenShiftFailureActionImpl implements OnOpenShiftFailureAction {
 

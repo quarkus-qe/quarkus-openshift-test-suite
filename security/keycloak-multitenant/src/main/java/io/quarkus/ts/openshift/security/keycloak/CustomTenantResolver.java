@@ -1,11 +1,11 @@
 package io.quarkus.ts.openshift.security.keycloak;
 
-import io.quarkus.oidc.TenantResolver;
-import io.vertx.ext.web.RoutingContext;
+import java.util.stream.Stream;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import java.util.stream.Stream;
+import io.quarkus.oidc.TenantResolver;
+import io.vertx.ext.web.RoutingContext;
 
 @ApplicationScoped
 public class CustomTenantResolver implements TenantResolver {

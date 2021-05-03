@@ -1,17 +1,17 @@
 package io.quarkus.ts.openshift.microprofile;
 
+import static io.restassured.RestAssured.when;
+import static org.awaitility.Awaitility.with;
+import static org.hamcrest.CoreMatchers.is;
+
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-
-import java.time.Duration;
-import java.util.concurrent.TimeUnit;
-
-import static io.restassured.RestAssured.when;
-import static org.awaitility.Awaitility.with;
-import static org.hamcrest.CoreMatchers.is;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public abstract class AbstractMicroProfileTest {
@@ -46,7 +46,7 @@ public abstract class AbstractMicroProfileTest {
                 .untilAsserted(() -> {
                     when()
                             .get("/client/fallback")
-                    .then()
+                            .then()
                             .log().body()
                             .log().status()
                             .statusCode(200)

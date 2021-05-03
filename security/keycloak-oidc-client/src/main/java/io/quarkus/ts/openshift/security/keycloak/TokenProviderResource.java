@@ -1,11 +1,11 @@
 package io.quarkus.ts.openshift.security.keycloak;
 
-import io.quarkus.oidc.client.OidcClient;
-import io.quarkus.oidc.client.OidcClients;
-
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+
+import io.quarkus.oidc.client.OidcClient;
+import io.quarkus.oidc.client.OidcClients;
 
 @Path("/generate-token")
 public class TokenProviderResource {

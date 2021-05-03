@@ -10,5 +10,5 @@ import io.quarkus.ts.openshift.common.ParallelAdditionalResourcesEnabled;
 @AdditionalResources("classpath:deployments/kafka/apicurio.yaml")
 @OnlyIfConfigured("ts.authenticated-registry")
 @ParallelAdditionalResourcesEnabled
-public class AmqStreamsOpenShiftIT extends AbstractKafkaTest{
+public class AmqStreamsOpenShiftIT extends AbstractKafkaTest {
 }

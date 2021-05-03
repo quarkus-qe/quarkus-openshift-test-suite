@@ -1,21 +1,21 @@
 package io.quarkus.ts.openshift.messaging.artemisjta;
 
-import org.jboss.logging.Logger;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.when;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static io.restassured.RestAssured.given;
-import static io.restassured.RestAssured.when;
-import static org.awaitility.Awaitility.await;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import org.jboss.logging.Logger;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 
 /**
  * Synopsis:
@@ -41,9 +41,9 @@ public abstract class AbstractArtemisTest {
         given()
                 .queryParam("fail", "false")
                 .body("666")
-        .when()
+                .when()
                 .post("/price-tx")
-        .then()
+                .then()
                 .statusCode(200);
 
         thenPriceOneIs("666");
@@ -60,9 +60,9 @@ public abstract class AbstractArtemisTest {
     public void testJTAPriceFail() {
         given().queryParam("fail", "true")
                 .body("999")
-        .when()
+                .when()
                 .post("/price-tx")
-        .then()
+                .then()
                 .statusCode(500);
 
         thenPriceOneIs("");
@@ -80,9 +80,9 @@ public abstract class AbstractArtemisTest {
         given()
                 .queryParam("fail", "true")
                 .body("69")
-        .when()
+                .when()
                 .post("/price-non-tx")
-        .then()
+                .then()
                 .statusCode(500);
 
         thenPriceOneIs("69");
@@ -109,9 +109,9 @@ public abstract class AbstractArtemisTest {
             actual.add(
                     given()
                             .queryParam("ack", ack)
-                    .when()
+                            .when()
                             .get("/noAck")
-                    .then()
+                            .then()
                             .statusCode(200)
                             .extract().body().asString());
         }

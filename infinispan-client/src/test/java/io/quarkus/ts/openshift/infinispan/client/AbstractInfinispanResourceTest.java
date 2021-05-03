@@ -1,19 +1,8 @@
 package io.quarkus.ts.openshift.infinispan.client;
 
-import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.api.model.KubernetesList;
-import io.fabric8.kubernetes.api.model.Service;
-import io.fabric8.kubernetes.client.utils.Serialization;
-import io.fabric8.openshift.api.model.DeploymentConfig;
-import io.fabric8.openshift.api.model.Route;
-import io.fabric8.openshift.client.OpenShiftClient;
-import io.quarkus.ts.openshift.app.metadata.AppMetadata;
-import io.quarkus.ts.openshift.common.Command;
-import io.quarkus.ts.openshift.common.CustomizeApplicationDeployment;
-import io.quarkus.ts.openshift.common.injection.TestResource;
-import io.quarkus.ts.openshift.common.util.AwaitUtil;
-import io.quarkus.ts.openshift.common.util.OpenShiftUtil;
-import org.junit.jupiter.api.AfterAll;
+import static io.restassured.RestAssured.when;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.CoreMatchers.is;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,9 +17,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static io.restassured.RestAssured.when;
-import static org.awaitility.Awaitility.await;
-import static org.hamcrest.CoreMatchers.is;
+import org.junit.jupiter.api.AfterAll;
+
+import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.kubernetes.api.model.KubernetesList;
+import io.fabric8.kubernetes.api.model.Service;
+import io.fabric8.kubernetes.client.utils.Serialization;
+import io.fabric8.openshift.api.model.DeploymentConfig;
+import io.fabric8.openshift.api.model.Route;
+import io.fabric8.openshift.client.OpenShiftClient;
+import io.quarkus.ts.openshift.app.metadata.AppMetadata;
+import io.quarkus.ts.openshift.common.Command;
+import io.quarkus.ts.openshift.common.CustomizeApplicationDeployment;
+import io.quarkus.ts.openshift.common.injection.TestResource;
+import io.quarkus.ts.openshift.common.util.AwaitUtil;
+import io.quarkus.ts.openshift.common.util.OpenShiftUtil;
 
 public abstract class AbstractInfinispanResourceTest {
     protected static final String ORIGIN_CLUSTER_NAME = "totally-random-infinispan-cluster-name";
@@ -80,7 +81,8 @@ public abstract class AbstractInfinispanResourceTest {
         new Command("oc", "apply", "-f", CLUSTER_CONFIGMAP_PATH).runAndWait();
         new Command("oc", "apply", "-f", CLUSTER_CONFIG_PATH).runAndWait();
 
-        new Command("oc", "-n", CLUSTER_NAMESPACE_NAME, "wait", "--for", "condition=wellFormed", "--timeout=300s", "infinispan/" + NEW_CLUSTER_NAME).runAndWait();
+        new Command("oc", "-n", CLUSTER_NAMESPACE_NAME, "wait", "--for", "condition=wellFormed", "--timeout=300s",
+                "infinispan/" + NEW_CLUSTER_NAME).runAndWait();
 
         deploySecondInfinispanClient(oc, metadata);
     }
@@ -102,7 +104,8 @@ public abstract class AbstractInfinispanResourceTest {
      * @throws IOException
      * @throws InterruptedException
      */
-    public static void deploySecondInfinispanClient(OpenShiftClient oc, AppMetadata metadata) throws IOException, InterruptedException {
+    public static void deploySecondInfinispanClient(OpenShiftClient oc, AppMetadata metadata)
+            throws IOException, InterruptedException {
         List<HasMetadata> objs = oc.load(Files.newInputStream(Paths.get("target/kubernetes/openshift.yml"))).get();
         List<HasMetadata> necessary_objects = new ArrayList<>();
 
@@ -140,7 +143,8 @@ public abstract class AbstractInfinispanResourceTest {
 
         KubernetesList list = new KubernetesList();
         list.setItems(necessary_objects);
-        Serialization.yamlMapper().writeValue(Files.newOutputStream(Paths.get(new File(SECOND_CLIENT_DEPLOYMENT_CONFIG).getPath())), list);
+        Serialization.yamlMapper()
+                .writeValue(Files.newOutputStream(Paths.get(new File(SECOND_CLIENT_DEPLOYMENT_CONFIG).getPath())), list);
 
         new Command("oc", "apply", "-f", SECOND_CLIENT_DEPLOYMENT_CONFIG).runAndWait();
     }
@@ -183,11 +187,10 @@ public abstract class AbstractInfinispanResourceTest {
      * @return endpoint value as String
      */
     public String getCounterValue(String url) {
-        String actualResponse =
-            when()
-                    .get(url)
-                    .then().statusCode(200)
-                    .extract().asString();
+        String actualResponse = when()
+                .get(url)
+                .then().statusCode(200)
+                .extract().asString();
 
         return actualResponse;
     }
@@ -199,11 +202,10 @@ public abstract class AbstractInfinispanResourceTest {
      * @return increased endpoint value as String
      */
     public String fillTheCache(String url) {
-        String actualResponse =
-            when()
-                    .put(url)
-                    .then().statusCode(200)
-                    .extract().asString();
+        String actualResponse = when()
+                .put(url)
+                .then().statusCode(200)
+                .extract().asString();
 
         return actualResponse;
     }
@@ -233,7 +235,8 @@ public abstract class AbstractInfinispanResourceTest {
     public void killInfinispanCluster() throws IOException, InterruptedException {
         adjustYml(CLUSTER_CONFIG_PATH, "replicas: 1", "replicas: 0");
         new Command("oc", "apply", "-f", CLUSTER_CONFIG_PATH).runAndWait();
-        new Command("oc", "-n", CLUSTER_NAMESPACE_NAME, "wait", "--for", "condition=gracefulShutdown", "--timeout=300s", "infinispan/" + NEW_CLUSTER_NAME).runAndWait();
+        new Command("oc", "-n", CLUSTER_NAMESPACE_NAME, "wait", "--for", "condition=gracefulShutdown", "--timeout=300s",
+                "infinispan/" + NEW_CLUSTER_NAME).runAndWait();
     }
 
     /**
@@ -246,7 +249,8 @@ public abstract class AbstractInfinispanResourceTest {
     public void restartInfinispanCluster() throws IOException, InterruptedException {
         adjustYml(CLUSTER_CONFIG_PATH, "replicas: 0", "replicas: 1");
         new Command("oc", "apply", "-f", CLUSTER_CONFIG_PATH).runAndWait();
-        new Command("oc", "-n", CLUSTER_NAMESPACE_NAME, "wait", "--for", "condition=wellFormed", "--timeout=360s", "infinispan/" + NEW_CLUSTER_NAME).runAndWait();
+        new Command("oc", "-n", CLUSTER_NAMESPACE_NAME, "wait", "--for", "condition=wellFormed", "--timeout=360s",
+                "infinispan/" + NEW_CLUSTER_NAME).runAndWait();
     }
 
     /**

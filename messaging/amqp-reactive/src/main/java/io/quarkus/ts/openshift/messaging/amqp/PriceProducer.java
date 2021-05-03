@@ -1,12 +1,13 @@
 package io.quarkus.ts.openshift.messaging.amqp;
 
-import io.reactivex.Flowable;
-import org.eclipse.microprofile.reactive.messaging.Outgoing;
-import org.jboss.logging.Logger;
+import java.util.concurrent.TimeUnit;
 
 import javax.enterprise.context.ApplicationScoped;
 
-import java.util.concurrent.TimeUnit;
+import org.eclipse.microprofile.reactive.messaging.Outgoing;
+import org.jboss.logging.Logger;
+
+import io.reactivex.Flowable;
 
 @ApplicationScoped
 public class PriceProducer {

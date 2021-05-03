@@ -1,11 +1,5 @@
 package io.quarkus.ts.openshift.sqldb.multiplepus;
 
-import io.quarkus.ts.openshift.sqldb.multiplepus.model.fruit.Fruit;
-import io.quarkus.ts.openshift.sqldb.multiplepus.model.vegetable.Vegetable;
-import io.restassured.http.ContentType;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static javax.ws.rs.core.Response.Status.CREATED;
@@ -16,6 +10,13 @@ import static javax.ws.rs.core.Response.Status.UNSUPPORTED_MEDIA_TYPE;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasSize;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.ts.openshift.sqldb.multiplepus.model.fruit.Fruit;
+import io.quarkus.ts.openshift.sqldb.multiplepus.model.vegetable.Vegetable;
+import io.restassured.http.ContentType;
 
 public abstract class AbstractMultiplePersistenceUnitTest {
 

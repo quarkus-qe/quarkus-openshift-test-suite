@@ -1,23 +1,24 @@
 package io.quarkus.ts.openshift.config.secret.api.server;
 
-import io.quarkus.ts.openshift.app.metadata.AppMetadata;
-import io.quarkus.ts.openshift.common.AdditionalResources;
-import io.quarkus.ts.openshift.common.OpenShiftTest;
-import io.quarkus.ts.openshift.common.injection.TestResource;
-import io.quarkus.ts.openshift.common.util.OpenShiftUtil;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-
-import java.io.File;
-import java.util.concurrent.TimeUnit;
-
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static org.awaitility.Awaitility.await;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.Matchers.containsString;
+
+import java.io.File;
+import java.util.concurrent.TimeUnit;
+
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
+import io.quarkus.ts.openshift.app.metadata.AppMetadata;
+import io.quarkus.ts.openshift.common.AdditionalResources;
+import io.quarkus.ts.openshift.common.OpenShiftTest;
+import io.quarkus.ts.openshift.common.injection.TestResource;
+import io.quarkus.ts.openshift.common.util.OpenShiftUtil;
 
 @OpenShiftTest
 @AdditionalResources("classpath:secret.yaml")
@@ -34,7 +35,7 @@ public class ConfigSecretApiServerOpenShiftIT {
     public void originalConfigMap_simpleInvocation() {
         when()
                 .get("/hello")
-        .then()
+                .then()
                 .statusCode(200)
                 .body("content", is("Hello World from Secret!"));
     }
@@ -44,9 +45,9 @@ public class ConfigSecretApiServerOpenShiftIT {
     public void originalConfigMap_parameterizedInvocation() {
         given()
                 .queryParam("name", "Albert Einstein")
-        .when()
+                .when()
                 .get("/hello")
-        .then()
+                .then()
                 .statusCode(200)
                 .body("content", is("Hello Albert Einstein from Secret!"));
     }
@@ -59,7 +60,7 @@ public class ConfigSecretApiServerOpenShiftIT {
 
         when()
                 .get("/hello")
-        .then()
+                .then()
                 .statusCode(200)
                 .body(containsString("Good morning World from an updated Secret!"));
     }
@@ -73,7 +74,7 @@ public class ConfigSecretApiServerOpenShiftIT {
         await().atMost(5, TimeUnit.MINUTES).untilAsserted(() -> {
             when()
                     .get("/hello")
-            .then()
+                    .then()
                     .statusCode(500);
         });
     }

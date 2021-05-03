@@ -1,9 +1,9 @@
 package io.quarkus.ts.openshift.security.keycloak;
 
-import org.junit.jupiter.api.Test;
-
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+
+import org.junit.jupiter.api.Test;
 
 public abstract class AbstractSecurityKeycloakOpenShiftTest {
 

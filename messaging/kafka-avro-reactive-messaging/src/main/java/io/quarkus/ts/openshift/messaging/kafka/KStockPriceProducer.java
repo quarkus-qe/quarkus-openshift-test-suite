@@ -1,18 +1,19 @@
 package io.quarkus.ts.openshift.messaging.kafka;
 
-import io.quarkus.scheduler.Scheduled;
-import io.smallrye.common.constraint.NotNull;
+import java.util.Random;
+import java.util.function.BiConsumer;
+import java.util.stream.IntStream;
+
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
+
 import org.eclipse.microprofile.reactive.messaging.Channel;
 import org.eclipse.microprofile.reactive.messaging.Emitter;
 import org.eclipse.microprofile.reactive.messaging.OnOverflow;
 import org.jboss.logging.Logger;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
-
-import java.util.Random;
-import java.util.function.BiConsumer;
-import java.util.stream.IntStream;
+import io.quarkus.scheduler.Scheduled;
+import io.smallrye.common.constraint.NotNull;
 
 @ApplicationScoped
 public class KStockPriceProducer {
@@ -27,11 +28,12 @@ public class KStockPriceProducer {
 
     private Random random = new Random();
 
-    @Scheduled(every="1s")
+    @Scheduled(every = "1s")
     public void generate() {
         IntStream.range(0, BATCH_SIZE).forEach(next -> {
-                StockPrice event = StockPrice.newBuilder().setId("IBM").setPrice(random.nextDouble()).setStatus(status.PENDING).build();
-                emitter.send(event).whenComplete(handlerEmitterResponse(KStockPriceProducer.class.getName()));
+            StockPrice event = StockPrice.newBuilder().setId("IBM").setPrice(random.nextDouble()).setStatus(status.PENDING)
+                    .build();
+            emitter.send(event).whenComplete(handlerEmitterResponse(KStockPriceProducer.class.getName()));
         });
     }
 
