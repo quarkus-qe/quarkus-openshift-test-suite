@@ -1,14 +1,15 @@
 package io.quarkus.ts.openshift.messaging.kafka.containers;
 
-import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
-import io.strimzi.StrimziKafkaContainer;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
+
 import org.jboss.logging.Logger;
 import org.testcontainers.containers.Network;
 import org.testcontainers.lifecycle.Startables;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Stream;
+import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
+import io.strimzi.StrimziKafkaContainer;
 
 public class StrimziKafkaResource implements QuarkusTestResourceLifecycleManager {
 
@@ -21,7 +22,8 @@ public class StrimziKafkaResource implements QuarkusTestResourceLifecycleManager
         Network network = Network.newNetwork();
 
         kafkaContainer = new StrimziKafkaContainer("0.18.0-kafka-2.5.0").withNetwork(network);
-        schemaRegistry = new SchemaRegistryContainer("apicurio/apicurio-registry-mem", "1.2.2.Final", 8080).withNetwork(network).withKafka(kafkaContainer, 9092);
+        schemaRegistry = new SchemaRegistryContainer("apicurio/apicurio-registry-mem", "1.2.2.Final", 8080).withNetwork(network)
+                .withKafka(kafkaContainer, 9092);
 
         Startables.deepStart(Stream.of(kafkaContainer, schemaRegistry)).join();
 

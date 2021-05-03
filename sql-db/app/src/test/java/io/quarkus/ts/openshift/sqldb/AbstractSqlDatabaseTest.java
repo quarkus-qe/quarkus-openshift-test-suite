@@ -1,16 +1,17 @@
 package io.quarkus.ts.openshift.sqldb;
 
-import io.restassured.http.ContentType;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
-
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
+
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+
+import io.restassured.http.ContentType;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public abstract class AbstractSqlDatabaseTest {
@@ -19,7 +20,7 @@ public abstract class AbstractSqlDatabaseTest {
     public void getAll() {
         when()
                 .get("/book")
-        .then()
+                .then()
                 .statusCode(200)
                 .body("", hasSize(7));
     }
@@ -29,7 +30,7 @@ public abstract class AbstractSqlDatabaseTest {
     public void get() {
         when()
                 .get("/book/7")
-        .then()
+                .then()
                 .statusCode(200)
                 .body("title", equalTo("Perdido Street Station"))
                 .body("author", equalTo("China Miéville"));
@@ -43,11 +44,11 @@ public abstract class AbstractSqlDatabaseTest {
         book.author = "William Gibson";
 
         given()
-        .when()
+                .when()
                 .contentType(ContentType.JSON)
                 .body(book)
                 .post("/book")
-        .then()
+                .then()
                 .statusCode(201)
                 .body("id", equalTo(8))
                 .body("title", equalTo("Neuromancer"))
@@ -55,7 +56,7 @@ public abstract class AbstractSqlDatabaseTest {
 
         when()
                 .get("/book/8")
-        .then()
+                .then()
                 .statusCode(200)
                 .body("title", equalTo("Neuromancer"))
                 .body("author", equalTo("William Gibson"));
@@ -65,11 +66,11 @@ public abstract class AbstractSqlDatabaseTest {
     @Order(4)
     public void createInvalidPayload() {
         given()
-        .when()
+                .when()
                 .contentType(ContentType.TEXT)
                 .body("")
                 .post("/book")
-        .then()
+                .then()
                 .statusCode(415)
                 .body("code", equalTo(415));
     }
@@ -83,11 +84,11 @@ public abstract class AbstractSqlDatabaseTest {
         book.author = "bar";
 
         given()
-        .when()
+                .when()
                 .contentType(ContentType.JSON)
                 .body(book)
                 .post("/book")
-        .then()
+                .then()
                 .statusCode(422)
                 .body("code", equalTo(422))
                 .body("error", equalTo("unexpected ID in request"));
@@ -102,11 +103,11 @@ public abstract class AbstractSqlDatabaseTest {
         book.author = "Bruce Sterling";
 
         given()
-        .when()
+                .when()
                 .contentType(ContentType.JSON)
                 .body(book)
                 .put("/book/8")
-        .then()
+                .then()
                 .statusCode(200)
                 .body("id", equalTo(8))
                 .body("title", equalTo("Schismatrix"))
@@ -114,7 +115,7 @@ public abstract class AbstractSqlDatabaseTest {
 
         when()
                 .get("/book/8")
-        .then()
+                .then()
                 .statusCode(200)
                 .body("title", equalTo("Schismatrix"))
                 .body("author", equalTo("Bruce Sterling"));
@@ -129,11 +130,11 @@ public abstract class AbstractSqlDatabaseTest {
         book.author = "bar";
 
         given()
-        .when()
+                .when()
                 .contentType(ContentType.JSON)
                 .body(book)
                 .put("/book/999")
-        .then()
+                .then()
                 .statusCode(404)
                 .body("code", equalTo(404))
                 .body("error", equalTo("book '999' not found"));
@@ -143,11 +144,11 @@ public abstract class AbstractSqlDatabaseTest {
     @Order(8)
     public void updateInvalidPayload() {
         given()
-        .when()
+                .when()
                 .contentType(ContentType.TEXT)
                 .body("")
                 .put("/book/8")
-        .then()
+                .then()
                 .statusCode(415)
                 .body("code", equalTo(415));
     }
@@ -158,11 +159,11 @@ public abstract class AbstractSqlDatabaseTest {
         Book book = new Book();
 
         given()
-        .when()
+                .when()
                 .contentType(ContentType.JSON)
                 .body(book)
                 .put("/book/8")
-        .then()
+                .then()
                 .statusCode(422)
                 .body("code", equalTo(422))
                 .body("error.message", containsInAnyOrder("book title must be set", "book author must be set"));
@@ -173,12 +174,12 @@ public abstract class AbstractSqlDatabaseTest {
     public void delete() {
         when()
                 .delete("/book/8")
-        .then()
+                .then()
                 .statusCode(204);
 
         when()
                 .get("/book/8")
-        .then()
+                .then()
                 .statusCode(404)
                 .body("code", equalTo(404))
                 .body("error", equalTo("book '8' not found"));
@@ -189,7 +190,7 @@ public abstract class AbstractSqlDatabaseTest {
     public void deleteWithUnknownId() {
         when()
                 .delete("/book/999")
-        .then()
+                .then()
                 .statusCode(404)
                 .body("code", equalTo(404))
                 .body("error", equalTo("book '999' not found"));

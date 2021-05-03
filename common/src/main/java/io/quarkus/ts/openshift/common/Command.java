@@ -1,5 +1,7 @@
 package io.quarkus.ts.openshift.common;
 
+import static org.fusesource.jansi.Ansi.ansi;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -10,8 +12,6 @@ import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
-
-import static org.fusesource.jansi.Ansi.ansi;
 
 public class Command {
     private final String description;

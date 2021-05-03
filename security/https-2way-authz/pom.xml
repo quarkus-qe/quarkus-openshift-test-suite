@@ -1,21 +1,15 @@
-<?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
-         xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
     <parent>
         <groupId>io.quarkus.ts.openshift</groupId>
         <artifactId>parent</artifactId>
         <version>1.0.0-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
-
     <artifactId>security-https-2way-authz</artifactId>
     <packaging>jar</packaging>
-
     <name>Quarkus OpenShift TS: Security: HTTPS with two-way TLS + Authorization</name>
-
     <dependencies>
         <dependency>
             <groupId>io.quarkus</groupId>
@@ -37,7 +31,6 @@
             <groupId>io.quarkus.ts.openshift</groupId>
             <artifactId>app-metadata</artifactId>
         </dependency>
-
         <dependency>
             <groupId>io.quarkus</groupId>
             <artifactId>quarkus-junit5</artifactId>
@@ -59,7 +52,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>
@@ -70,7 +62,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
             </plugin>
-
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>keytool-maven-plugin</artifactId>
@@ -125,7 +116,6 @@
                             <noprompt>true</noprompt>
                         </configuration>
                     </execution>
-
                     <execution>
                         <id>client-keystore</id>
                         <phase>generate-resources</phase>
@@ -175,7 +165,6 @@
                             <noprompt>true</noprompt>
                         </configuration>
                     </execution>
-
                     <execution>
                         <id>guest-client-keystore</id>
                         <phase>generate-resources</phase>
@@ -225,7 +214,6 @@
                             <noprompt>true</noprompt>
                         </configuration>
                     </execution>
-
                     <execution>
                         <id>unknown-client-keystore</id>
                         <phase>generate-resources</phase>

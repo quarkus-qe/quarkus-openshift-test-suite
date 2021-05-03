@@ -1,14 +1,14 @@
 package io.quarkus.ts.openshift.common;
 
-import org.junit.jupiter.api.extension.ConditionEvaluationResult;
-import org.junit.jupiter.api.extension.ExecutionCondition;
-import org.junit.jupiter.api.extension.ExtensionContext;
+import static org.junit.platform.commons.util.AnnotationUtils.findAnnotation;
 
 import java.lang.reflect.AnnotatedElement;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import static org.junit.platform.commons.util.AnnotationUtils.findAnnotation;
+import org.junit.jupiter.api.extension.ConditionEvaluationResult;
+import org.junit.jupiter.api.extension.ExecutionCondition;
+import org.junit.jupiter.api.extension.ExtensionContext;
 
 public class DisabledOnQuarkusCondition implements ExecutionCondition {
     private static final ConditionEvaluationResult ENABLED_BY_DEFAULT = ConditionEvaluationResult.enabled(
@@ -23,7 +23,8 @@ public class DisabledOnQuarkusCondition implements ExecutionCondition {
             String quarkusVersion = io.quarkus.builder.Version.getVersion();
 
             return pattern.matcher(quarkusVersion).matches()
-                    ? ConditionEvaluationResult.disabled("Disabled on Quarkus version " + quarkusVersion + " (reason: " + disabledOnQuarkus.get().reason() + ")")
+                    ? ConditionEvaluationResult.disabled("Disabled on Quarkus version " + quarkusVersion + " (reason: "
+                            + disabledOnQuarkus.get().reason() + ")")
                     : ConditionEvaluationResult.enabled("Enabled on Quarkus version " + quarkusVersion);
         }
         return ENABLED_BY_DEFAULT;

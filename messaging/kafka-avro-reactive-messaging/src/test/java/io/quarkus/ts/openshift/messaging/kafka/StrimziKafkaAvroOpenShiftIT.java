@@ -8,5 +8,5 @@ import io.quarkus.ts.openshift.common.ParallelAdditionalResourcesEnabled;
 @AdditionalResources("classpath:deployments/kafka/strimzi.yaml")
 @AdditionalResources("classpath:deployments/kafka/apicurio.yaml")
 @ParallelAdditionalResourcesEnabled
-public class StrimziKafkaAvroOpenShiftIT extends AbstractKafkaTest{
+public class StrimziKafkaAvroOpenShiftIT extends AbstractKafkaTest {
 }

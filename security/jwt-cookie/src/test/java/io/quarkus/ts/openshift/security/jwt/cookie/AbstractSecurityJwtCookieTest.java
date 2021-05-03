@@ -1,9 +1,7 @@
 package io.quarkus.ts.openshift.security.jwt.cookie;
 
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.restassured.http.ContentType;
-import org.junit.jupiter.api.Test;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.equalTo;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,8 +19,11 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
+import org.junit.jupiter.api.Test;
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.restassured.http.ContentType;
 
 public abstract class AbstractSecurityJwtCookieTest {
 
@@ -47,7 +48,8 @@ public abstract class AbstractSecurityJwtCookieTest {
         return createToken(Date::new, invalidity, groups);
     }
 
-    private static String createToken(Supplier<Date> clock, Invalidity invalidity, String... groups) throws IOException, GeneralSecurityException {
+    private static String createToken(Supplier<Date> clock, Invalidity invalidity, String... groups)
+            throws IOException, GeneralSecurityException {
         String issuer = "https://my.auth.server/";
         if (invalidity == Invalidity.WRONG_ISSUER) {
             issuer = "https://wrong/";
@@ -83,84 +85,87 @@ public abstract class AbstractSecurityJwtCookieTest {
     @Test
     public void secured_everyone_noGroup() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken())
+                .when().cookie(COOKIE, createToken())
                 .get("/secured/everyone")
-        .then()
+                .then()
                 .statusCode(200)
-                .body(equalTo("Hello, test-subject@example.com, your token was issued by https://my.auth.server/ and you are in groups []"));
+                .body(equalTo(
+                        "Hello, test-subject@example.com, your token was issued by https://my.auth.server/ and you are in groups []"));
     }
 
     @Test
     public void secured_everyone_viewGroup() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken("view"))
+                .when().cookie(COOKIE, createToken("view"))
                 .get("/secured/everyone")
-        .then()
+                .then()
                 .statusCode(200)
-                .body(equalTo("Hello, test-subject@example.com, your token was issued by https://my.auth.server/ and you are in groups [view]"));
+                .body(equalTo(
+                        "Hello, test-subject@example.com, your token was issued by https://my.auth.server/ and you are in groups [view]"));
     }
 
     @Test
     public void secured_everyone_adminGroup() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken("admin"))
+                .when().cookie(COOKIE, createToken("admin"))
                 .get("/secured/everyone")
-        .then()
+                .then()
                 .statusCode(200)
-                .body(equalTo("Hello, test-subject@example.com, your token was issued by https://my.auth.server/ and you are in groups [admin, superuser]"));
+                .body(equalTo(
+                        "Hello, test-subject@example.com, your token was issued by https://my.auth.server/ and you are in groups [admin, superuser]"));
     }
 
     @Test
     public void secured_everyone_wrongIssuer() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken(Invalidity.WRONG_ISSUER))
+                .when().cookie(COOKIE, createToken(Invalidity.WRONG_ISSUER))
                 .get("/secured/everyone")
-        .then()
+                .then()
                 .statusCode(401);
     }
 
     @Test
     public void secured_everyone_wrongDate() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken(Invalidity.WRONG_DATE))
+                .when().cookie(COOKIE, createToken(Invalidity.WRONG_DATE))
                 .get("/secured/everyone")
-        .then()
+                .then()
                 .statusCode(401);
     }
 
     @Test
     public void secured_everyone_wrongKey() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken(Invalidity.WRONG_KEY))
+                .when().cookie(COOKIE, createToken(Invalidity.WRONG_KEY))
                 .get("/secured/everyone")
-        .then()
+                .then()
                 .statusCode(401);
     }
 
     @Test
     public void secured_admin_noGroup() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken())
+                .when().cookie(COOKIE, createToken())
                 .get("/secured/admin")
-        .then()
+                .then()
                 .statusCode(403);
     }
 
     @Test
     public void secured_admin_viewGroup() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken("view"))
+                .when().cookie(COOKIE, createToken("view"))
                 .get("/secured/admin")
-        .then()
+                .then()
                 .statusCode(403);
     }
 
     @Test
     public void secured_admin_adminGroup() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken("admin"))
+                .when().cookie(COOKIE, createToken("admin"))
                 .get("/secured/admin")
-        .then()
+                .then()
                 .statusCode(200)
                 .body(equalTo("Restricted area! Admin access granted!"));
     }
@@ -168,36 +173,36 @@ public abstract class AbstractSecurityJwtCookieTest {
     @Test
     public void secured_noone_noGroup() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken())
+                .when().cookie(COOKIE, createToken())
                 .get("/secured/noone")
-        .then()
+                .then()
                 .statusCode(403);
     }
 
     @Test
     public void secured_noone_viewGroup() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken("view"))
+                .when().cookie(COOKIE, createToken("view"))
                 .get("/secured/noone")
-        .then()
+                .then()
                 .statusCode(403);
     }
 
     @Test
     public void secured_noone_adminGroup() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken("admin"))
+                .when().cookie(COOKIE, createToken("admin"))
                 .get("/secured/noone")
-        .then()
+                .then()
                 .statusCode(403);
     }
 
     @Test
     public void permitted_correctToken() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken())
+                .when().cookie(COOKIE, createToken())
                 .get("/permitted")
-        .then()
+                .then()
                 .statusCode(200)
                 .body(equalTo("Hello there!"));
     }
@@ -205,45 +210,45 @@ public abstract class AbstractSecurityJwtCookieTest {
     @Test
     public void permitted_wrongIssuer() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken(Invalidity.WRONG_ISSUER))
+                .when().cookie(COOKIE, createToken(Invalidity.WRONG_ISSUER))
                 .get("/permitted")
-        .then()
+                .then()
                 .statusCode(401); // in Thorntail, this is 200, but both approaches are likely valid
     }
 
     @Test
     public void permitted_wrongDate() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken(Invalidity.WRONG_DATE))
+                .when().cookie(COOKIE, createToken(Invalidity.WRONG_DATE))
                 .get("/permitted")
-        .then()
+                .then()
                 .statusCode(401); // in Thorntail, this is 200, but both approaches are likely valid
     }
 
     @Test
     public void permitted_wrongKey() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken(Invalidity.WRONG_KEY))
+                .when().cookie(COOKIE, createToken(Invalidity.WRONG_KEY))
                 .get("/permitted")
-        .then()
+                .then()
                 .statusCode(401); // in Thorntail, this is 200, but both approaches are likely valid
     }
 
     @Test
     public void denied_correctToken() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken())
+                .when().cookie(COOKIE, createToken())
                 .get("/denied")
-        .then()
+                .then()
                 .statusCode(403);
     }
 
     @Test
     public void mixed_constrained() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken())
+                .when().cookie(COOKIE, createToken())
                 .get("/mixed/constrained")
-        .then()
+                .then()
                 .statusCode(200)
                 .body(equalTo("Constrained method"));
     }
@@ -251,19 +256,19 @@ public abstract class AbstractSecurityJwtCookieTest {
     @Test
     public void mixed_unconstrained() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken())
+                .when().cookie(COOKIE, createToken())
                 .get("/mixed/unconstrained")
-        .then()
+                .then()
                 .statusCode(403); // quarkus.security.deny-unannotated-members=true
     }
 
     @Test
     public void contentTypes_plain_plainGroup() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken("plain"))
+                .when().cookie(COOKIE, createToken("plain"))
                 .accept(ContentType.TEXT)
                 .get("/content-types")
-        .then()
+                .then()
                 .statusCode(200)
                 .body(equalTo("Hello, world!"));
     }
@@ -271,20 +276,20 @@ public abstract class AbstractSecurityJwtCookieTest {
     @Test
     public void contentTypes_plain_webGroup() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken("web"))
+                .when().cookie(COOKIE, createToken("web"))
                 .accept(ContentType.TEXT)
                 .get("/content-types")
-        .then()
+                .then()
                 .statusCode(403);
     }
 
     @Test
     public void contentTypes_web_webGroup() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken("web"))
+                .when().cookie(COOKIE, createToken("web"))
                 .accept(ContentType.HTML)
                 .get("/content-types")
-        .then()
+                .then()
                 .statusCode(200)
                 .body(equalTo("<html>Hello, world!</html>"));
     }
@@ -292,19 +297,19 @@ public abstract class AbstractSecurityJwtCookieTest {
     @Test
     public void contentTypes_web_plainGroup() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken("plain"))
+                .when().cookie(COOKIE, createToken("plain"))
                 .accept(ContentType.HTML)
                 .get("/content-types")
-        .then()
+                .then()
                 .statusCode(403);
     }
 
     @Test
     public void parameterizedPaths_admin_adminGroup() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken("admin"))
+                .when().cookie(COOKIE, createToken("admin"))
                 .get("/parameterized-paths/my/foo/admin")
-        .then()
+                .then()
                 .statusCode(200)
                 .body(equalTo("Admin accessed foo"));
     }
@@ -312,18 +317,18 @@ public abstract class AbstractSecurityJwtCookieTest {
     @Test
     public void parameterizedPaths_admin_viewGroup() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken("view"))
+                .when().cookie(COOKIE, createToken("view"))
                 .get("/parameterized-paths/my/foo/admin")
-        .then()
+                .then()
                 .statusCode(403);
     }
 
     @Test
     public void parameterizedPaths_view_viewGroup() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken("view"))
+                .when().cookie(COOKIE, createToken("view"))
                 .get("/parameterized-paths/my/foo/view")
-        .then()
+                .then()
                 .statusCode(200)
                 .body(equalTo("View accessed foo"));
     }
@@ -331,9 +336,9 @@ public abstract class AbstractSecurityJwtCookieTest {
     @Test
     public void parameterizedPaths_view_adminGroup() throws IOException, GeneralSecurityException {
         given()
-        .when().cookie(COOKIE, createToken("admin"))
+                .when().cookie(COOKIE, createToken("admin"))
                 .get("/parameterized-paths/my/foo/view")
-        .then()
+                .then()
                 .statusCode(403);
     }
 
@@ -346,9 +351,9 @@ public abstract class AbstractSecurityJwtCookieTest {
         };
 
         given()
-        .when().cookie(COOKIE, createToken(clock, null,"admin"))
+                .when().cookie(COOKIE, createToken(clock, null, "admin"))
                 .get("/secured/admin")
-        .then()
+                .then()
                 .statusCode(200)
                 .body(equalTo("Restricted area! Admin access granted!"));
     }

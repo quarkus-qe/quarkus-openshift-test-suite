@@ -1,5 +1,10 @@
 package io.quarkus.ts.openshift.app.metadata;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
+
+import org.eclipse.microprofile.config.ConfigProvider;
+
 import io.quarkus.container.spi.ContainerImageInfoBuildItem;
 import io.quarkus.deployment.annotations.BuildProducer;
 import io.quarkus.deployment.annotations.BuildStep;
@@ -7,18 +12,14 @@ import io.quarkus.deployment.builditem.GeneratedFileSystemResourceBuildItem;
 import io.quarkus.kubernetes.spi.KubernetesHealthLivenessPathBuildItem;
 import io.quarkus.kubernetes.spi.KubernetesHealthReadinessPathBuildItem;
 import io.quarkus.vertx.http.deployment.HttpRootPathBuildItem;
-import org.eclipse.microprofile.config.ConfigProvider;
-
-import java.nio.charset.StandardCharsets;
-import java.util.Optional;
 
 public class AppMetadataCollector {
     @BuildStep
     public void collectAppMetadata(ContainerImageInfoBuildItem containerImage,
-                                   HttpRootPathBuildItem httpRoot,
-                                   Optional<KubernetesHealthLivenessPathBuildItem> liveness,
-                                   Optional<KubernetesHealthReadinessPathBuildItem> readiness,
-                                   BuildProducer<GeneratedFileSystemResourceBuildItem> output) {
+            HttpRootPathBuildItem httpRoot,
+            Optional<KubernetesHealthLivenessPathBuildItem> liveness,
+            Optional<KubernetesHealthReadinessPathBuildItem> readiness,
+            BuildProducer<GeneratedFileSystemResourceBuildItem> output) {
 
         String image = containerImage.getImage();
         int lastSlash = image.lastIndexOf('/');
@@ -42,12 +43,10 @@ public class AppMetadataCollector {
                 appName,
                 httpRoot.getRootPath(),
                 knownEndpoint,
-                deploymentTarget
-        );
+                deploymentTarget);
 
         output.produce(new GeneratedFileSystemResourceBuildItem(
                 "app-metadata.properties",
-                result.toString().getBytes(StandardCharsets.UTF_8)
-        ));
+                result.toString().getBytes(StandardCharsets.UTF_8)));
     }
 }

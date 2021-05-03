@@ -1,13 +1,7 @@
 package io.quarkus.ts.openshift.common.util;
 
-import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.client.dsl.ExecListener;
-import io.fabric8.kubernetes.client.dsl.ExecWatch;
-import io.fabric8.openshift.api.model.Route;
-import io.fabric8.openshift.client.OpenShiftClient;
-import io.quarkus.ts.openshift.common.DefaultTimeout;
-import io.quarkus.ts.openshift.common.OpenShiftTestException;
-import okhttp3.Response;
+import static org.awaitility.Awaitility.await;
+import static org.fusesource.jansi.Ansi.ansi;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -19,8 +13,14 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import static org.awaitility.Awaitility.await;
-import static org.fusesource.jansi.Ansi.ansi;
+import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.client.dsl.ExecListener;
+import io.fabric8.kubernetes.client.dsl.ExecWatch;
+import io.fabric8.openshift.api.model.Route;
+import io.fabric8.openshift.client.OpenShiftClient;
+import io.quarkus.ts.openshift.common.DefaultTimeout;
+import io.quarkus.ts.openshift.common.OpenShiftTestException;
+import okhttp3.Response;
 
 public final class OpenShiftUtil {
     private final OpenShiftClient oc;

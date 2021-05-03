@@ -1,10 +1,5 @@
 package io.quarkus.ts.openshift.common.deploy;
 
-import io.fabric8.openshift.client.OpenShiftClient;
-import io.quarkus.ts.openshift.common.Command;
-import io.quarkus.ts.openshift.common.injection.TestResource;
-import org.apache.commons.lang3.StringUtils;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,6 +12,12 @@ import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.commons.lang3.StringUtils;
+
+import io.fabric8.openshift.client.OpenShiftClient;
+import io.quarkus.ts.openshift.common.Command;
+import io.quarkus.ts.openshift.common.injection.TestResource;
 
 /**
  * If the test class is using the {@code UsingQuarkusPluginDeploymentStrategy} strategy, the test framework will use the

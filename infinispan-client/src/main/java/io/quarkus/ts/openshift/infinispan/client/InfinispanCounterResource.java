@@ -1,7 +1,6 @@
 package io.quarkus.ts.openshift.infinispan.client;
 
-import io.quarkus.infinispan.client.Remote;
-import org.infinispan.client.hotrod.RemoteCache;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -10,7 +9,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import java.util.concurrent.atomic.AtomicInteger;
+import org.infinispan.client.hotrod.RemoteCache;
+
+import io.quarkus.infinispan.client.Remote;
 
 public class InfinispanCounterResource {
     protected AtomicInteger counter = new AtomicInteger(0);

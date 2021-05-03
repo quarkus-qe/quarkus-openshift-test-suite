@@ -1,19 +1,20 @@
 package io.quarkus.ts.openshift.messaging.kafka.producer;
 
-import io.quarkus.ts.openshift.messaging.kafka.aggregator.model.LoginAttempt;
-import io.smallrye.mutiny.Multi;
-import io.smallrye.reactive.messaging.kafka.Record;
-import io.vertx.core.json.Json;
-import org.eclipse.microprofile.config.inject.ConfigProperty;
-import org.eclipse.microprofile.reactive.messaging.Outgoing;
-import org.jboss.logging.Logger;
-
-import javax.enterprise.context.ApplicationScoped;
-
 import java.time.Duration;
 import java.util.Base64;
 import java.util.List;
 import java.util.Random;
+
+import javax.enterprise.context.ApplicationScoped;
+
+import org.eclipse.microprofile.config.inject.ConfigProperty;
+import org.eclipse.microprofile.reactive.messaging.Outgoing;
+import org.jboss.logging.Logger;
+
+import io.quarkus.ts.openshift.messaging.kafka.aggregator.model.LoginAttempt;
+import io.smallrye.mutiny.Multi;
+import io.smallrye.reactive.messaging.kafka.Record;
+import io.vertx.core.json.Json;
 
 @ApplicationScoped
 public class EventsProducer {
@@ -38,15 +39,16 @@ public class EventsProducer {
                     Integer httpCode = getRandomHttpCode();
 
                     LOG.infov("Endpoint: {0} ID: {1}, HTTP-code: {2}", loginEndpoint, loginEndpointEnc, httpCode);
-                    return Record.of(loginEndpointEnc, Json.encode(new LoginAttempt(loginEndpointEnc, loginEndpoint, httpCode)));
+                    return Record.of(loginEndpointEnc,
+                            Json.encode(new LoginAttempt(loginEndpointEnc, loginEndpoint, httpCode)));
                 });
     }
 
-    private String getRandomEndpointUrl(){
+    private String getRandomEndpointUrl() {
         return loginUrls.get(random.nextInt(loginUrls.size()));
     }
 
-    private Integer getRandomHttpCode(){
+    private Integer getRandomHttpCode() {
         return httpCodes.get(random.nextInt(httpCodes.size()));
     }
 

@@ -7,7 +7,7 @@ import java.lang.annotation.Target;
 
 /**
  * Allow you to deploy several additional resources at once.
- * */
+ */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ParallelAdditionalResourcesEnabled {

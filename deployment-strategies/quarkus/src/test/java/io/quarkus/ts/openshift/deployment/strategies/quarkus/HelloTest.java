@@ -1,11 +1,12 @@
 package io.quarkus.ts.openshift.deployment.strategies.quarkus;
 
-import io.quarkus.test.junit.QuarkusTest;
-import org.junit.jupiter.api.Test;
-
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.CoreMatchers.is;
+
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
 public class HelloTest {
@@ -13,7 +14,7 @@ public class HelloTest {
     public void hello() {
         when()
                 .get("/hello")
-        .then()
+                .then()
                 .statusCode(200)
                 .body("content", is("Hello, World!"));
     }
@@ -21,10 +22,10 @@ public class HelloTest {
     @Test
     public void parameterizedHello() {
         given()
-        .when()
+                .when()
                 .queryParam("name", "Isaac")
                 .get("/hello")
-        .then()
+                .then()
                 .statusCode(200)
                 .body("content", is("Hello, Isaac!"));
     }

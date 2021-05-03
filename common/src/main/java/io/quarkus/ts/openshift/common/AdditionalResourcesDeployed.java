@@ -1,10 +1,6 @@
 package io.quarkus.ts.openshift.common;
 
-import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.openshift.client.OpenShiftClient;
-import io.quarkus.ts.openshift.common.util.AwaitUtil;
-import io.quarkus.ts.openshift.common.util.ImageOverrides;
-import org.junit.jupiter.api.extension.ExtensionContext.Store.CloseableResource;
+import static org.fusesource.jansi.Ansi.ansi;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,7 +11,12 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 
-import static org.fusesource.jansi.Ansi.ansi;
+import org.junit.jupiter.api.extension.ExtensionContext.Store.CloseableResource;
+
+import io.fabric8.kubernetes.api.model.HasMetadata;
+import io.fabric8.openshift.client.OpenShiftClient;
+import io.quarkus.ts.openshift.common.util.AwaitUtil;
+import io.quarkus.ts.openshift.common.util.ImageOverrides;
 
 final class AdditionalResourcesDeployed implements CloseableResource {
 
@@ -30,7 +31,7 @@ final class AdditionalResourcesDeployed implements CloseableResource {
     }
 
     static AdditionalResourcesDeployed deploy(AdditionalResources annotation, TestsStatus testsStatus,
-                                              OpenShiftClient oc, AwaitUtil awaitUtil) throws IOException, InterruptedException {
+            OpenShiftClient oc, AwaitUtil awaitUtil) throws IOException, InterruptedException {
         String url = annotation.value();
 
         Path tempFile = copyResourceIntoTempFile(url);

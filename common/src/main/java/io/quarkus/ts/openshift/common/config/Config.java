@@ -33,7 +33,8 @@ public class Config {
 
     /**
      * Returns a boolean config value under given {@code key}.
-     * The empty string and the {@code "true"} (case <i>insensitive</i>) string are considered truthy; all other strings are falsy.
+     * The empty string and the {@code "true"} (case <i>insensitive</i>) string are considered truthy; all other strings are
+     * falsy.
      * If there's no value under the {@code key}, the {@code defaultValue} is returned instead.
      * Note that the {@code key} must begin with {@code ts.}, the prefix is not handled automatically.
      */

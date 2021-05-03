@@ -1,8 +1,5 @@
 package io.quarkus.ts.openshift.messaging.artemisjta;
 
-import org.apache.commons.lang3.StringUtils;
-import org.jboss.logging.Logger;
-
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.jms.ConnectionFactory;
@@ -11,6 +8,9 @@ import javax.jms.JMSContext;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
+
+import org.apache.commons.lang3.StringUtils;
+import org.jboss.logging.Logger;
 
 @ApplicationScoped
 public class ConsumerService {

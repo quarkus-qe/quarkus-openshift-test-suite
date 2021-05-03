@@ -1,10 +1,8 @@
 package io.quarkus.ts.openshift.security.basic;
 
-import io.restassured.response.ValidatableResponse;
-import io.restassured.specification.RequestSpecification;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.anything;
+import static org.hamcrest.CoreMatchers.equalTo;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -12,9 +10,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static io.restassured.RestAssured.given;
-import static org.hamcrest.CoreMatchers.anything;
-import static org.hamcrest.CoreMatchers.equalTo;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+
+import io.restassured.response.ValidatableResponse;
+import io.restassured.specification.RequestSpecification;
 
 public abstract class AbstractSecurityBasicTest {
     private static final String ADMIN_USERNAME = "albert";
@@ -89,7 +90,6 @@ public abstract class AbstractSecurityBasicTest {
                 Arguments.of(ADMIN_USERNAME, ADMIN_PASSWORD, true),
                 Arguments.of(USER_USERNAME, UNKNOWN_PASSWORD, false),
                 Arguments.of(ADMIN_USERNAME, UNKNOWN_PASSWORD, false),
-                Arguments.of(UNKNOWN_USERNAME, UNKNOWN_PASSWORD, false)
-        );
+                Arguments.of(UNKNOWN_USERNAME, UNKNOWN_PASSWORD, false));
     }
 }

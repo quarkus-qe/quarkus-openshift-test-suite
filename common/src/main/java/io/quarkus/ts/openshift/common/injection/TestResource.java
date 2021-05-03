@@ -9,15 +9,15 @@ import java.lang.annotation.Target;
  * Marks a test instance field or test method parameter for injection.
  * The field/parameter must have one of these types:
  * <ul>
- *     <li>{@link io.fabric8.openshift.client.OpenShiftClient}</li>
- *     <li>{@link io.quarkus.ts.openshift.app.metadata.AppMetadata}</li>
- *     <li>{@link io.quarkus.ts.openshift.common.config.Config}</li>
- *     <li>{@link io.quarkus.ts.openshift.common.util.AwaitUtil}</li>
- *     <li>{@link io.quarkus.ts.openshift.common.util.OpenShiftUtil}</li>
- *     <li>{@link java.net.URL} (see also {@link WithName @WithName})</li>
+ * <li>{@link io.fabric8.openshift.client.OpenShiftClient}</li>
+ * <li>{@link io.quarkus.ts.openshift.app.metadata.AppMetadata}</li>
+ * <li>{@link io.quarkus.ts.openshift.common.config.Config}</li>
+ * <li>{@link io.quarkus.ts.openshift.common.util.AwaitUtil}</li>
+ * <li>{@link io.quarkus.ts.openshift.common.util.OpenShiftUtil}</li>
+ * <li>{@link java.net.URL} (see also {@link WithName @WithName})</li>
  * </ul>
  */
-@Target({ElementType.FIELD, ElementType.PARAMETER})
+@Target({ ElementType.FIELD, ElementType.PARAMETER })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TestResource {
 }

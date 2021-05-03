@@ -1,15 +1,16 @@
 package io.quarkus.ts.openshift.messaging.artemis;
 
-import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
-import org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ;
-import org.apache.commons.io.FileUtils;
+import static org.awaitility.Awaitility.await;
 
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static org.awaitility.Awaitility.await;
+import org.apache.activemq.artemis.core.server.embedded.EmbeddedActiveMQ;
+import org.apache.commons.io.FileUtils;
+
+import io.quarkus.test.common.QuarkusTestResourceLifecycleManager;
 
 public class ArtemisTestResource implements QuarkusTestResourceLifecycleManager {
     private EmbeddedActiveMQ embedded;
@@ -23,8 +24,7 @@ public class ArtemisTestResource implements QuarkusTestResourceLifecycleManager 
 
             await().atMost(5, TimeUnit.MINUTES).until(() -> embedded.getActiveMQServer() != null
                     && embedded.getActiveMQServer().isActive()
-                    && embedded.getActiveMQServer().getConnectorsService().isStarted()
-            );
+                    && embedded.getActiveMQServer().getConnectorsService().isStarted());
         } catch (Exception e) {
             throw new RuntimeException("Could not start embedded ActiveMQ Artemis server", e);
         }

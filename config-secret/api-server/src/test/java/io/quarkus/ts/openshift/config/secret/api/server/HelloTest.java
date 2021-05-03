@@ -1,10 +1,11 @@
 package io.quarkus.ts.openshift.config.secret.api.server;
 
-import io.quarkus.test.junit.QuarkusTest;
-import org.junit.jupiter.api.Test;
-
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.CoreMatchers.is;
+
+import org.junit.jupiter.api.Test;
+
+import io.quarkus.test.junit.QuarkusTest;
 
 @QuarkusTest
 public class HelloTest {
@@ -12,7 +13,7 @@ public class HelloTest {
     public void hello() {
         when()
                 .get("/hello")
-        .then()
+                .then()
                 .statusCode(200)
                 .body("content", is("Hello, World!"));
     }

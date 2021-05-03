@@ -1,22 +1,23 @@
 package io.quarkus.ts.openshift.microprofile;
 
-import io.quarkus.ts.openshift.common.AdditionalResources;
-import io.quarkus.ts.openshift.common.DisabledOnQuarkus;
-import io.quarkus.ts.openshift.common.OpenShiftTest;
-import io.quarkus.ts.openshift.common.injection.TestResource;
-import io.quarkus.ts.openshift.common.injection.WithName;
+import static io.restassured.RestAssured.when;
+import static org.awaitility.Awaitility.await;
+import static org.hamcrest.Matchers.hasItems;
+import static org.hamcrest.Matchers.hasSize;
+
+import java.net.URL;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import java.net.URL;
-import java.util.concurrent.TimeUnit;
-
-import static io.restassured.RestAssured.when;
-import static org.awaitility.Awaitility.await;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.hasSize;
+import io.quarkus.ts.openshift.common.AdditionalResources;
+import io.quarkus.ts.openshift.common.DisabledOnQuarkus;
+import io.quarkus.ts.openshift.common.OpenShiftTest;
+import io.quarkus.ts.openshift.common.injection.TestResource;
+import io.quarkus.ts.openshift.common.injection.WithName;
 
 @OpenShiftTest
 @AdditionalResources("classpath:jaeger-all-in-one-template.yml")
@@ -24,7 +25,8 @@ import static org.hamcrest.Matchers.hasSize;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @DisabledOnQuarkus(version = "1\\.3\\..*", reason = "https://github.com/quarkusio/quarkus/pull/7987")
 public class MicroProfileOpenShiftIT extends AbstractMicroProfileTest {
-    @TestResource @WithName("jaeger-query")
+    @TestResource
+    @WithName("jaeger-query")
     private URL jaegerUrl;
 
     @TestResource
@@ -39,7 +41,7 @@ public class MicroProfileOpenShiftIT extends AbstractMicroProfileTest {
         await().atMost(30, TimeUnit.SECONDS).untilAsserted(() -> {
             when()
                     .get(jaegerUrl + "/api/traces?service=test-traced-service")
-            .then()
+                    .then()
                     .statusCode(200)
                     .log().body()
                     .log().status()
@@ -48,35 +50,33 @@ public class MicroProfileOpenShiftIT extends AbstractMicroProfileTest {
                     .body("data[0].spans.operationName", hasItems(
                             "GET:io.quarkus.ts.openshift.microprofile.ClientResource.get",
                             "GET",
-                            "GET:io.quarkus.ts.openshift.microprofile.HelloResource.get"
-                    ))
+                            "GET:io.quarkus.ts.openshift.microprofile.HelloResource.get"))
                     .body("data[0].spans.logs.fields.value.flatten()", hasItems(
                             "ClientResource called",
                             "HelloResource called",
                             "HelloService called",
-                            "HelloService async processing"
-                    ))
-                    .body("data[0].spans.find { it.operationName == 'GET:io.quarkus.ts.openshift.microprofile.ClientResource.get' }.tags.collect { \"${it.key}=${it.value}\".toString() }", hasItems(
-                            "span.kind=server",
-                            "component=jaxrs",
-                            "http.url=" + applicationUrl + "/client",
-                            "http.method=GET",
-                            "http.status_code=200"
-                    ))
-                    .body("data[0].spans.find { it.operationName == 'GET' }.tags.collect { \"${it.key}=${it.value}\".toString() }", hasItems(
-                            "span.kind=client",
-                            "component=jaxrs",
-                            "http.url=http://microprofile-test:8080/hello",
-                            "http.method=GET",
-                            "http.status_code=200"
-                    ))
-                    .body("data[0].spans.find { it.operationName == 'GET:io.quarkus.ts.openshift.microprofile.HelloResource.get' }.tags.collect { \"${it.key}=${it.value}\".toString() }", hasItems(
-                            "span.kind=server",
-                            "component=jaxrs",
-                            "http.url=http://microprofile-test:8080/hello",
-                            "http.method=GET",
-                            "http.status_code=200"
-                    ));
+                            "HelloService async processing"))
+                    .body("data[0].spans.find { it.operationName == 'GET:io.quarkus.ts.openshift.microprofile.ClientResource.get' }.tags.collect { \"${it.key}=${it.value}\".toString() }",
+                            hasItems(
+                                    "span.kind=server",
+                                    "component=jaxrs",
+                                    "http.url=" + applicationUrl + "/client",
+                                    "http.method=GET",
+                                    "http.status_code=200"))
+                    .body("data[0].spans.find { it.operationName == 'GET' }.tags.collect { \"${it.key}=${it.value}\".toString() }",
+                            hasItems(
+                                    "span.kind=client",
+                                    "component=jaxrs",
+                                    "http.url=http://microprofile-test:8080/hello",
+                                    "http.method=GET",
+                                    "http.status_code=200"))
+                    .body("data[0].spans.find { it.operationName == 'GET:io.quarkus.ts.openshift.microprofile.HelloResource.get' }.tags.collect { \"${it.key}=${it.value}\".toString() }",
+                            hasItems(
+                                    "span.kind=server",
+                                    "component=jaxrs",
+                                    "http.url=http://microprofile-test:8080/hello",
+                                    "http.method=GET",
+                                    "http.status_code=200"));
         });
     }
 }

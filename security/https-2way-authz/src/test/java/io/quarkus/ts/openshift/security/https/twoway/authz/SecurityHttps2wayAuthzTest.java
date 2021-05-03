@@ -1,8 +1,15 @@
 package io.quarkus.ts.openshift.security.https.twoway.authz;
 
-import io.quarkus.test.common.http.TestHTTPResource;
-import io.quarkus.test.junit.QuarkusTest;
-import io.quarkus.ts.openshift.common.DisabledOnQuarkus;
+import static io.quarkus.ts.openshift.common.util.HttpsAssertions.assertTls13OnlyHandshakeError;
+import static io.quarkus.ts.openshift.common.util.HttpsAssertions.assertTlsHandshakeError;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.io.File;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
+import javax.net.ssl.SSLContext;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Request;
@@ -12,15 +19,9 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.ssl.SSLContexts;
 import org.junit.jupiter.api.Test;
 
-import javax.net.ssl.SSLContext;
-
-import java.io.File;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-
-import static io.quarkus.ts.openshift.common.util.HttpsAssertions.assertTls13OnlyHandshakeError;
-import static io.quarkus.ts.openshift.common.util.HttpsAssertions.assertTlsHandshakeError;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import io.quarkus.test.common.http.TestHTTPResource;
+import io.quarkus.test.junit.QuarkusTest;
+import io.quarkus.ts.openshift.common.DisabledOnQuarkus;
 
 @QuarkusTest
 @DisabledOnQuarkus(version = "1\\.[345]\\..*", reason = "https://github.com/quarkusio/quarkus/pull/8991")
@@ -134,7 +135,8 @@ public class SecurityHttps2wayAuthzTest {
     }
 
     @Test
-    public void https_serverCertificateUnknownToClient_clientCertificateUnknownToServer() throws IOException, GeneralSecurityException {
+    public void https_serverCertificateUnknownToClient_clientCertificateUnknownToServer()
+            throws IOException, GeneralSecurityException {
         SSLContext sslContext = SSLContexts.custom()
                 .setKeyStoreType("pkcs12")
                 .loadKeyMaterial(new File("target/unknown-client-keystore.pkcs12"), CLIENT_PASSWORD, CLIENT_PASSWORD)

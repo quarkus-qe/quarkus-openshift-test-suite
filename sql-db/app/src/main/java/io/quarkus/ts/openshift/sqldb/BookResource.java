@@ -1,6 +1,6 @@
 package io.quarkus.ts.openshift.sqldb;
 
-import io.quarkus.panache.common.Sort;
+import java.util.List;
 
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -17,7 +17,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import java.util.List;
+import io.quarkus.panache.common.Sort;
 
 @Path("/book")
 @Produces(MediaType.APPLICATION_JSON)

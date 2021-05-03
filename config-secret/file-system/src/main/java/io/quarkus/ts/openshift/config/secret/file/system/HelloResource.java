@@ -1,6 +1,6 @@
 package io.quarkus.ts.openshift.config.secret.file.system;
 
-import org.eclipse.microprofile.config.inject.ConfigProperty;
+import java.util.Optional;
 
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -10,7 +10,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import java.util.Optional;
+import org.eclipse.microprofile.config.inject.ConfigProperty;
 
 @Path("/hello")
 public class HelloResource {

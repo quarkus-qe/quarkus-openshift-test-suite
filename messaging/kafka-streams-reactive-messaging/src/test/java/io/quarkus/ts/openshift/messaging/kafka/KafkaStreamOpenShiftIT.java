@@ -5,5 +5,5 @@ import io.quarkus.ts.openshift.common.OpenShiftTest;
 
 @OpenShiftTest
 @AdditionalResources("classpath:deployments/kafka/strimzi.yaml")
-public class KafkaStreamOpenShiftIT extends AbstractKafkaTest{
+public class KafkaStreamOpenShiftIT extends AbstractKafkaTest {
 }

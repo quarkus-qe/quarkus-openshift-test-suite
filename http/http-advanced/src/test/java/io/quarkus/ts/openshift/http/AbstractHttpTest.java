@@ -1,5 +1,31 @@
 package io.quarkus.ts.openshift.http;
 
+import static io.quarkus.ts.openshift.http.HttpClientVersionResource.HTTP_VERSION;
+import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.when;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.in;
+import static org.hamcrest.Matchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Paths;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import javax.ws.rs.core.Response;
+
+import org.apache.commons.lang3.StringUtils;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
 import io.quarkus.ts.openshift.common.injection.TestResource;
 import io.quarkus.ts.openshift.http.clients.HealthClientService;
 import io.quarkus.ts.openshift.http.clients.HttpVersionClientService;
@@ -15,31 +41,6 @@ import io.vertx.mutiny.ext.web.client.HttpResponse;
 import io.vertx.mutiny.ext.web.client.WebClient;
 import io.vertx.mutiny.ext.web.client.predicate.ResponsePredicate;
 import io.vertx.mutiny.ext.web.client.predicate.ResponsePredicateResult;
-import org.apache.commons.lang3.StringUtils;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-
-import javax.ws.rs.core.Response;
-
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Paths;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import static io.quarkus.ts.openshift.http.HttpClientVersionResource.HTTP_VERSION;
-import static io.restassured.RestAssured.given;
-import static io.restassured.RestAssured.when;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.in;
-import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class AbstractHttpTest {
 
@@ -75,7 +76,8 @@ public abstract class AbstractHttpTest {
     @DisplayName("Http/2 Server test")
     public void http2Server() throws InterruptedException, URISyntaxException {
         CountDownLatch done = new CountDownLatch(1);
-        Uni<JsonObject> content = WebClient.create(Vertx.vertx(), defaultVertxHttpClientOptions()).getAbs(getAppEndpoint() + "hello")
+        Uni<JsonObject> content = WebClient.create(Vertx.vertx(), defaultVertxHttpClientOptions())
+                .getAbs(getAppEndpoint() + "hello")
                 .expect(ResponsePredicate.create(AbstractHttpTest::isHttp2x))
                 .expect(ResponsePredicate.status(Response.Status.OK.getStatusCode()))
                 .send().map(HttpResponse::bodyAsJsonObject)
@@ -110,11 +112,12 @@ public abstract class AbstractHttpTest {
     @DisplayName("Http/2 Client Async test")
     @Disabled("blocked by: https://issues.redhat.com/browse/QUARKUS-658")
     public void http2ClientAsync() throws Exception {
-        HttpVersionClientServiceAsync clientServiceAsync = new RestClientServiceBuilder<HttpVersionClientServiceAsync>(getAppEndpoint())
-                .withHostVerified(true)
-                .withPassword(PASSWORD)
-                .withKeyStorePath(KEY_STORE_PATH)
-                .build(HttpVersionClientServiceAsync.class);
+        HttpVersionClientServiceAsync clientServiceAsync = new RestClientServiceBuilder<HttpVersionClientServiceAsync>(
+                getAppEndpoint())
+                        .withHostVerified(true)
+                        .withPassword(PASSWORD)
+                        .withKeyStorePath(KEY_STORE_PATH)
+                        .build(HttpVersionClientServiceAsync.class);
 
         Response resp = clientServiceAsync
                 .getClientHttpVersion()
@@ -131,17 +134,12 @@ public abstract class AbstractHttpTest {
         List<String> endpoints = Arrays.asList(
                 "/openapi", "/swagger-ui", "/metrics/base", "/metrics/application",
                 "/metrics/vendor", "/metrics", "/health/group", "/health/well", "/health/ready",
-                "/health/live", "/health"
-        );
+                "/health/live", "/health");
 
         for (String endpoint : endpoints) {
             given().redirects().follow(false)
                     .log().uri()
-                    .expect().
-                    statusCode(301).
-                    header("Location", containsString("/q" + endpoint)).
-                    when().
-                    get(endpoint);
+                    .expect().statusCode(301).header("Location", containsString("/q" + endpoint)).when().get(endpoint);
 
             given().expect().statusCode(in(Arrays.asList(200, 204))).when().get(endpoint);
         }
@@ -162,7 +160,8 @@ public abstract class AbstractHttpTest {
     @Test
     public void vertxHttpClientRedirection() throws InterruptedException, URISyntaxException {
         CountDownLatch done = new CountDownLatch(1);
-        Uni<Integer> statusCode = WebClient.create(Vertx.vertx(), defaultVertxHttpClientOptions()).getAbs(getAppEndpoint() + "health")
+        Uni<Integer> statusCode = WebClient.create(Vertx.vertx(), defaultVertxHttpClientOptions())
+                .getAbs(getAppEndpoint() + "health")
                 .send().map(HttpResponse::statusCode)
                 .ifNoItem().after(Duration.ofSeconds(TIMEOUT_SEC)).fail()
                 .onFailure().retry().atMost(RETRY);
@@ -181,7 +180,8 @@ public abstract class AbstractHttpTest {
     }
 
     private static ResponsePredicateResult isHttp2x(HttpResponse<Void> resp) {
-        return (resp.version().compareTo(HttpVersion.HTTP_2) == 0) ? ResponsePredicateResult.success() : ResponsePredicateResult.failure("Expected HTTP/2");
+        return (resp.version().compareTo(HttpVersion.HTTP_2) == 0) ? ResponsePredicateResult.success()
+                : ResponsePredicateResult.failure("Expected HTTP/2");
     }
 
     private WebClientOptions defaultVertxHttpClientOptions() throws URISyntaxException {

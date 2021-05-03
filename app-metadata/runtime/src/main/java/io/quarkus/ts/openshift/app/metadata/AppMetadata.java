@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 /**
  * Useful information about the test application.
+ * 
  * @see #appName
  * @see #httpRoot
  * @see #knownEndpoint
@@ -71,8 +72,7 @@ public final class AppMetadata {
                     props.getProperty("app-name"),
                     props.getProperty("http-root"),
                     props.getProperty("known-endpoint"),
-                    props.getProperty("deployment-target")
-            );
+                    props.getProperty("deployment-target"));
         } catch (NoSuchFileException e) {
             throw new RuntimeException(file + " not found, did you add the app-metadata extension?", e);
         } catch (IOException e) {
