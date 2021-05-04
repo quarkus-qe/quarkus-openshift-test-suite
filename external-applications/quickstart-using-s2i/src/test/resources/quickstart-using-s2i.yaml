@@ -1,0 +1,97 @@
+apiVersion: v1
+kind: List
+items:
+- apiVersion: image.openshift.io/v1
+  kind: ImageStream
+  metadata:
+    name: quickstart-using-s2i
+  spec:
+    lookupPolicy:
+      local: false
+
+- apiVersion: build.openshift.io/v1
+  kind: BuildConfig
+  metadata:
+    name: quickstart-using-s2i
+  spec:
+    output:
+      to:
+        kind: ImageStreamTag
+        name: quickstart-using-s2i:latest
+    source:
+      git:
+        uri: https://github.com/quarkusio/quarkus-quickstarts
+        ref: "1.11"
+      contextDir: "getting-started"
+      type: Git
+      configMaps:
+      - configMap:
+          name: settings-mvn
+        destinationDir: "/configuration"
+    strategy:
+      type: Source
+      sourceStrategy:
+        env:
+        - name: MAVEN_ARGS
+          value: -s /configuration/settings.xml -Dquarkus-plugin.version=${version.plugin.quarkus} -Dquarkus.platform.version=${version.quarkus} -Dquarkus.platform.group-id=${quarkus.platform.group-id} -Dquarkus.platform.artifact-id=${quarkus.platform.artifact-id} -DskipTests=true
+        from:
+          # This is the default JDK version when creating the quickstart from OpenShift Console
+          kind: ImageStreamTag
+          namespace: openshift
+          name: 'java:openjdk-11-el7'
+    triggers:
+    - type: ConfigChange
+    - type: ImageChange
+      imageChange: {}
+
+- apiVersion: apps.openshift.io/v1
+  kind: DeploymentConfig
+  metadata:
+    name: quickstart-using-s2i
+  spec:
+    replicas: 1
+    selector:
+      name: quickstart-using-s2i
+    template:
+      metadata:
+        labels:
+          name: quickstart-using-s2i
+      spec:
+        containers:
+        - name: quickstart-using-s2i
+          image: quickstart-using-s2i:latest
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+    test: false
+    triggers:
+      - type: ConfigChange
+      - type: ImageChange
+        imageChangeParams:
+          automatic: true
+          containerNames:
+          - quickstart-using-s2i
+          from:
+            kind: ImageStreamTag
+            name: quickstart-using-s2i:latest
+
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: quickstart-using-s2i
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    selector:
+      name: quickstart-using-s2i
+
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    name: quickstart-using-s2i
+  spec:
+    to:
+      name: quickstart-using-s2i

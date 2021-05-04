@@ -53,6 +53,7 @@
 
         <module>external-applications/todo-demo-app</module>
         <module>external-applications/quarkus-workshop-super-heroes</module>
+        <module>external-applications/quickstart-using-s2i</module>
 
         <module>deployment-strategies/quarkus</module>
     </modules>
