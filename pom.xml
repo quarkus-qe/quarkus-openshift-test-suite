@@ -60,7 +60,7 @@
         <quarkus.platform.artifact-id>quarkus-universe-bom</quarkus.platform.artifact-id>
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
         <version.apicurio.registry.utils.serde>1.3.2.Final</version.apicurio.registry.utils.serde>
-        <version.quarkiverse.apicurio.registry.client>0.0.1</version.quarkiverse.apicurio.registry.client>
+        <version.quarkiverse.apicurio.registry.client>0.0.2</version.quarkiverse.apicurio.registry.client>
         <version.strimzi>0.20.1</version.strimzi>
         <version.apache-httpclient-fluent>4.5.12</version.apache-httpclient-fluent>
         <!-- same as Apache HTTP Client managed by Quarkus BOM -->
