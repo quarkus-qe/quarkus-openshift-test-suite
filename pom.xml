@@ -221,6 +221,8 @@
                             <excludes>
                                 <!-- Exclude files from target folder -->
                                 <exclude>**/target/**/*.xml</exclude>
+                                <!-- Exclude files from IDEA folder -->
+                                <exclude>**/.idea/**/*.xml</exclude>
                                 <!-- Exclude Quarkus main repository -->
                                 <exclude>**/quarkus/**/*.xml</exclude>
                             </excludes>
