@@ -76,6 +76,7 @@
         <version.quarkus>1.13.3.Final</version.quarkus>
         <version.plugin.quarkus>${version.quarkus}</version.plugin.quarkus>
         <version.testcontainers>1.15.3</version.testcontainers>
+        <version.com.squareup.retrofit2>2.9.0</version.com.squareup.retrofit2>
         <version.formatter-maven-plugin>2.15.0</version.formatter-maven-plugin>
         <version.impsort-maven-plugin>1.6.0</version.impsort-maven-plugin>
         <version.xml-format-maven-plugin>3.1.2</version.xml-format-maven-plugin>
@@ -160,6 +161,12 @@
                 <groupId>org.fusesource.jansi</groupId>
                 <artifactId>jansi</artifactId>
                 <version>${version.fusesource-jansi}</version>
+            </dependency>
+            <!-- TODO: com.squareup.retrofit2:retrofit:2.9.0 should be removed on Quarkus 2.0.0.Alphas-->
+            <dependency>
+                <groupId>com.squareup.retrofit2</groupId>
+                <artifactId>retrofit</artifactId>
+                <version>${version.com.squareup.retrofit2}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
