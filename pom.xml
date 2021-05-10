@@ -15,7 +15,6 @@
         <module>app-metadata/deployment</module>
         <module>app-metadata/runtime</module>
         <module>common</module>
-
         <module>http/http-minimum</module>
         <module>http/http-advanced</module>
         <module>configmap/api-server</module>
@@ -50,11 +49,9 @@
         <module>microprofile</module>
         <module>micrometer/prometheus</module>
         <module>micrometer/prometheus-kafka</module>
-
         <module>external-applications/todo-demo-app</module>
         <module>external-applications/quarkus-workshop-super-heroes</module>
         <module>external-applications/quickstart-using-s2i</module>
-
         <module>deployment-strategies/quarkus</module>
     </modules>
 
