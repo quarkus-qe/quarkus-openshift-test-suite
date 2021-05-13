@@ -8,6 +8,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.eclipse.microprofile.jwt.JsonWebToken;
 
+import io.quarkus.security.Authenticated;
 import io.quarkus.security.identity.SecurityIdentity;
 
 @Path("/admin")
@@ -20,6 +21,7 @@ public class AdminResource {
 
     @GET
     @Produces(MediaType.TEXT_PLAIN)
+    @Authenticated
     public String get() {
         return "Hello, admin " + identity.getPrincipal().getName();
     }
@@ -27,6 +29,7 @@ public class AdminResource {
     @GET
     @Path("/issuer")
     @Produces(MediaType.TEXT_PLAIN)
+    @Authenticated
     public String issuer() {
         return "admin token issued by " + jwt.getIssuer();
     }

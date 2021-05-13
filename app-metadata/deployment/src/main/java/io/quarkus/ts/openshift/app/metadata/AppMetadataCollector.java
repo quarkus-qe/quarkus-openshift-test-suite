@@ -33,7 +33,7 @@ public class AppMetadataCollector {
         } else if (liveness.isPresent()) {
             knownEndpoint = liveness.get().getPath();
         } else {
-            knownEndpoint = httpRoot.adjustPath("/"); // TODO ?
+            knownEndpoint = httpRoot.resolvePath("/"); // TODO ?
         }
 
         String deploymentTarget = ConfigProvider.getConfig()
