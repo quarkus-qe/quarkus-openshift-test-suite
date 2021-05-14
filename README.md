@@ -536,27 +536,37 @@ Container images used in the tests are:
 
 ### `infinispan-client`
 
-Verifies the way of sharing cache with Datagrid operator.
+Verifies the way of the sharing cache by Datagrid operator and Infinispan cluster and data consistency after failures.
 
-#### Prerequisities
+#### Prerequisites
 - Datagrid operator installed in `datagrid-operator` namespace. This needs cluster-admin rights to install.
 - The operator supports only single-namespace so it has to watch another well-known namespace `datagrid-cluster`. 
-This namespace must be created by "qe" user or this user must have access to it because infinispan tests are connecting to it.
+This namespace must be created by "qe" user or this user must have access to it because tests are connecting to it.
 - These namespaces should be prepared after the Openshift installation - See [Installing Data Grid Operator](https://access.redhat.com/documentation/en-us/red_hat_data_grid/8.1/html/running_data_grid_on_openshift/installation)
 
-Tests are creating an infinispan cluster in the `datagrid-cluster` namespace. Cluster is created before tests by `infinispan_cluster_config.yaml`. 
-To allow parallel runs of tests this cluster must be renamed for every test run - along with configmap `infinispan-config`. The configmap contains 
-configuration property `quarkus.infinispan-client.server-list`. Value of this property is a path to the infinispan cluster from test namespace, 
-its structure is `infinispan-cluster-name.datagrid-cluster-namespace.svc.cluster.local:11222`. It is because testsuite using dynamically generated 
-namespaces for tests. So this path is needed for tests to find infinispan server.
+The test suite contains a Maven profile activated using the `include.datagrid`. 
+To execute Datagrid tests use the following switch in the maven command:
 
-The infinispan cluster needs 2 special secrets - tls-secret with TLS certificate and connect-secret with the credentials.
+```
+-Dinclude.datagrid
+```
+
+Tests create an Infinispan cluster in the `datagrid-cluster` namespace. Cluster is created before tests by `infinispan_cluster_config.yaml`. 
+To allow parallel runs of tests this cluster is renamed for every test run - along with configmap `infinispan-config`. The configmap contains 
+configuration property `quarkus.infinispan-client.server-list`. Value of this property is a path to the infinispan cluster from test namespace, 
+its structure is `infinispan-cluster-name.datagrid-cluster-namespace.svc.cluster.local:11222`. It is because the testsuite uses dynamically generated 
+namespaces for tests. So this path is needed for the tests to find Infinispan cluster in another namespace.
+
+The Infinispan cluster needs 2 special secrets - tls-secret with TLS certificate and connect-secret with the credentials.
 TLS certificate is a substitution of `secrets/signing-key` in openshift-service-ca namespace, which "qe" user cannot use (doesn't have rights on it). 
 Clientcert secret is generated for "qe" from the tls-secret mentioned above.
 
-Infinispan client test are using the cache directly with @Inject and @RemoteCache. Through the JAX-RS endpoint, we send data into the cache and retrieve it through another JAX-RS endpoint. 
-The next tests are checking a simple fail-over - first client (application) fail, then Infinispan cluster (cache) fail. Tests kill either the Quarkus pod or Infinispan cluster pod, then wait for redeployment, and check data.
-For the Quarkus application pod killing is used the same approach as in configmap tests.
+Infinispan client tests use the cache directly with `@Inject` and `@RemoteCache`. Through the JAX-RS endpoint, we send data into the cache and retrieve it through another JAX-RS endpoint. 
+The next tests are checking a simple fail-over - first client (application) fail, then Infinispan cluster (cache) fail. Tests kill first the Quarkus pod then Infinispan cluster pod and then check data.
+For the Quarkus application, pod killing is used the same approach as in configmap tests. For the Infinispan cluster, pod killing is updated its YAML snipped and uploaded with zero replicas.
+By default, when the Infinispan server is down and the application can't open a connection, it tries to connect again, up to 10 times (max_retries) and gives up after 60s (connect_timeout).
+Because of that we are using the `hotrod-client.properties` file where are the max_retries and connect_timeout reduced. Without this the application will be still trying to connect to the Infinispan server next 10 minutes and the incremented number can appear later.
+The last three tests are for testing of the multiple client access to the cache. We simulate the second client by deploying the second deployment config, Service, and Route for these tests. These are copied from the `openshift.yml` file.
 
 ### `security/basic`
 

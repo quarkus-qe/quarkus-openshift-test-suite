@@ -1,16 +1,10 @@
 package io.quarkus.ts.openshift.infinispan.client;
 
-import io.fabric8.openshift.client.OpenShiftClient;
-import io.quarkus.ts.openshift.app.metadata.AppMetadata;
 import io.quarkus.ts.openshift.common.AdditionalResources;
-import io.quarkus.ts.openshift.common.Command;
-import io.quarkus.ts.openshift.common.CustomizeApplicationDeployment;
-import io.quarkus.ts.openshift.common.CustomizeApplicationUndeployment;
+import io.quarkus.ts.openshift.common.OnlyIfConfigured;
 import io.quarkus.ts.openshift.common.OpenShiftTest;
+import io.quarkus.ts.openshift.common.OpenShiftTestException;
 import io.quarkus.ts.openshift.common.deploy.UsingQuarkusPluginDeploymentStrategy;
-import io.quarkus.ts.openshift.common.injection.TestResource;
-import io.quarkus.ts.openshift.common.util.AwaitUtil;
-import io.quarkus.ts.openshift.common.util.OpenShiftUtil;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -18,155 +12,86 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.concurrent.TimeUnit;
 
 import static io.restassured.RestAssured.when;
 import static org.awaitility.Awaitility.await;
-import static org.hamcrest.CoreMatchers.is;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @OpenShiftTest(strategy = UsingQuarkusPluginDeploymentStrategy.class)
 @AdditionalResources("classpath:clientcert_secret.yaml")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-public class InfinispanCountersOpenShiftIT {
+@OnlyIfConfigured("ts.authenticated-registry")
+public class InfinispanCountersOpenShiftIT extends AbstractInfinispanResourceTest {
 
-    private static final String ORIGIN_CLUSTER_NAME = "totally-random-infinispan-cluster-name";
-    private static final String CLUSTER_CONFIG_PATH = "target/test-classes/infinispan_cluster_config.yaml";
-    private static final String CLUSTER_CONFIGMAP_PATH = "target/test-classes/infinispan_cluster_configmap.yaml";
-
-    private static final String CLUSTER_NAMESPACE_NAME = "datagrid-cluster";
-    private static String NEW_CLUSTER_NAME = null;
-
-    @TestResource
-    private AppMetadata metadata;
-
-    @TestResource
-    private OpenShiftUtil openshift;
-
-    @TestResource
-    private AwaitUtil await;
-
-    // Application deployment is performed by the Quarkus Kubernetes extension during test execution.
-    // Creating an infinispan cluster, its secrets and setting the path to it for the application
-    @CustomizeApplicationDeployment
-    public static void deploy(OpenShiftClient oc) throws IOException, InterruptedException {
-        new Command("oc", "apply", "-f", "target/test-classes/connect_secret.yaml").runAndWait();
-        new Command("oc", "apply", "-f", "target/test-classes/tls_secret.yaml").runAndWait();
-
-        // there should be unique name for every created infinispan cluster to be able parallel runs
-        NEW_CLUSTER_NAME = oc.getNamespace() + "-infinispan-cluster";
-
-        adjustYml(CLUSTER_CONFIG_PATH, ORIGIN_CLUSTER_NAME, NEW_CLUSTER_NAME);
-        adjustYml(CLUSTER_CONFIGMAP_PATH, ORIGIN_CLUSTER_NAME, NEW_CLUSTER_NAME);
-
-        new Command("oc", "apply", "-f", CLUSTER_CONFIGMAP_PATH).runAndWait();
-        new Command("oc", "apply", "-f", CLUSTER_CONFIG_PATH).runAndWait();
-
-        new Command("oc", "-n", CLUSTER_NAMESPACE_NAME, "wait", "--for", "condition=wellFormed", "--timeout=300s", "infinispan/" + NEW_CLUSTER_NAME).runAndWait();
-    }
-
-    // Undeployment of the application and infinispan cluster
-    @CustomizeApplicationUndeployment
-    public static void undeploy() throws IOException, InterruptedException {
-        new Command("oc", "delete", "-f", CLUSTER_CONFIGMAP_PATH).runAndWait();
-        new Command("oc", "delete", "-f", CLUSTER_CONFIG_PATH).runAndWait();
-    }
-
+    /**
+     * Simple check of connection to endpoints
+     *
+     * Expected values = 0
+     */
     @Test
     @Order(1)
     public void testConnectToEndpoints() {
-        when()
-                .get("/first-counter/get-cache")
-                .then()
-                .statusCode(200)
-                .body(is("0"));
+        String firstEndpointCache = getCounterValue(appUrl + "/first-counter/get-cache");
+        String secondEndpointCache = getCounterValue(appUrl + "/second-counter/get-cache");
 
-        when()
-                .get("/second-counter/get-cache")
-                .then()
-                .statusCode(200)
-                .body(is("0"));
+        assertEquals(firstEndpointCache, secondEndpointCache);
     }
 
+    /**
+     * Test increment counters by 1
+     *
+     * Client counters should be 1 for both endpoints
+     * Cache counter is shared and should be 2
+     */
     @Test
     @Order(2)
     public void testUpdateCacheOnEndpoints() {
-        // fill the cache in the first class
-        when()
-                .put("/first-counter/increment-counters")
-                .then()
-                .statusCode(200)
-                .body(is("Cache=1 Client=1"));
+        String firstEndpointCounters = fillTheCache(appUrl + "/first-counter/increment-counters");
+        String secondEndpointCounters = fillTheCache(appUrl + "/second-counter/increment-counters");
 
-        // fill the cache in the second class
-        when()
-                .put("/second-counter/increment-counters")
-                .then()
-                .statusCode(200)
-                .body(is("Cache=2 Client=1"));
-
-        // check the cache counter
-        when()
-                .get("/first-counter/get-cache")
-                .then()
-                .statusCode(200)
-                .body(is("2"));
-
-        when()
-                .get("/second-counter/get-cache")
-                .then()
-                .statusCode(200)
-                .body(is("2"));
-
-        // check the client counter
-        when()
-                .get("/first-counter/get-client")
-                .then()
-                .statusCode(200)
-                .body(is("1"));
-
-        when()
-                .get("/second-counter/get-client")
-                .then()
-                .statusCode(200)
-                .body(is("1"));
+        assertEquals("Cache=1 Client=1", firstEndpointCounters);
+        assertEquals("Cache=2 Client=1", secondEndpointCounters);
     }
 
+    /**
+     * Client fail-over test. Testing the Quarkus application will connect back to the DataGrid server after restart.
+     *
+     * Cache counter should remain the same.
+     * Client counter is reset to 0
+     */
     @Test
     @Order(3)
     public void testCacheAfterClientsRestart() {
-        // always start from 0
-        resetCounters();
+        resetCacheCounter(appUrl + "/first-counter/reset-cache");
+        resetClientCounter(appUrl + "/first-counter/reset-client");
+
         // fill the cache
-        incrementCountersOnValue(10);
+        incrementCountersOnValue(appUrl + "/first-counter/increment-counters", 10);
 
         // restart the app
         openshift.rolloutChanges(metadata.appName);
 
-        // check the cache counter
-        when()
-                .get("/first-counter/get-cache")
-                .then()
-                .statusCode(200)
-                .body(is("10"));
+        String cacheCounter = getCounterValue(appUrl + "/first-counter/get-cache");
+        String clientCounter = getCounterValue(appUrl + "/first-counter/get-client");
 
-        // check the client counter
-        when()
-                .get("/first-counter/get-client")
-                .then()
-                .statusCode(200)
-                .body(is("0"));
+        assertEquals("10", cacheCounter);
+        assertEquals("0", clientCounter);
     }
 
+    /**
+     * Client fail-over test. Testing the request to the DataGrid server by the failed Quarkus application.
+     *
+     * Cache counter should remain the same.
+     * Client counter is reset to 0
+     */
     @Test
     @Order(4)
     public void testInvokeWithFailedNode() {
-        resetCounters();
-        incrementCountersOnValue(10);
+        resetCacheCounter(appUrl + "/first-counter/reset-cache");
+        resetClientCounter(appUrl + "/first-counter/reset-client");
+
+        incrementCountersOnValue(appUrl + "/first-counter/increment-counters", 10);
 
         // kill the app = fail of the client
         int replicas = openshift.countReadyReplicas(metadata.appName);
@@ -174,34 +99,40 @@ public class InfinispanCountersOpenShiftIT {
 
         // try to invoke the cache
         when()
-                .put("/first-counter/increment-counters")
+                .put(appUrl + "/first-counter/increment-counters")
                 .then()
-                .statusCode(Matchers.allOf(Matchers.greaterThanOrEqualTo(500),Matchers.lessThan(600)));
+                .statusCode(Matchers.allOf(Matchers.greaterThanOrEqualTo(500), Matchers.lessThan(600)));
 
         // turn-on the app
         openshift.scale(metadata.appName, replicas);
         await.awaitAppRoute();
 
-        // check the cache counter
-        when()
-                .get("/first-counter/get-cache")
-                .then()
-                .statusCode(200)
-                .body(is("10"));
+        String cacheCounter = getCounterValue(appUrl + "/first-counter/get-cache");
+        String clientCounter = getCounterValue(appUrl + "/first-counter/get-client");
 
-        // check the client counter
-        when()
-                .get("/first-counter/get-client")
-                .then()
-                .statusCode(200)
-                .body(is("0"));
+        assertEquals("10", cacheCounter);
+        assertEquals("0", clientCounter);
     }
 
+    /**
+     * Infinispan fail-over test. Testing restart the infinispan cluster in DataGrid operator and wait the Quarkus
+     * application connects back. The restart is done by reducing the number of infinispan cluster replicas to 0 and it waits
+     * for the shutdown condition. Then the number of replicas is changed back to 1.
+     *
+     * We don't have cache backup in this test case, so the cache is deleted by the restart of infinispan cluster.
+     * The cache definition "mycache" remains, but the "counter" cache in it is deleted.
+     * Client counter should remain with the same value after the restart.
+     *
+     * @throws IOException
+     * @throws InterruptedException
+     */
     @Test
     @Order(5)
     public void testRestartInfinispanCluster() throws IOException, InterruptedException {
-        resetCounters();
-        incrementCountersOnValue(10);
+        resetCacheCounter(appUrl + "/first-counter/reset-cache");
+        resetClientCounter(appUrl + "/first-counter/reset-client");
+
+        incrementCountersOnValue(appUrl + "/first-counter/increment-counters", 10);
 
         killInfinispanCluster();
         restartInfinispanCluster();
@@ -209,23 +140,33 @@ public class InfinispanCountersOpenShiftIT {
         // try to connect back to infinispan cluster and expect no content
         await().atMost(5, TimeUnit.MINUTES).untilAsserted(() -> {
             when()
-                    .get("/first-counter/get-cache")
-            .then()
+                    .get(appUrl + "/first-counter/get-cache")
+                    .then()
                     .statusCode(204);
         });
 
-        // check the client counter
-        when()
-                .get("/first-counter/get-client")
-                .then()
-                .body(is("10"));
+        String clientCounter = getCounterValue(appUrl + "/first-counter/get-client");
+        assertEquals("10", clientCounter);
     }
 
+    /**
+     * Infinispan fail-over test. Testing a restart of the infinispan cluster and increment/change the cache counter value
+     * after the restart. The cache is deleted by the restart of infinispan cluster. Because of this, we need to fill the cache
+     * again. It is done by 'cache.put("counter", 0)'. Then it could be incremented.
+     *
+     * Cache newly created after the restart and incremented by 1 so it should be only 1.
+     * Client counter should remain the same during the restart and after the counter incrementing should by increased by 1.
+     *
+     * @throws IOException
+     * @throws InterruptedException
+     */
     @Test
     @Order(6)
     public void testIncrementAfterRestartInfinispanCluster() throws IOException, InterruptedException {
-        resetCounters();
-        incrementCountersOnValue(10);
+        resetCacheCounter(appUrl + "/first-counter/reset-cache");
+        resetClientCounter(appUrl + "/first-counter/reset-client");
+
+        incrementCountersOnValue(appUrl + "/first-counter/increment-counters", 10);
 
         killInfinispanCluster();
         restartInfinispanCluster();
@@ -233,96 +174,150 @@ public class InfinispanCountersOpenShiftIT {
         // try to connect back to infinispan cluster and expect no content
         await().atMost(5, TimeUnit.MINUTES).untilAsserted(() -> {
             when()
-                    .get("/first-counter/get-cache")
+                    .get(appUrl + "/first-counter/get-cache")
                     .then()
                     .statusCode(204);
         });
 
         // create the deleted cache counter again
-        when()
-                .put("/first-counter/reset-cache")
-                .then()
-                .statusCode(200)
-                .body(is("Cache=0"));
-
+        String zeroCache = fillTheCache(appUrl + "/first-counter/reset-cache");
         // try to increment counters
-        when()
-                .put("/first-counter/increment-counters")
-                .then()
-                .statusCode(200)
-                .body(is("Cache=1 Client=11"));
+        String firstEndpointCounters = fillTheCache(appUrl + "/first-counter/increment-counters");
+
+        assertEquals("Cache=0", zeroCache);
+        assertEquals("Cache=1 Client=11", firstEndpointCounters);
     }
 
+    /**
+     * Infinispan fail-over test. Test invoke a request on the Infinispan server which is currently down.
+     * Because of our settings in the hotrod-client.properties file, the application is trying to connect only once and only 1s.
+     * By default, the app is trying to connect 60 s with 10 retries even when the next tests continue. It means that the counter
+     * could be unexpectedly increased in one of the next tests
+     *
+     * Cache should be empty (status code 204).
+     * Client counter should be increased even if the server is down.
+     *
+     * @throws IOException
+     * @throws InterruptedException
+     */
     @Test
     @Order(7)
     public void testInvokeOnFailedInfinispanCluster() throws IOException, InterruptedException {
-        resetCounters();
-        incrementCountersOnValue(10);
+        resetCacheCounter(appUrl + "/first-counter/reset-cache");
+        resetClientCounter(appUrl + "/first-counter/reset-client");
+
+        incrementCountersOnValue(appUrl + "/first-counter/increment-counters", 10);
 
         killInfinispanCluster();
 
         // try to increment counters
         when()
-                .put("/first-counter/increment-counters")
+                .put(appUrl + "/first-counter/increment-counters")
                 .then()
-                .statusCode(Matchers.allOf(Matchers.greaterThanOrEqualTo(500),Matchers.lessThan(600)));
+                .statusCode(Matchers.allOf(Matchers.greaterThanOrEqualTo(500), Matchers.lessThan(600)));
 
         restartInfinispanCluster();
 
         // try to connect back to infinispan cluster and expect no content
         await().atMost(5, TimeUnit.MINUTES).untilAsserted(() -> {
             when()
-                    .get("/first-counter/get-cache")
+                    .get(appUrl + "/first-counter/get-cache")
                     .then()
                     .statusCode(204);
         });
 
         // check the client counter
-        when()
-                .get("/first-counter/get-client")
-                .then()
-                .body(is("11"));
+        String clientCounter = getCounterValue(appUrl + "/first-counter/get-client");
+        assertEquals("11", clientCounter);
     }
 
-    private void resetCounters() {
-        when()
-                .put("/first-counter/reset-cache")
-                .then()
-                .body(is("Cache=0"));
+    /**
+     * Check the connection to the second client (second Quarkus application).
+     *
+     * @throws OpenShiftTestException
+     */
+    @Test
+    @Order(8)
+    public void testConnectSecondClient() throws OpenShiftTestException {
+        resetCacheCounter(appUrl + "/first-counter/reset-cache");
 
-        when()
-                .put("/first-counter/reset-client")
-                .then()
-                .body(is("Client=0"));
+        String secondClientCache = getCounterValue(openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/get-cache");
+        assertEquals("0", secondClientCache);
     }
 
-    private void incrementCountersOnValue(int count) {
-        for (int i = 1; i <= count; i++) {
-            when()
-                    .put("/first-counter/increment-counters")
-                    .then()
-                    .body(is("Cache=" + i + " Client=" + i));
-        }
+    /**
+     * Testing the cache is shared between clients (apps). Every client has its own client counter.
+     *
+     * Clients counters should be increased only if the increase is called by their client.
+     * Cache counter is shared and should contain the sum of both client counters.
+     *
+     * @throws OpenShiftTestException
+     */
+    @Test
+    @Order(9)
+    public void testMultipleClientIncrement() throws OpenShiftTestException {
+        // reset the first and client
+        resetCacheCounter(appUrl + "/first-counter/reset-cache");
+        resetClientCounter(appUrl + "/first-counter/reset-client");
+        resetClientCounter(openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/reset-client");
+
+        // fill the cache in first and second client
+        incrementCountersOnValue(appUrl + "/first-counter/increment-counters", 10);
+        incrementCountersOnValue(openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/increment-counters", 10);
+
+        // save the cache counters in first and second client
+        String firstClientCacheCounter = getCounterValue(appUrl + "/first-counter/get-cache");
+        String secondClientCacheCounter = getCounterValue(openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/get-cache");
+
+        // save the client counters in first and second client
+        String firstClientAppCounter = getCounterValue(appUrl + "/first-counter/get-client");
+        String secondClientAppCounter = getCounterValue(openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/get-client");
+
+        assertEquals("10", firstClientAppCounter);
+        assertEquals("10", secondClientAppCounter);
+
+        // sum of both client counters
+        String cacheValue = String.valueOf(Integer.valueOf(firstClientAppCounter) + Integer.valueOf(secondClientAppCounter));
+        assertEquals(cacheValue, firstClientCacheCounter);
+        assertEquals(cacheValue, secondClientCacheCounter);
     }
 
-    private void killInfinispanCluster() throws IOException, InterruptedException {
-        adjustYml(CLUSTER_CONFIG_PATH, "replicas: 1", "replicas: 0");
-        new Command("oc", "apply", "-f", CLUSTER_CONFIG_PATH).runAndWait();
-        new Command("oc", "-n", CLUSTER_NAMESPACE_NAME, "wait", "--for", "condition=gracefulShutdown", "--timeout=300s", "infinispan/" + NEW_CLUSTER_NAME).runAndWait();
-    }
+    /**
+     * Multiple client Infinispan fail-over test. Testing restart the infinispan cluster and increment/change counters values
+     * of both client applications after the restart.
+     *
+     * Cache newly created after the restart and incremented by 1 by each client so it should by on value 2.
+     * Client counters should remain the same during the restart and after the counters incrementing both are increased by 1.
+     *
+     * @throws IOException
+     * @throws InterruptedException
+     * @throws OpenShiftTestException
+     */
+    @Test
+    @Order(10)
+    public void testMultipleClientDataAfterRestartInfinispanCluster() throws IOException, InterruptedException, OpenShiftTestException {
+        resetCacheCounter(appUrl + "/first-counter/reset-cache");
+        resetClientCounter(appUrl + "/first-counter/reset-client");
+        resetClientCounter(openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/reset-client");
 
-    private void restartInfinispanCluster() throws IOException, InterruptedException {
-        adjustYml(CLUSTER_CONFIG_PATH, "replicas: 0", "replicas: 1");
-        new Command("oc", "apply", "-f", CLUSTER_CONFIG_PATH).runAndWait();
-        new Command("oc", "-n", CLUSTER_NAMESPACE_NAME, "wait", "--for", "condition=wellFormed", "--timeout=300s", "infinispan/" + NEW_CLUSTER_NAME).runAndWait();
-    }
+        // update the cache in both clients
+        String firstClientCounters = fillTheCache(appUrl + "/first-counter/increment-counters");
+        String secondClientCounters = fillTheCache(openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/increment-counters");
 
-    private static void adjustYml(String path, String originString, String newString) throws IOException {
-        Path yamlPath = Paths.get(path);
-        Charset charset = StandardCharsets.UTF_8;
+        assertEquals("Cache=1 Client=1", firstClientCounters);
+        assertEquals("Cache=2 Client=1", secondClientCounters);
 
-        String yamlContent = new String(Files.readAllBytes(yamlPath), charset);
-        yamlContent = yamlContent.replace(originString, newString);
-        Files.write(yamlPath, yamlContent.getBytes(charset));
+        killInfinispanCluster();
+        restartInfinispanCluster();
+
+        // create the deleted cache counter again
+        resetCacheCounter(appUrl + "/first-counter/reset-cache");
+
+        // increment counters by the first and second client
+        firstClientCounters = fillTheCache(appUrl + "/first-counter/increment-counters");
+        secondClientCounters = fillTheCache(openshift.getUrlFromRoute(SECOND_CLIENT_APPLICATION_NAME) + "/first-counter/increment-counters");
+
+        assertEquals("Cache=1 Client=2", firstClientCounters);
+        assertEquals("Cache=2 Client=2", secondClientCounters);
     }
 }
