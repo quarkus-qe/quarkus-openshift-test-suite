@@ -9,9 +9,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
+
+import io.quarkus.ts.openshift.common.util.OsUtils;
 
 public class Command {
     private final String description;
@@ -46,10 +49,15 @@ public class Command {
     }
 
     public void runAndWait() throws IOException, InterruptedException {
-        System.out.println(ansi().a("running ").fgYellow().a(String.join(" ", command)).reset());
+        List<String> effectiveCommand = new ArrayList<>(command);
+        if (OsUtils.isWindows()) {
+            effectiveCommand.addAll(0, Arrays.asList("cmd", "/c"));
+        }
+
+        System.out.println(ansi().a("running ").fgYellow().a(String.join(" ", effectiveCommand)).reset());
         Process process = new ProcessBuilder()
                 .redirectErrorStream(true)
-                .command(command)
+                .command(effectiveCommand)
                 .directory(new File(".").getAbsoluteFile())
                 .start();
 
@@ -59,7 +67,7 @@ public class Command {
 
         int result = process.waitFor();
         if (result != 0) {
-            throw new RuntimeException(description + " failed (executed " + command + ", return code " + result + ")");
+            throw new RuntimeException(description + " failed (executed " + effectiveCommand + ", return code " + result + ")");
         }
     }
 
