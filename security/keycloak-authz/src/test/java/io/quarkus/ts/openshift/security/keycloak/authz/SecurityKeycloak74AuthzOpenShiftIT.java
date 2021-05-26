@@ -1,13 +1,10 @@
 package io.quarkus.ts.openshift.security.keycloak.authz;
 
-import org.junit.jupiter.api.Disabled;
-
 import io.quarkus.ts.openshift.common.AdditionalResources;
 import io.quarkus.ts.openshift.common.InjectRouteUrlIntoApp;
 import io.quarkus.ts.openshift.common.OnlyIfConfigured;
 import io.quarkus.ts.openshift.common.OpenShiftTest;
 
-@Disabled("Caused by https://github.com/quarkusio/quarkus/issues/14318")
 @OpenShiftTest
 @AdditionalResources("classpath:deployments/keycloak/version-74.yaml")
 @AdditionalResources("classpath:keycloak-realm.yaml")
