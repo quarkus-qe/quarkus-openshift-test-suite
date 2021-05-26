@@ -79,7 +79,7 @@
         <version.com.squareup.retrofit2>2.9.0</version.com.squareup.retrofit2>
         <version.formatter-maven-plugin>2.15.0</version.formatter-maven-plugin>
         <version.impsort-maven-plugin>1.6.0</version.impsort-maven-plugin>
-        <version.xml-format-maven-plugin>3.1.2</version.xml-format-maven-plugin>
+        <version.xml-format-maven-plugin>3.2.0</version.xml-format-maven-plugin>
         <src.format.goal>format</src.format.goal>
         <src.sort.goal>sort</src.sort.goal>
         <xml.format.goal>xml-format</xml.format.goal>
