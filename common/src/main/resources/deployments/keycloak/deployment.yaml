@@ -50,7 +50,7 @@ items:
               - /bin/bash
               - -c
               - /opt/eap/bin/livenessProbe.sh
-            initialDelaySeconds: 60
+            initialDelaySeconds: 120
           ports:
           - containerPort: 8778
             name: jolokia
