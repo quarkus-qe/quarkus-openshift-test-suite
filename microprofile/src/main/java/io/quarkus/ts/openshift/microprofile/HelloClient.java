@@ -13,7 +13,7 @@ import org.eclipse.microprofile.faulttolerance.Asynchronous;
 import org.eclipse.microprofile.faulttolerance.Fallback;
 import org.eclipse.microprofile.rest.client.inject.RegisterRestClient;
 
-@RegisterRestClient(baseUri = "http://microprofile-test:8080/")
+@RegisterRestClient(baseUri = "http://microprofile-test/")
 public interface HelloClient {
     @GET
     @Path("/hello")

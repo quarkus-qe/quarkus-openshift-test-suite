@@ -67,14 +67,14 @@ public class MicroProfileOpenShiftIT extends AbstractMicroProfileTest {
                             hasItems(
                                     "span.kind=client",
                                     "component=jaxrs",
-                                    "http.url=http://microprofile-test:8080/hello",
+                                    "http.url=http://microprofile-test/hello",
                                     "http.method=GET",
                                     "http.status_code=200"))
                     .body("data[0].spans.find { it.operationName == 'GET:io.quarkus.ts.openshift.microprofile.HelloResource.get' }.tags.collect { \"${it.key}=${it.value}\".toString() }",
                             hasItems(
                                     "span.kind=server",
                                     "component=jaxrs",
-                                    "http.url=http://microprofile-test:8080/hello",
+                                    "http.url=http://microprofile-test/hello",
                                     "http.method=GET",
                                     "http.status_code=200"));
         });

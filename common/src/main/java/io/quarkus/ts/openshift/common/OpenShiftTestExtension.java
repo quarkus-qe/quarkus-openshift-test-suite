@@ -262,7 +262,7 @@ final class OpenShiftTestExtension implements BeforeAllCallback, AfterAllCallbac
             Route route = oc.routes().withName(metadata.appName).get();
             if (route == null) {
                 throw new OpenShiftTestException(
-                        "Missing route " + metadata.appName + ", did you set quarkus.openshift.expose=true?");
+                        "Missing route " + metadata.appName + ", did you set quarkus.openshift.route.expose=true?");
             }
             if (route.getSpec().getTls() != null) {
                 RestAssured.useRelaxedHTTPSValidation();
