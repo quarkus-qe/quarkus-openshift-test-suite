@@ -67,7 +67,7 @@ public class HeroesOpenShiftIT {
     public void testOpenApi() {
         given()
                 .header(ACCEPT, APPLICATION_JSON)
-                .when().get(url + "/openapi")
+                .when().get(url + "/q/openapi")
                 .then()
                 .statusCode(OK.getStatusCode());
     }
@@ -76,7 +76,7 @@ public class HeroesOpenShiftIT {
     public void testLiveness() {
         given()
                 .header(ACCEPT, APPLICATION_JSON)
-                .when().get(url + "/health/live")
+                .when().get(url + "/q/health/live")
                 .then()
                 .statusCode(OK.getStatusCode());
     }
@@ -85,7 +85,7 @@ public class HeroesOpenShiftIT {
     public void testReadiness() {
         given()
                 .header(ACCEPT, APPLICATION_JSON)
-                .when().get(url + "/health/ready")
+                .when().get(url + "/q/health/ready")
                 .then()
                 .statusCode(OK.getStatusCode());
     }
@@ -94,7 +94,7 @@ public class HeroesOpenShiftIT {
     public void testMetrics() {
         given()
                 .header(ACCEPT, APPLICATION_JSON)
-                .when().get(url + "/metrics/application")
+                .when().get(url + "/q/metrics/application")
                 .then()
                 .statusCode(OK.getStatusCode());
     }
@@ -179,7 +179,7 @@ public class HeroesOpenShiftIT {
     public void testCalledOperationMetrics() {
         given()
                 .header(ACCEPT, APPLICATION_JSON)
-                .when().get(url + "/metrics/application")
+                .when().get(url + "/q/metrics/application")
                 .then()
                 .statusCode(OK.getStatusCode())
                 .body("'io.quarkus.workshop.superheroes.hero.HeroResource.countCreateHero'", is(1))

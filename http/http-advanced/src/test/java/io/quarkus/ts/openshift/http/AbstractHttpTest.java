@@ -4,7 +4,6 @@ import static io.quarkus.ts.openshift.http.HttpClientVersionResource.HTTP_VERSIO
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.in;
 import static org.hamcrest.Matchers.is;
@@ -130,17 +129,13 @@ public abstract class AbstractHttpTest {
 
     @Test
     @DisplayName("Non-application endpoint move to /q/")
-    public void nonAppRedirections() {
+    public void nonAppEndpoints() {
         List<String> endpoints = Arrays.asList(
-                "/openapi", "/swagger-ui", "/metrics/base", "/metrics/application",
-                "/metrics/vendor", "/metrics", "/health/group", "/health/well", "/health/ready",
-                "/health/live", "/health");
+                "q/openapi", "q/swagger-ui", "q/metrics/base", "q/metrics/application",
+                "q/metrics/vendor", "q/metrics", "q/health/group", "q/health/well", "q/health/ready",
+                "q/health/live", "q/health");
 
         for (String endpoint : endpoints) {
-            given().redirects().follow(false)
-                    .log().uri()
-                    .expect().statusCode(301).header("Location", containsString("/q" + endpoint)).when().get(endpoint);
-
             given().expect().statusCode(in(Arrays.asList(200, 204))).when().get(endpoint);
         }
     }
@@ -161,7 +156,7 @@ public abstract class AbstractHttpTest {
     public void vertxHttpClientRedirection() throws InterruptedException, URISyntaxException {
         CountDownLatch done = new CountDownLatch(1);
         Uni<Integer> statusCode = WebClient.create(Vertx.vertx(), defaultVertxHttpClientOptions())
-                .getAbs(getAppEndpoint() + "health")
+                .getAbs(getAppEndpoint() + "q/health")
                 .send().map(HttpResponse::statusCode)
                 .ifNoItem().after(Duration.ofSeconds(TIMEOUT_SEC)).fail()
                 .onFailure().retry().atMost(RETRY);
