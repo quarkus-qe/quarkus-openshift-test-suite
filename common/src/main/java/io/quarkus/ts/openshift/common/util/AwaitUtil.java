@@ -11,8 +11,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 import io.fabric8.kubernetes.api.model.HasMetadata;
-import io.fabric8.kubernetes.client.Handlers;
-import io.fabric8.kubernetes.client.ResourceHandler;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.quarkus.ts.openshift.app.metadata.AppMetadata;
 import io.quarkus.ts.openshift.common.DefaultTimeout;
@@ -68,13 +66,15 @@ public final class AwaitUtil {
                             .until(() -> {
                                 HasMetadata current = oc.resource(it).fromServer().get();
                                 if (current == null) {
-                                    ResourceHandler<HasMetadata, ?> handler = Handlers.get(it.getKind(), it.getApiVersion());
-                                    if (handler != null && !handler.getApiVersion().equals(it.getApiVersion())) {
-                                        throw new OpenShiftTestException("Couldn't load " + readableKind(it.getKind()) + " '"
-                                                + it.getMetadata().getName() + "' from API server, most likely because"
-                                                + " the 'apiVersion' doesn't match: has '" + it.getApiVersion() + "', but"
-                                                + " should have '" + handler.getApiVersion() + "'");
-                                    }
+                                    // We can't get the metadata info from Fabric8 client any longer.
+                                    // Reported in https://github.com/fabric8io/kubernetes-client/issues/3413
+                                    // ResourceHandler<HasMetadata, ?> handler = Handlers.get(it.getKind(), it.getApiVersion());
+                                    // if (handler != null && !handler.getApiVersion().equals(it.getApiVersion())) {
+                                    //     throw new OpenShiftTestException("Couldn't load " + readableKind(it.getKind()) + " '"
+                                    //            + it.getMetadata().getName() + "' from API server, most likely because"
+                                    //            + " the 'apiVersion' doesn't match: has '" + it.getApiVersion() + "', but"
+                                    //            + " should have '" + handler.getApiVersion() + "'");
+                                    // }
                                     throw new OpenShiftTestException("Couldn't load " + readableKind(it.getKind()) + " '"
                                             + it.getMetadata().getName() + "' from API server");
                                 }
