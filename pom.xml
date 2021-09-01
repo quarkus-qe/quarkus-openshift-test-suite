@@ -66,7 +66,7 @@
         <!-- same as Apache HTTP Client managed by Quarkus BOM -->
         <version.fusesource-jansi>2.3.4</version.fusesource-jansi>
         <version.impsort-maven-plugin>1.6.2</version.impsort-maven-plugin>
-        <version.jandex-maven-plugin>1.1.1</version.jandex-maven-plugin>
+        <version.jandex-maven-plugin>1.2.0</version.jandex-maven-plugin>
         <version.jjwt>0.11.2</version.jjwt>
         <version.quarkus.qpid.jms>0.27.0</version.quarkus.qpid.jms>
         <version.apache.avro>1.10.2</version.apache.avro>
