@@ -77,7 +77,7 @@
         <version.maven-surefire-plugin>2.22.2</version.maven-surefire-plugin>
         <version.quarkus>2.3.1.Final</version.quarkus>
         <version.plugin.quarkus>${version.quarkus}</version.plugin.quarkus>
-        <version.testcontainers>1.16.1</version.testcontainers>
+        <version.testcontainers>1.16.2</version.testcontainers>
         <version.com.squareup.retrofit2>2.9.0</version.com.squareup.retrofit2>
         <version.formatter-maven-plugin>2.16.0</version.formatter-maven-plugin>
         <version.impsort-maven-plugin>1.6.0</version.impsort-maven-plugin>
