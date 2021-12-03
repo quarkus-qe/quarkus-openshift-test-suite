@@ -93,7 +93,7 @@ public abstract class AbstractSecurityKeycloakOpenShiftTest {
     }
 
     private void thenPageReturns(String expectedMessage) {
-        assertEquals(expectedMessage, page.asText(), "Page content should match with expected content");
+        assertEquals(expectedMessage, page.asNormalizedText(), "Page content should match with expected content");
     }
 
     private void thenReturnsForbiddenWhenLoginAs(String user) {
