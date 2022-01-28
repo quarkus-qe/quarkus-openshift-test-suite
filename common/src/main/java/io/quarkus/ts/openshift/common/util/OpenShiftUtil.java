@@ -156,7 +156,7 @@ public final class OpenShiftUtil {
                 .writingOutput(out)
                 .usingListener(new ExecListener() {
                     @Override
-                    public void onOpen(Response response) {
+                    public void onOpen() {
                         // do nothing
                     }
 
