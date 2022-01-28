@@ -70,6 +70,7 @@
         <version.jjwt>0.11.2</version.jjwt>
         <version.quarkus.qpid.jms>0.31.0</version.quarkus.qpid.jms>
         <version.apache.avro>1.10.2</version.apache.avro>
+        <version.assertj>3.22.0</version.assertj>
         <version.htmlunit>2.55.0</version.htmlunit>
         <version.keytool-maven-plugin>1.5</version.keytool-maven-plugin>
         <version.maven-compiler-plugin>3.9.0</version.maven-compiler-plugin>
@@ -187,6 +188,11 @@
                 <groupId>net.sourceforge.htmlunit</groupId>
                 <artifactId>htmlunit</artifactId>
                 <version>${version.htmlunit}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.assertj</groupId>
+                <artifactId>assertj-core</artifactId>
+                <version>${version.assertj}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
