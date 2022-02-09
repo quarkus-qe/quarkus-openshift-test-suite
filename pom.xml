@@ -20,8 +20,8 @@
         <module>messaging/artemis</module>
         <module>messaging/artemis-jta</module>
         <module>messaging/amqp-reactive</module>
-        <module>messaging/kafka-avro-reactive-messaging</module>
-        <module>messaging/kafka-streams-reactive-messaging</module>
+        <!-- <module>messaging/kafka-avro-reactive-messaging</module>
+        <module>messaging/kafka-streams-reactive-messaging</module> -->
         <module>messaging/qpid</module>
         <module>scaling</module>
         <module>sql-db/app</module>
@@ -61,7 +61,6 @@
         <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
         <version.apicurio.registry.utils.serde>1.3.2.Final</version.apicurio.registry.utils.serde>
         <version.quarkiverse.apicurio.registry.client>0.0.2</version.quarkiverse.apicurio.registry.client>
-        <version.strimzi>0.25.0</version.strimzi>
         <version.apache-httpclient-fluent>4.5.13</version.apache-httpclient-fluent>
         <!-- same as Apache HTTP Client managed by Quarkus BOM -->
         <version.fusesource-jansi>2.4.0</version.fusesource-jansi>
@@ -76,7 +75,7 @@
         <version.maven-compiler-plugin>3.9.0</version.maven-compiler-plugin>
         <version.maven-jar-plugin>3.2.2</version.maven-jar-plugin>
         <version.maven-surefire-plugin>2.22.2</version.maven-surefire-plugin>
-        <version.quarkus>2.7.0.Final</version.quarkus>
+        <version.quarkus>2.7.1.Final</version.quarkus>
         <version.quarkus-artemis-bom>1.0.4</version.quarkus-artemis-bom>
         <version.plugin.quarkus>${version.quarkus}</version.plugin.quarkus>
         <version.testcontainers>1.16.3</version.testcontainers>
@@ -146,12 +145,6 @@
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt-jackson</artifactId>
                 <version>${version.jjwt}</version>
-            </dependency>
-            <dependency>
-                <groupId>io.strimzi</groupId>
-                <artifactId>strimzi-test-container</artifactId>
-                <version>${version.strimzi}</version>
-                <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>io.apicurio</groupId>
