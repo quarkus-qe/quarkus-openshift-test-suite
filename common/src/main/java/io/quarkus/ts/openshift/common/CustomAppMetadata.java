@@ -18,7 +18,7 @@ public @interface CustomAppMetadata {
     /**
      * Name of the application, which is also used as a name of the Kubernetes resources.
      * Corresponds to {@code quarkus.application.name} and/or {@code quarkus.container-image.name}.
-     * 
+     *
      * @see io.quarkus.ts.openshift.app.metadata.AppMetadata#appName
      */
     String appName();
@@ -26,7 +26,7 @@ public @interface CustomAppMetadata {
     /**
      * Root path for the HTTP endpoint of the application.
      * Corresponds to {@code quarkus.http.root-path}.
-     * 
+     *
      * @see io.quarkus.ts.openshift.app.metadata.AppMetadata#httpRoot
      */
     String httpRoot();
@@ -34,14 +34,14 @@ public @interface CustomAppMetadata {
     /**
      * Known endpoint that can be used to find out if the application is already running.
      * If the application has a readiness or liveness probe, it can be used here.
-     * 
+     *
      * @see io.quarkus.ts.openshift.app.metadata.AppMetadata#knownEndpoint
      */
     String knownEndpoint();
 
     /**
      * The target deployment platform.
-     * 
+     *
      * @see io.quarkus.ts.openshift.app.metadata.AppMetadata#deploymentTarget
      */
     String deploymentTarget() default "";

@@ -7,7 +7,7 @@ public interface OnOpenShiftFailureAction {
 
     /**
      * Action to perform
-     * 
+     *
      * @throws Exception to be logged
      */
     void execute() throws Exception;
