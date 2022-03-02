@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 /**
  * Useful information about the test application.
- * 
+ *
  * @see #appName
  * @see #httpRoot
  * @see #knownEndpoint
