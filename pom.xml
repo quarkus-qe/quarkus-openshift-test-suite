@@ -77,7 +77,7 @@
         <version.maven-surefire-plugin>2.22.2</version.maven-surefire-plugin>
         <version.quarkus>2.8.1.Final</version.quarkus>
         <version.quarkus-artemis-bom>1.0.5</version.quarkus-artemis-bom>
-        <version.quarkus-ide-config>2.8.1.Final</version.quarkus-ide-config>
+        <version.quarkus-ide-config>2.8.2.Final</version.quarkus-ide-config>
         <version.plugin.quarkus>${version.quarkus}</version.plugin.quarkus>
         <version.testcontainers>1.17.1</version.testcontainers>
         <version.com.squareup.retrofit2>2.9.0</version.com.squareup.retrofit2>
