@@ -66,7 +66,7 @@
         <version.fusesource-jansi>2.4.0</version.fusesource-jansi>
         <version.impsort-maven-plugin>1.6.2</version.impsort-maven-plugin>
         <version.jandex-maven-plugin>1.2.2</version.jandex-maven-plugin>
-        <version.jjwt>0.11.2</version.jjwt>
+        <version.jjwt>0.11.3</version.jjwt>
         <version.quarkus.qpid.jms>0.33.0</version.quarkus.qpid.jms>
         <version.apache.avro>1.10.2</version.apache.avro>
         <version.assertj>3.22.0</version.assertj>
