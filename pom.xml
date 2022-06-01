@@ -69,7 +69,7 @@
         <version.jjwt>0.11.5</version.jjwt>
         <version.quarkus.qpid.jms>0.34.0</version.quarkus.qpid.jms>
         <version.apache.avro>1.10.2</version.apache.avro>
-        <version.assertj>3.22.0</version.assertj>
+        <version.assertj>3.23.1</version.assertj>
         <version.htmlunit>2.55.0</version.htmlunit>
         <version.keytool-maven-plugin>1.5</version.keytool-maven-plugin>
         <version.maven-compiler-plugin>3.10.1</version.maven-compiler-plugin>
