@@ -113,10 +113,10 @@ public abstract class AbstractHttpTest {
     public void http2ClientAsync() throws Exception {
         HttpVersionClientServiceAsync clientServiceAsync = new RestClientServiceBuilder<HttpVersionClientServiceAsync>(
                 getAppEndpoint())
-                        .withHostVerified(true)
-                        .withPassword(PASSWORD)
-                        .withKeyStorePath(KEY_STORE_PATH)
-                        .build(HttpVersionClientServiceAsync.class);
+                .withHostVerified(true)
+                .withPassword(PASSWORD)
+                .withKeyStorePath(KEY_STORE_PATH)
+                .build(HttpVersionClientServiceAsync.class);
 
         Response resp = clientServiceAsync
                 .getClientHttpVersion()
