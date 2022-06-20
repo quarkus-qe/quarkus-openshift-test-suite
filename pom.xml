@@ -67,7 +67,7 @@
         <version.impsort-maven-plugin>1.7.0</version.impsort-maven-plugin>
         <version.jandex-maven-plugin>1.2.2</version.jandex-maven-plugin>
         <version.jjwt>0.11.5</version.jjwt>
-        <version.quarkus.qpid.jms>0.34.0</version.quarkus.qpid.jms>
+        <version.quarkus.qpid.jms>0.35.0</version.quarkus.qpid.jms>
         <version.apache.avro>1.10.2</version.apache.avro>
         <version.assertj>3.23.1</version.assertj>
         <version.htmlunit>2.55.0</version.htmlunit>
@@ -361,7 +361,7 @@
             <properties>
                 <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
                 <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
-                <version.qpid-jms>0.34.0</version.qpid-jms>
+                <version.qpid-jms>0.35.0</version.qpid-jms>
                 <version.quarkus>999-SNAPSHOT</version.quarkus>
             </properties>
             <dependencyManagement>
