@@ -20,7 +20,6 @@ import io.fabric8.openshift.api.model.Route;
 import io.fabric8.openshift.client.OpenShiftClient;
 import io.quarkus.ts.openshift.common.DefaultTimeout;
 import io.quarkus.ts.openshift.common.OpenShiftTestException;
-import okhttp3.Response;
 
 public final class OpenShiftUtil {
     private final OpenShiftClient oc;

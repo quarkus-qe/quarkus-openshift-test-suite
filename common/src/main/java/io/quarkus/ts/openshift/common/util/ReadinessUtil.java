@@ -8,9 +8,9 @@ import io.fabric8.kubernetes.api.model.ReplicationController;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.apps.ReplicaSet;
 import io.fabric8.kubernetes.api.model.apps.StatefulSet;
-import io.fabric8.kubernetes.client.internal.readiness.Readiness;
+import io.fabric8.kubernetes.client.readiness.Readiness;
 import io.fabric8.openshift.api.model.DeploymentConfig;
-import io.fabric8.openshift.client.internal.readiness.OpenShiftReadiness;
+import io.fabric8.openshift.client.readiness.OpenShiftReadiness;
 
 /**
  * Unifies Fabric8 Kubernetes Client's {@link Readiness} and {@link OpenShiftReadiness}.
