@@ -83,7 +83,7 @@ jobs:
           name: ci-artifacts
           path: artifacts-jvm${{ matrix.java }}.zip
   build-main-native:
-    name: JVM build - Quarkus main
+    name: Native build - Quarkus main
     runs-on: ubuntu-latest
     strategy:
       matrix:
