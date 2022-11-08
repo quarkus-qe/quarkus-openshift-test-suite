@@ -75,7 +75,7 @@
         <version.maven-compiler-plugin>3.10.1</version.maven-compiler-plugin>
         <version.maven-jar-plugin>3.3.0</version.maven-jar-plugin>
         <version.maven-surefire-plugin>2.22.2</version.maven-surefire-plugin>
-        <version.quarkus>2.13.3.Final</version.quarkus>
+        <version.quarkus>2.13.4.Final</version.quarkus>
         <version.quarkus-artemis-bom>2.0.1</version.quarkus-artemis-bom>
         <version.quarkus-ide-config>2.10.0.Final</version.quarkus-ide-config>
         <version.plugin.quarkus>${version.quarkus}</version.plugin.quarkus>
