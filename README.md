@@ -371,7 +371,7 @@ will execute the whole test suite using Docker to run containers for native buil
   -Dts.authenticated-registry
 ```
 
-Currently used builder image is `quarkus/ubi-quarkus-mandrel` and the base image for OpenShift deployment is 
+Currently used builder image is `quarkus/ubi-quarkus-mandrel-builder-image` and the base image for OpenShift deployment is 
 `quarkus/ubi-quarkus-native-binary-s2i`.
 
 ### OpenShift Serverless / Knative
