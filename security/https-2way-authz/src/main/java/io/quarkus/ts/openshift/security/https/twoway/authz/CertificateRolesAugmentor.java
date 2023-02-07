@@ -4,14 +4,13 @@ import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.Set;
 
-import javax.inject.Singleton;
-
 import io.quarkus.security.credential.CertificateCredential;
 import io.quarkus.security.identity.AuthenticationRequestContext;
 import io.quarkus.security.identity.SecurityIdentity;
 import io.quarkus.security.identity.SecurityIdentityAugmentor;
 import io.quarkus.security.runtime.QuarkusSecurityIdentity;
 import io.smallrye.mutiny.Uni;
+import jakarta.inject.Singleton;
 
 /**
  * Quarkus doesn't have a declarative/configuration way to assign roles when using certificate authentication.

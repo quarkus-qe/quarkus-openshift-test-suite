@@ -17,8 +17,9 @@
         <module>config-secret/api-server</module>
         <module>config-secret/file-system</module>
         <module>lifecycle-application</module>
-        <module>messaging/artemis</module>
-        <module>messaging/artemis-jta</module>
+        <!--        TODO: Enable once the Jakarta version is available -->
+        <!--        <module>messaging/artemis</module>-->
+        <!--        <module>messaging/artemis-jta</module>-->
         <module>messaging/amqp-reactive</module>
         <!-- <module>messaging/kafka-avro-reactive-messaging</module>
         <module>messaging/kafka-streams-reactive-messaging</module> -->
@@ -67,7 +68,7 @@
         <version.impsort-maven-plugin>1.8.0</version.impsort-maven-plugin>
         <version.jandex-maven-plugin>1.2.3</version.jandex-maven-plugin>
         <version.jjwt>0.11.5</version.jjwt>
-        <version.quarkus.qpid.jms>0.42.0</version.quarkus.qpid.jms>
+        <version.quarkus.qpid.jms>2.0.0.Alpha3</version.quarkus.qpid.jms>
         <version.apache.avro>1.10.2</version.apache.avro>
         <version.assertj>3.24.2</version.assertj>
         <version.htmlunit>2.55.0</version.htmlunit>
@@ -75,7 +76,7 @@
         <version.maven-compiler-plugin>3.10.1</version.maven-compiler-plugin>
         <version.maven-jar-plugin>3.3.0</version.maven-jar-plugin>
         <version.maven-surefire-plugin>2.22.2</version.maven-surefire-plugin>
-        <version.quarkus>2.16.1.Final</version.quarkus>
+        <version.quarkus>3.0.0.Alpha3</version.quarkus>
         <version.quarkus-artemis-bom>2.0.4</version.quarkus-artemis-bom>
         <version.quarkus-ide-config>2.10.0.Final</version.quarkus-ide-config>
         <version.plugin.quarkus>${version.quarkus}</version.plugin.quarkus>
@@ -361,18 +362,8 @@
             <properties>
                 <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
                 <quarkus.platform.group-id>io.quarkus</quarkus.platform.group-id>
-                <version.qpid-jms>0.42.0</version.qpid-jms>
                 <version.quarkus>999-SNAPSHOT</version.quarkus>
             </properties>
-            <dependencyManagement>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.amqphub.quarkus</groupId>
-                        <artifactId>quarkus-qpid-jms</artifactId>
-                        <version>${version.qpid-jms}</version>
-                    </dependency>
-                </dependencies>
-            </dependencyManagement>
         </profile>
         <profile>
             <id>native</id>

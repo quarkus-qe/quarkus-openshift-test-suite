@@ -1,10 +1,9 @@
 package io.quarkus.ts.openshift.http;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.ws.rs.core.Response;
-
 import io.quarkus.vertx.web.Route;
 import io.vertx.ext.web.RoutingContext;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.core.Response;
 
 @ApplicationScoped
 public class HttpClientVersionResource {

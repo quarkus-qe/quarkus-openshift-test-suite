@@ -4,7 +4,7 @@ import java.util.Random;
 import java.util.function.BiConsumer;
 import java.util.stream.IntStream;
 
-import javax.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 
 import org.eclipse.microprofile.reactive.messaging.Channel;

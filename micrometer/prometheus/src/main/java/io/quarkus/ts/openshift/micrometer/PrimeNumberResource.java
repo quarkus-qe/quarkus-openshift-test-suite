@@ -3,15 +3,14 @@ package io.quarkus.ts.openshift.micrometer;
 import java.util.concurrent.atomic.LongAccumulator;
 import java.util.function.Supplier;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
 import org.apache.commons.lang3.RandomStringUtils;
 
 import io.micrometer.core.instrument.MeterRegistry;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.MediaType;
 
 @Path("/")
 public class PrimeNumberResource {
