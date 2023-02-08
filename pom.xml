@@ -82,7 +82,7 @@
         <version.plugin.quarkus>${version.quarkus}</version.plugin.quarkus>
         <version.testcontainers>1.17.6</version.testcontainers>
         <version.com.squareup.retrofit2>2.9.0</version.com.squareup.retrofit2>
-        <version.formatter-maven-plugin>2.21.0</version.formatter-maven-plugin>
+        <version.formatter-maven-plugin>2.22.0</version.formatter-maven-plugin>
         <version.impsort-maven-plugin>1.6.0</version.impsort-maven-plugin>
         <version.xml-format-maven-plugin>3.2.2</version.xml-format-maven-plugin>
         <src.format.goal>format</src.format.goal>
